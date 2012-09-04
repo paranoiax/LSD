@@ -182,6 +182,10 @@ function love.load()
 	gameOver = false
 	gameOverTimer = 3
 	
+	--runNativeResolution()	
+	scaleX = screenWidth / 1280
+	scaleY = screenHeight / 720
+	
 end
 
 function love.update(dt)
@@ -268,15 +272,16 @@ function love.update(dt)
 	game_over(dt)
 	outOfBounds()
 	
-	
 end
 
-function love.draw()	
+function love.draw()
+
+	--love.graphics.scale( scaleX, scaleY )
 
 	love.graphics.setBackgroundColor(255,255,255)
 	love.graphics.setColor(255,255,255)
 	love.graphics.setBlendMode("alpha")
-	love.graphics.draw(bg,0,0)
+	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 	
 	camera:set()
 	camera:shake()
@@ -365,7 +370,7 @@ function love.draw()
 	trans = math.random(250,255)
 	love.graphics.setColor(255,255,255,trans)
 	love.graphics.setBlendMode("multiplicative")
-	love.graphics.draw(lens,0,0)
+	love.graphics.draw(lens,0,0,0,scaleX,scaleY)
 	draw_timer()
 	
 end
@@ -554,4 +559,11 @@ function outOfBounds()
 			gameOver = true
 		end
 	end	
+end
+
+function runNativeResolution()
+	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
+	if gameFullscreen == false then
+		love.graphics.toggleFullscreen()
+	end
 end
