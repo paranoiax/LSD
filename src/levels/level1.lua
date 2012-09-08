@@ -5,8 +5,7 @@
 	addSensor(60,330,100,40)
 	addSensor(60,560,100,40)
 	addSensor(510,70,160,40)
-	addSensor(510,550,160,40)
-	
+	addSensor(510,550,160,40)	
 	
 	addWall(0,0,40,660)
 	addWall(40,0,660,40)

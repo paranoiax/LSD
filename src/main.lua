@@ -75,15 +75,16 @@ function endCallback(fixture1, fixture2, contact)
    
 end
 
-function love.load()
+function love.load()	
 
 	explodeBall = false
 	BallExplode = false
 	explosionTime = 1
 
-	debugmode = true
+	debugmode = false
 	
 	f = love.graphics.newFont(48)
+	e = love.graphics.newFont(72)
 	d = love.graphics.newFont(14)
 	--love.mouse:setGrab(false)
 	
@@ -96,6 +97,7 @@ function love.load()
 	screenWidth = love.graphics.getWidth()
 	screenHeight = love.graphics.getHeight()
 	
+	button = {}
 	objects = {}
 	Sensor = {}
 	Obstacle = {}
@@ -128,10 +130,6 @@ function love.load()
 	death = false
 	shake = false
 	camera.time = 3
-	
-	--randTime = 2
-	--randX = 0
-	--randY = 0	
 	
 	-- LEVEL --	
 	
@@ -167,229 +165,82 @@ function love.load()
 	
 	for q = 1, #Wall do
 		addRedRectangle(Wall[q].x - Wall[q].width / 2,Wall[q].y - Wall[q].height / 2,Wall[q].width,Wall[q].height)
-	end
+	end	
 	
 	limit = 90
 	deathLimit = 70
 	SensorsCount = #Sensor
 	SensorsDestroyed = 0
 	
-	TEsound.playLooping("sounds/music.mp3", "music")
-	TEsound.volume("music", 0.5)
-	
 	win = false
 	winTimer = 3
 	gameOver = false
 	gameOverTimer = 3
 	
-	--runNativeResolution()	
+	runNativeResolution()
 	scaleX = screenWidth / 1280
 	scaleY = screenHeight / 720
+	
+	ball_menu_image = love.graphics.newImage("images/ball_anim_menu.png")
+	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
+	
+	button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -70,"Continue", "continue")
+	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3,"New Game", "new_game")
+	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +70,"Quit", "quit")
 	
 end
 
 function love.update(dt)
 
+if GAMESTATE == "MENU" then
+	ball_menu_anim:update(dt)	
+end
 
-	world:update(dt)
-
-	TEsound.cleanup()
-		
-	objects.ball.anim:update(dt)
-	
-	explosionTimer(dt)
-	
-	for q = 1, #Sensor do
-		if Sensor[q].isDestroyed == true then
-			Sensor[q].body:setActive(false)
-		end
-	end
-	
-	camera.x = objects.ball.body:getX() - screenWidth / 2
-	camera.y = objects.ball.body:getY() - screenHeight / 2
-	
-	if objects.ball.isAlive == false then
-		objects.ball.canJump = false
-	end
-
-	function love.mousereleased(x,y,b)
-		if b == "l" then
-			ball_launch(x,y)
-			aiming = false
-			if objects.ball.canJump == true then
-				objects.ball.sticky = false
-			end
-		end
-	end
-	
-	function love.mousepressed(x,y,b)
-		if b == "l" then
-			aiming = true
-		end
-	end
-	
-	if objects.ball.sticky == true then
-		objects.ball.body:setLinearVelocity(0,0)
-		objects.ball.body:setAwake(false)		
-	end
-	
-	if currentParticle > limit then
-		currentParticle = 1
-		limit = 90
-		for q = 1, #Particle do
-			Particle[q].fixture:destroy()
-			Particle[q].body:setActive(false)
-			Particle[q].body:destroy()
-		end
-	end
-	
-	if explode == true then
-		for q = 1, #Particle do
-			Particle[q].fixture:destroy()
-			Particle[q].body:setActive(false)
-			Particle[q].body:destroy()
-		end
-		addParticle()
-		for q = 1, #Particle do
-			Particle[q].body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
-		end
-		explode = false
-	end
-	
-	if death == true then
-		TEsound.play("sounds/death.wav")
-		addDeathParticle()
-		for q = 1, #DeathParticle do
-			DeathParticle[q].body:applyLinearImpulse(VelX / 500, VelY / 500)
-		end
-		death = false
-	end
-	
-	camera:timer(dt)
-	--randTimer(dt)
-	checkWin()
-	nextLevel(dt)
-	game_over(dt)
-	outOfBounds()
+INGAME_UPDATE(dt)
+button_check()
 	
 end
 
 function love.draw()
-
-	--love.graphics.scale( scaleX, scaleY )
-
-	love.graphics.setBackgroundColor(255,255,255)
+if GAMESTATE == "MENU" then
 	love.graphics.setColor(255,255,255)
-	love.graphics.setBlendMode("alpha")
 	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+	ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 150)
 	
-	camera:set()
-	camera:shake()
-	
-	love.graphics.setLine(3, "smooth")
-	
-	if aiming == true then
-		draw_crosshair()
-	end
-	
-	if objects.ball.isAlive == true then
-		love.graphics.setColor(255,255,255)
-		--love.graphics.circle("fill", objects.ball.body:getX(), objects.ball.body:getY(), objects.ball.shape:getRadius(), 24)
-		objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
-	end
-   
-	if debugmode == true then
-		for q = 1, #Sensor do
-			if Sensor[q].touching == 1 then
-				love.graphics.setColor(200, 0, 0, 60)
-				love.graphics.polygon("fill", Sensor[q].body:getWorldPoints(Sensor[q].shape:getPoints()))
-			end
-		end
-	end
-	
-	for q = 1, #Wall do
-		love.graphics.setColor(166,38,27)
-		love.graphics.polygon("fill", Wall[q].body:getWorldPoints(Wall[q].shape:getPoints()))
-	end
-	
-	for q = 1, #Particle do
-		love.graphics.setColor(69,69,69)
-		love.graphics.polygon("fill", Particle[q].body:getWorldPoints(Particle[q].shape:getPoints()))
-	end
-	
-	for q = 1, #DeathParticle do
-		love.graphics.setColor(202,143,84)
-		love.graphics.polygon("fill", DeathParticle[q].body:getWorldPoints(DeathParticle[q].shape:getPoints()))	
-	end
-	
-	drawGreyRectangle()
-	drawRedRectangle()
-	
-	if debugmode == true then
-		love.graphics.setColor(255,50,200)
-		love.graphics.setFont(d)
-		love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-		love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
-		for q = 1, #Sensor do 
-			if Sensor[q].touching == 1 then
-				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
-			end
-		end
-		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-		love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
-		love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
-		love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
-		love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
-	end	
-	
-	love.graphics.setFont(f)
+	love.graphics.setFont(e)
 	love.graphics.setColor(10,10,10)
-	love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 2 + camera.y, screenWidth, "center")
+	love.graphics.printf("Little Sticky Destroyer",2, 22, screenWidth, "center")
 	love.graphics.setColor(217,177,102)
-	love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 0 + camera.y, screenWidth, "center")
+	love.graphics.printf("Little Sticky Destroyer",0, 20, screenWidth, "center")
 	
-	if win == true then
-		love.graphics.setFont(f)
-		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")	
-	end
-	
-	if gameOver == true and win == false then
-		love.graphics.setFont(f)
-		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")	
-	end
-	
-	camera:unset()
-	
-	trans = math.random(250,255)
-	love.graphics.setColor(255,255,255,trans)
-	love.graphics.setBlendMode("multiplicative")
-	love.graphics.draw(lens,0,0,0,scaleX,scaleY)
-	draw_timer()
+	button_draw()
+	menuCursor()
+end
+
+INGAME_DRAW()
 	
 end
 
 function ball_launch()
-
 	local x,y=objects.ball.body:getPosition()
 	if objects.ball.canJump == true then
 		objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
 	end
-	
 end
 
-function draw_crosshair()
+function draw_crosshair()		
 	if objects.ball.canJump == true then
 		love.graphics.setColor(202,143,84,distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
 		love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
 		love.graphics.setColor(255,255,255,255)
 	end
+end
+
+function aim_crosshair()
+	love.mouse.setVisible(false)
+	love.graphics.setColor(202,143,84)
+	love.graphics.line(love.mouse:getX() -7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() + 7 + camera.x, love.mouse.getY() + 7 + camera.y)
+	love.graphics.line(love.mouse:getX() +7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() -7 + camera.x, love.mouse.getY() + 7 + camera.y)
 end
 
 function draw_timer()
@@ -430,8 +281,7 @@ function addWall(x, y, width, height)
 	Wall[currentWall].y = y
 	Wall[currentWall].width = width
 	Wall[currentWall].height = height
-	currentWall = currentWall + 1
-	
+	currentWall = currentWall + 1	
 end
 
 function addGreyRectangle(x,y,w,h)
@@ -508,16 +358,20 @@ end
 
 function love.keypressed(key)
 	if key == "escape" then
-		love.event.push("quit")
+		if GAMESTATE == "MENU" then
+			love.event.push("quit")
+		elseif GAMESTATE == "INGAME" then
+			GAMESTATE = "MENU"
+			love.filesystem.load("main.lua")()
+			love.load()
+		end
 	elseif key == "r" then
-		TEsound.stop("music")
 		love.filesystem.load("main.lua")()
 		love.load()
 	end
 end
 
 function checkWin()
-
 	if SensorsDestroyed == SensorsCount then
 		win = true		
 	end
@@ -526,21 +380,15 @@ function checkWin()
 		objects.ball.isAlive = false
 		objects.ball.canJump = false
 	end
-
-end
-
-function randTimer(dt)
-	randTime = randTime - dt * 10
-	if randTime < 1 then
-		randX=math.random(0,1280)
-		randY=math.random(0,720)
-		randTime = 3
-	end
 end
 
 function explosionTimer(dt)
+	local multiplier = SensorsDestroyed / SensorsCount
+	if multiplier >= 1 then
+		multiplier = 1
+	end
 	if explodeBall == true and SensorsDestroyed > 0 then
-		explosionTime =  explosionTime - dt * 1.25 * (SensorsDestroyed / SensorsCount)
+		explosionTime =  explosionTime - dt * 1.25 * multiplier
 	end
 	if explosionTime < 0 then
 		objects.ball.sticky = true
@@ -558,12 +406,252 @@ function outOfBounds()
 		if win == false then
 			gameOver = true
 		end
-	end	
+	end
 end
 
 function runNativeResolution()
 	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
 	if gameFullscreen == false then
 		love.graphics.toggleFullscreen()
+	end
+end
+
+function INGAME_UPDATE(dt)
+	if GAMESTATE == "INGAME" then
+		world:update(dt)
+		TEsound.cleanup()		
+		objects.ball.anim:update(dt)	
+		explosionTimer(dt)
+		
+		for q = 1, #Sensor do
+			if Sensor[q].isDestroyed == true then
+				Sensor[q].body:setActive(false)
+			end
+		end
+		
+		camera.x = objects.ball.body:getX() - screenWidth / 2
+		camera.y = objects.ball.body:getY() - screenHeight / 2
+		
+		if objects.ball.isAlive == false then
+			objects.ball.canJump = false
+		end
+
+		function love.mousereleased(x,y,b)
+			if b == "l" and GAMESTATE == "INGAME" then
+				ball_launch(x,y)
+				aiming = false
+				if objects.ball.canJump == true then
+					objects.ball.sticky = false
+				end
+			end
+		end		
+		
+		if objects.ball.sticky == true then
+			objects.ball.body:setLinearVelocity(0,0)
+			objects.ball.body:setAwake(false)		
+		end
+		
+		if currentParticle > limit then
+			currentParticle = 1
+			limit = 90
+			for q = 1, #Particle do
+				Particle[q].fixture:destroy()
+				Particle[q].body:setActive(false)
+				Particle[q].body:destroy()
+			end
+		end
+		
+		if explode == true then
+			for q = 1, #Particle do
+				Particle[q].fixture:destroy()
+				Particle[q].body:setActive(false)
+				Particle[q].body:destroy()
+			end
+			addParticle()
+			for q = 1, #Particle do
+				Particle[q].body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
+			end
+			explode = false
+		end
+		
+		if death == true then
+			TEsound.play("sounds/death.wav")
+			addDeathParticle()
+			for q = 1, #DeathParticle do
+				DeathParticle[q].body:applyLinearImpulse(VelX / 500, VelY / 500)
+			end
+			death = false
+		end
+		
+		camera:timer(dt)
+		checkWin()
+		nextLevel(dt)
+		game_over(dt)
+		outOfBounds()
+	end
+end
+
+function INGAME_DRAW()
+	if GAMESTATE == "INGAME" then
+		love.graphics.setBackgroundColor(255,255,255)
+		love.graphics.setColor(255,255,255)
+		love.graphics.setBlendMode("alpha")
+		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+		
+		camera:set()
+		camera:shake()
+		
+		love.graphics.setLine(3, "smooth")
+		
+		if aiming == true then
+			draw_crosshair()
+		end	
+		
+		if objects.ball.isAlive == true then
+			love.graphics.setColor(255,255,255)
+			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+		end
+	   
+		if debugmode == true then
+			for q = 1, #Sensor do
+				if Sensor[q].touching == 1 then
+					love.graphics.setColor(200, 0, 0, 60)
+					love.graphics.polygon("fill", Sensor[q].body:getWorldPoints(Sensor[q].shape:getPoints()))
+				end
+			end
+		end
+		
+		for q = 1, #Wall do
+			love.graphics.setColor(166,38,27)
+			love.graphics.polygon("fill", Wall[q].body:getWorldPoints(Wall[q].shape:getPoints()))
+		end
+		
+		for q = 1, #Particle do
+			love.graphics.setColor(69,69,69)
+			love.graphics.polygon("fill", Particle[q].body:getWorldPoints(Particle[q].shape:getPoints()))
+		end
+		
+		for q = 1, #DeathParticle do
+			love.graphics.setColor(202,143,84)
+			love.graphics.polygon("fill", DeathParticle[q].body:getWorldPoints(DeathParticle[q].shape:getPoints()))	
+		end
+		
+		drawGreyRectangle()
+		drawRedRectangle()
+		
+		if debugmode == true then
+			love.graphics.setColor(255,50,200)
+			love.graphics.setFont(d)
+			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
+			love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
+			love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
+			for q = 1, #Sensor do 
+				if Sensor[q].touching == 1 then
+					love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
+				end
+			end
+			love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
+			love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
+			love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
+			love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
+			love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
+			love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
+		end	
+		
+		love.graphics.setFont(f)
+		love.graphics.setColor(10,10,10)
+		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 2 + camera.y, screenWidth, "center")
+		love.graphics.setColor(217,177,102)
+		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 0 + camera.y, screenWidth, "center")
+		
+		if win == true then
+			love.graphics.setFont(f)
+			love.graphics.setColor(10,10,10)
+			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
+			love.graphics.setColor(217,177,102)
+			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")	
+		end
+		
+		if gameOver == true and win == false then
+			love.graphics.setFont(f)
+			love.graphics.setColor(10,10,10)
+			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
+			love.graphics.setColor(217,177,102)
+			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")	
+		end
+		
+		aim_crosshair()
+		camera:unset()
+		
+		--[[
+		trans = math.random(250,255)	
+		love.graphics.setBlendMode("multiplicative")	
+		love.graphics.setColor(255,255,255,trans)
+		love.graphics.draw(lens,0,0,0,scaleX,scaleY)
+		]]
+		draw_timer()
+	end
+end
+
+function menuCursor()
+	love.mouse.setVisible(false)
+	love.graphics.setColor(202,143,84)
+	love.graphics.setLine(3, "smooth")
+	love.graphics.line(love.mouse:getX() -8, love.mouse:getY() -8, love.mouse.getX() + 8, love.mouse.getY() + 8)
+	love.graphics.line(love.mouse:getX() +8, love.mouse:getY() -8, love.mouse.getX() -8, love.mouse.getY() + 8)
+end
+
+function button_spawn(x,y,text, id)
+	table.insert(button, {x = x, y = y, text = text, id = id, mouseover = false})
+end
+
+function button_draw()
+	for i,v in ipairs(button) do		
+		love.graphics.setFont(f)
+		love.graphics.setColor(10,10,10)
+		love.graphics.print(v.text, v.x, v.y)
+		if v.mouseover == true then
+			love.graphics.setColor(217,177,102)
+			love.graphics.print(v.text, v.x -2, v.y -2)
+		end
+	end
+end
+
+function button_click(x,y)
+	for i,v in ipairs(button) do
+		if x > v.x and
+		x < v.x + f:getWidth(v.text) and
+		y > v.y and
+		y < v.y + f:getHeight(v.text) then
+			if v.id == "quit" then
+				love.event.push("quit")
+			elseif v.id == "continue" then
+				continue()
+			elseif v.id == "new_game" then
+				newGame()
+			end
+		end
+	end
+end
+
+function button_check()
+	for i,v in ipairs(button) do		
+		if love.mouse:getX() < v.x + f:getWidth(v.text) and
+		love.mouse:getX() > v.x and
+		love.mouse:getY() < v.y + f:getHeight(v.text) and
+		love.mouse:getY() > v.y then
+			v.mouseover = true
+		else
+			v.mouseover = false
+		end
+	end
+end
+
+function love.mousepressed(x,y,b)
+	if b == "l" and GAMESTATE == "INGAME" then
+		aiming = true
+	end
+	if b == "l" and GAMESTATE == "MENU" then
+		button_click(x,y)
 	end
 end
