@@ -36,7 +36,7 @@ function nextLevel(dt)
 		if love.filesystem.exists("levels/level"..currentLevel + 1 ..".lua") then
 			currentLevel = currentLevel + 1
 			if currentLevel > maxLevel then
-				love.filesystem.write("save.lua", currentLevel)
+				love.filesystem.write("save.lua", currentLevel + 1)
 			end
 		else
 			GAMESTATE = "MENU"
