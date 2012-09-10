@@ -1,6 +1,6 @@
 # LSD - Little Sticky Destroyer
 
-![LSD - Screenshot](/screenshot.jpg)
+![LSD - Screenshot](https://raw.github.com/paranoiax/LSD/master/screenshot.jpg)
 
 ## What is LSD?
 
