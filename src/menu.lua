@@ -26,6 +26,8 @@ function button_click(x,y)
 				continue()
 			elseif v.id == "new_game" then
 				newGame()
+			elseif v.id == "mapedit" then
+				Editor.load()
 			end
 		end
 	end

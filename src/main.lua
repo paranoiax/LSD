@@ -1,39 +1,34 @@
-require 'camera'
-require 'TEsound'
-require 'AnAL'
-require 'Loader'
-require 'menu'
-require 'controls'
+require "camera"
+require "TEsound"
+require "AnAL"
+require "Loader"
+require "Editor"
+require "menu"
+require "controls"
 
 explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
 
 function beginCallback(fixture1, fixture2, contact)
 
-	if fixture1:getUserData() == "wall" or fixture2:getUserData() == "wall" then
-		if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-			objects.ball.sticky = true
-			objects.ball.canJump = true
-			if win == false then
-				gameOver = true
-			end
+	if ( (fixture1:getUserData() == "wall") or (fixture2:getUserData() == "wall") ) and ( (fixture1:getUserData() == "ball") or (fixture2:getUserData() == "ball") ) then
+		objects.ball.sticky = true
+		objects.ball.canJump = true
+		if win == false then
+			gameOver = true
 		end
 	end
 	
-	if fixture1:getUserData() == "sensor" or fixture2:getUserData() == "sensor" then
-		if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-			objects.ball.sticky = true
-			objects.ball.canJump = true
-			explosionTime = 1
-			explodeBall = true
-		end
+	if ( (fixture1:getUserData() == "sensor") or (fixture2:getUserData() == "sensor") ) and ( (fixture1:getUserData() == "ball") or (fixture2:getUserData() == "ball") ) then
+		objects.ball.sticky = true
+		objects.ball.canJump = true
+		explosionTime = 1
+		explodeBall = true
 	end
 	
-	if fixture1:getUserData() == "wall" or fixture2:getUserData() == "wall" then
-		if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-			VelX, VelY = objects.ball.body:getLinearVelocity()
-			objects.ball.isAlive = false
-			death = true
-		end
+	if ( (fixture1:getUserData() == "wall") or (fixture2:getUserData() == "wall") ) and ( (fixture1:getUserData() == "ball") or (fixture2:getUserData() == "ball") ) then
+		VelX, VelY = objects.ball.body:getLinearVelocity()
+		objects.ball.isAlive = false
+		death = true
 	end
 	
 	for q = 1, #Sensor do
@@ -603,6 +598,7 @@ function MENU_DRAW()
 	end
 end
 
+-- loading main.lua again is: unresourceful (many resources, unless lua garbage collects it..)
 function continue()
 	con_level = love.filesystem.read("save.lua")
 	con_level = tonumber(con_level)	
