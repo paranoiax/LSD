@@ -211,9 +211,10 @@ function love.load()
 	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
 	
 	if currentLevel > 1 then
-		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85,"Continue", "continue")
+		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85-85,"Continue", "continue")
 	end
-	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3,"New Game", "new_game")
+	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3-85,"New Game", "new_game")
+	button_spawn(screenWidth / 2 - f:getWidth("MapEditor") / 2,screenHeight / 4 * 3,"Map Editor", "mapedit")
 	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +85,"Quit", "quit")
 	
 	if GAMESTATE == "MENU" then
@@ -588,13 +589,13 @@ function MENU_DRAW()
 	if GAMESTATE == "MENU" then
 		love.graphics.setColor(255,255,255)
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 150)
+		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 250)
 		
 		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Little Sticky Destroyer",2, 22, screenWidth, "center")
+		love.graphics.printf("Little Sticky Destroyer",2, 52, screenWidth, "center")
 		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Little Sticky Destroyer",0, 20, screenWidth, "center")
+		love.graphics.printf("Little Sticky Destroyer",0, 50, screenWidth, "center")
 		
 		button_draw()
 		menuCursor()
