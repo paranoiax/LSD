@@ -60,7 +60,7 @@ function endCallback(fixture1, fixture2, contact)
 
 	for q = 1, #Sensor do
 		if Sensor[q].fixture == fixture1 or Sensor[q].fixture == fixture2 then
-			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then				
+			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
 				Sensor[q].touching = 0
 				Sensor[q].fixture:destroy()
 				Sensor[q].isDestroyed = true
@@ -74,7 +74,7 @@ function endCallback(fixture1, fixture2, contact)
    
    contact = nil
    collectgarbage()
-   
+
 end
 
 function love.load()	
@@ -84,12 +84,12 @@ function love.load()
 	explosionTime = 1
 
 	debugmode = false
-	
+
 	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	d = love.graphics.newFont(14)
 	--love.mouse:setGrab(false)
-	
+
 	bg = love.graphics.newImage("images/bg.jpg")
 
 	love.physics.setMeter(64)
@@ -97,7 +97,7 @@ function love.load()
 	world:setCallbacks(beginCallback, endCallback)
 	screenWidth = love.graphics.getWidth()
 	screenHeight = love.graphics.getHeight()
-	
+
 	button = {}
 	objects = {}
 	Sensor = {}
@@ -110,19 +110,19 @@ function love.load()
 	currentParticle = 1
 	currentDeathParticle = 1
 	currentWall = 1
-	
+
 	Rectangle = {}
 	currentRectangle = 1	
 	GreyTiles = love.graphics.newImage('images/quad_grey.png')
 	GreyTiles:setWrap("repeat","repeat")	
 	GreyTilesW, GreyTilesH = GreyTiles:getWidth(), GreyTiles:getHeight()
-	
+
 	Rectangle2 = {}
 	currentRectangle2 = 1	
 	RedTiles = love.graphics.newImage('images/quad.png')
 	RedTiles:setWrap("repeat","repeat")	
 	RedTilesW, RedTilesH = RedTiles:getWidth(), GreyTiles:getHeight()
-	
+
 	collX = 0
 	collY = 0
 	VelX = 0
@@ -131,16 +131,16 @@ function love.load()
 	death = false
 	shake = false
 	camera.time = 3
-	
+
 	-- LEVEL --	
 	
 	love.filesystem.load("levels/level"..currentLevel..".lua")()	
 	if currentLevel > maxLevel then
 		love.filesystem.write("save.lua", currentLevel)
 	end
-	
+
 	-- LEVEL --
-	
+
 	objects.ball = {}
 	objects.ball.image = love.graphics.newImage("images/ball_anim.png")
 	objects.ball.anim = newAnimation(objects.ball.image, 24, 24, 0.1, 0)
@@ -159,20 +159,20 @@ function love.load()
 	objects.ball.sticky = false
 	objects.ball.canJump = false
 	objects.ball.isAlive = true
-	
+
 	for q = 1, #Sensor do
 		addGreyRectangle(Sensor[q].x - Sensor[q].width / 2,Sensor[q].y - Sensor[q].height / 2,Sensor[q].width,Sensor[q].height)
 	end
-	
+
 	for q = 1, #Wall do
 		addRedRectangle(Wall[q].x - Wall[q].width / 2,Wall[q].y - Wall[q].height / 2,Wall[q].width,Wall[q].height)
-	end	
-	
+	end
+
 	limit = 90
 	deathLimit = 70
 	SensorsCount = #Sensor
 	SensorsDestroyed = 0
-	
+
 	win = false
 	winTimer = 3
 	gameOver = false
@@ -534,7 +534,7 @@ function INGAME_DRAW()
 			love.graphics.setColor(10,10,10)
 			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
 			love.graphics.setColor(217,177,102)
-			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")	
+			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
 		end
 		
 		if gameOver == true and win == false then
@@ -542,11 +542,11 @@ function INGAME_DRAW()
 			love.graphics.setColor(10,10,10)
 			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
 			love.graphics.setColor(217,177,102)
-			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")	
+			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
 		end
 		
 		aim_crosshair()
-		camera:unset()	
+		camera:unset()
 		draw_timer()
 	end
 end
