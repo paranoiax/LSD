@@ -30,7 +30,7 @@ end
 
 function nextLevel(dt)
 	if win == true then
-		winTimer = winTimer - dt		
+		winTimer = winTimer - dt
 	end
 	if winTimer < 0 then
 		if love.filesystem.exists("levels/level"..currentLevel + 1 ..".lua") then

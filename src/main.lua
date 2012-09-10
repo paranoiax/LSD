@@ -2,6 +2,8 @@ require 'camera'
 require 'TEsound'
 require 'AnAL'
 require 'Loader'
+require 'menu'
+require 'controls'
 
 explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
 
@@ -89,7 +91,6 @@ function love.load()
 	--love.mouse:setGrab(false)
 	
 	bg = love.graphics.newImage("images/bg.jpg")
-	lens = love.graphics.newImage("images/lens.png")	
 
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 9.81 * 64, true)
@@ -188,35 +189,24 @@ function love.load()
 	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3,"New Game", "new_game")
 	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +70,"Quit", "quit")
 	
+	if GAMESTATE == "MENU" then
+		TEsound.stop("music")
+		TEsound.playLooping("sounds/music.mp3", "music")
+		TEsound.volume("music", 0.7)
+	end
+	
 end
 
 function love.update(dt)
 
-if GAMESTATE == "MENU" then
-	ball_menu_anim:update(dt)	
-end
-
+MENU_UPDATE(dt)
 INGAME_UPDATE(dt)
-button_check()
 	
 end
 
 function love.draw()
-if GAMESTATE == "MENU" then
-	love.graphics.setColor(255,255,255)
-	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-	ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 150)
-	
-	love.graphics.setFont(e)
-	love.graphics.setColor(10,10,10)
-	love.graphics.printf("Little Sticky Destroyer",2, 22, screenWidth, "center")
-	love.graphics.setColor(217,177,102)
-	love.graphics.printf("Little Sticky Destroyer",0, 20, screenWidth, "center")
-	
-	button_draw()
-	menuCursor()
-end
 
+MENU_DRAW()
 INGAME_DRAW()
 	
 end
@@ -304,7 +294,7 @@ function addRedRectangle(x,y,w,h)
 		Rectangle2[currentRectangle2].quad = love.graphics.newQuad(0, 0, w, h, RedTilesW, RedTilesW)
 		Rectangle2[currentRectangle2].x = x
 		Rectangle2[currentRectangle2].y = y
-		currentRectangle2 = currentRectangle2 + 1	
+		currentRectangle2 = currentRectangle2 + 1
 end
 
 function drawGreyRectangle()
@@ -354,21 +344,6 @@ function distanceFrom(x1,y1,x2,y2)
 	local distance = math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) * 0.65
 	if distance > 255 then distance = 255 end
 	return math.floor(distance + .5)
-end
-
-function love.keypressed(key)
-	if key == "escape" then
-		if GAMESTATE == "MENU" then
-			love.event.push("quit")
-		elseif GAMESTATE == "INGAME" then
-			GAMESTATE = "MENU"
-			love.filesystem.load("main.lua")()
-			love.load()
-		end
-	elseif key == "r" then
-		love.filesystem.load("main.lua")()
-		love.load()
-	end
 end
 
 function checkWin()
@@ -434,17 +409,7 @@ function INGAME_UPDATE(dt)
 		
 		if objects.ball.isAlive == false then
 			objects.ball.canJump = false
-		end
-
-		function love.mousereleased(x,y,b)
-			if b == "l" and GAMESTATE == "INGAME" then
-				ball_launch(x,y)
-				aiming = false
-				if objects.ball.canJump == true then
-					objects.ball.sticky = false
-				end
-			end
-		end		
+		end			
 		
 		if objects.ball.sticky == true then
 			objects.ball.body:setLinearVelocity(0,0)
@@ -581,77 +546,31 @@ function INGAME_DRAW()
 		end
 		
 		aim_crosshair()
-		camera:unset()
-		
-		--[[
-		trans = math.random(250,255)	
-		love.graphics.setBlendMode("multiplicative")	
-		love.graphics.setColor(255,255,255,trans)
-		love.graphics.draw(lens,0,0,0,scaleX,scaleY)
-		]]
+		camera:unset()	
 		draw_timer()
 	end
 end
 
-function menuCursor()
-	love.mouse.setVisible(false)
-	love.graphics.setColor(202,143,84)
-	love.graphics.setLine(3, "smooth")
-	love.graphics.line(love.mouse:getX() -8, love.mouse:getY() -8, love.mouse.getX() + 8, love.mouse.getY() + 8)
-	love.graphics.line(love.mouse:getX() +8, love.mouse:getY() -8, love.mouse.getX() -8, love.mouse.getY() + 8)
+function MENU_UPDATE(dt)
+	if GAMESTATE == "MENU" then
+		ball_menu_anim:update(dt)
+		button_check()
+	end
 end
 
-function button_spawn(x,y,text, id)
-	table.insert(button, {x = x, y = y, text = text, id = id, mouseover = false})
-end
-
-function button_draw()
-	for i,v in ipairs(button) do		
-		love.graphics.setFont(f)
+function MENU_DRAW()
+	if GAMESTATE == "MENU" then
+		love.graphics.setColor(255,255,255)
+		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 150)
+		
+		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
-		love.graphics.print(v.text, v.x, v.y)
-		if v.mouseover == true then
-			love.graphics.setColor(217,177,102)
-			love.graphics.print(v.text, v.x -2, v.y -2)
-		end
-	end
-end
-
-function button_click(x,y)
-	for i,v in ipairs(button) do
-		if x > v.x and
-		x < v.x + f:getWidth(v.text) and
-		y > v.y and
-		y < v.y + f:getHeight(v.text) then
-			if v.id == "quit" then
-				love.event.push("quit")
-			elseif v.id == "continue" then
-				continue()
-			elseif v.id == "new_game" then
-				newGame()
-			end
-		end
-	end
-end
-
-function button_check()
-	for i,v in ipairs(button) do		
-		if love.mouse:getX() < v.x + f:getWidth(v.text) and
-		love.mouse:getX() > v.x and
-		love.mouse:getY() < v.y + f:getHeight(v.text) and
-		love.mouse:getY() > v.y then
-			v.mouseover = true
-		else
-			v.mouseover = false
-		end
-	end
-end
-
-function love.mousepressed(x,y,b)
-	if b == "l" and GAMESTATE == "INGAME" then
-		aiming = true
-	end
-	if b == "l" and GAMESTATE == "MENU" then
-		button_click(x,y)
+		love.graphics.printf("Little Sticky Destroyer",2, 22, screenWidth, "center")
+		love.graphics.setColor(217,177,102)
+		love.graphics.printf("Little Sticky Destroyer",0, 20, screenWidth, "center")
+		
+		button_draw()
+		menuCursor()
 	end
 end
