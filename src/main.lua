@@ -232,21 +232,21 @@ function love.update(dt)
 end
 
 function love.draw()
-		
+	
 	MENU_DRAW()
 	INGAME_DRAW()
 
 	if debugmode == true then
 		love.graphics.setColor(255,50,200)
 		love.graphics.setFont(d)
-		--love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-		--love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-		--love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
-		--for q = 1, #Sensor do 
-			--if Sensor[q].touching == 1 then
-				--love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
-			--end
-		--end
+		--[[love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
+		love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
+		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
+		for q = 1, #Sensor do 
+			if Sensor[q].touching == 1 then
+				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
+			end
+		end--]]--
 		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
 		love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
 		--love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
@@ -258,7 +258,7 @@ function love.draw()
 end
 
 function ball_launch()
-	local x,y=objects.ball.body:getPosition()
+	local x,y = objects.ball.body:getPosition()
 	if objects.ball.canJump == true then
 		objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
 	end
@@ -300,7 +300,6 @@ function addSensor(x, y, width, height)
 	Sensor[currentSensor].width = width
 	Sensor[currentSensor].height = height
 	currentSensor = currentSensor + 1
-	
 end
 
 function addWall(x, y, width, height)
@@ -321,11 +320,11 @@ function addWall(x, y, width, height)
 end
 
 function addGreyRectangle(x,y,w,h)
-		Rectangle[currentRectangle] = {}
-		Rectangle[currentRectangle].quad = love.graphics.newQuad(0, 0, w, h, GreyTilesW, GreyTilesW)
-		Rectangle[currentRectangle].x = x
-		Rectangle[currentRectangle].y = y
-		currentRectangle = currentRectangle + 1	
+	Rectangle[currentRectangle] = {}
+	Rectangle[currentRectangle].quad = love.graphics.newQuad(0, 0, w, h, GreyTilesW, GreyTilesW)
+	Rectangle[currentRectangle].x = x
+	Rectangle[currentRectangle].y = y
+	currentRectangle = currentRectangle + 1	
 end
 
 function drawRedRectangle()
@@ -336,11 +335,11 @@ function drawRedRectangle()
 end
 
 function addRedRectangle(x,y,w,h)
-		Rectangle2[currentRectangle2] = {}
-		Rectangle2[currentRectangle2].quad = love.graphics.newQuad(0, 0, w, h, RedTilesW, RedTilesW)
-		Rectangle2[currentRectangle2].x = x
-		Rectangle2[currentRectangle2].y = y
-		currentRectangle2 = currentRectangle2 + 1
+	Rectangle2[currentRectangle2] = {}
+	Rectangle2[currentRectangle2].quad = love.graphics.newQuad(0, 0, w, h, RedTilesW, RedTilesW)
+	Rectangle2[currentRectangle2].x = x
+	Rectangle2[currentRectangle2].y = y
+	currentRectangle2 = currentRectangle2 + 1
 end
 
 function drawGreyRectangle()
@@ -354,41 +353,41 @@ end
 
 function addParticle()
 	while currentParticle < limit do
-	Particle[currentParticle] = {}
-	Particle[currentParticle].size = math.random(3,6)
-	Particle[currentParticle].body = love.physics.newBody(world, collX + math.random(-65,65), collY + math.random(-50,50), "dynamic")
-	Particle[currentParticle].shape = love.physics.newRectangleShape(Particle[currentParticle].size,Particle[currentParticle].size)
-	Particle[currentParticle].fixture = love.physics.newFixture(Particle[currentParticle].body, Particle[currentParticle].shape)
-	Particle[currentParticle].fixture:setSensor(false)
-	Particle[currentParticle].body:setMass(0.025)
-	Particle[currentParticle].fixture:setUserData("particle")
-	Particle[currentParticle].fixture:setCategory(3)
-	Particle[currentParticle].fixture:setMask(4,5)
-	currentParticle = currentParticle + 1
+		Particle[currentParticle] = {}
+		Particle[currentParticle].size = math.random(3,6)
+		Particle[currentParticle].body = love.physics.newBody(world, collX + math.random(-65,65), collY + math.random(-50,50), "dynamic")
+		Particle[currentParticle].shape = love.physics.newRectangleShape(Particle[currentParticle].size,Particle[currentParticle].size)
+		Particle[currentParticle].fixture = love.physics.newFixture(Particle[currentParticle].body, Particle[currentParticle].shape)
+		Particle[currentParticle].fixture:setSensor(false)
+		Particle[currentParticle].body:setMass(0.025)
+		Particle[currentParticle].fixture:setUserData("particle")
+		Particle[currentParticle].fixture:setCategory(3)
+		Particle[currentParticle].fixture:setMask(4,5)
+		currentParticle = currentParticle + 1
 	end
 	currentParticle = 1
 end
 
 function addDeathParticle()
 	while currentDeathParticle < deathLimit do
-	DeathParticle[currentDeathParticle] = {}
-	DeathParticle[currentDeathParticle].size = math.random(2,4)
-	DeathParticle[currentDeathParticle].body = love.physics.newBody(world, objects.ball.body:getX() + math.random(-objects.ball.shape:getRadius(),objects.ball.shape:getRadius()), objects.ball.body:getY() + math.random(-objects.ball.shape:getRadius(),objects.ball.shape:getRadius()), "dynamic")
-	DeathParticle[currentDeathParticle].shape = love.physics.newRectangleShape(DeathParticle[currentDeathParticle].size,DeathParticle[currentDeathParticle].size)
-	DeathParticle[currentDeathParticle].fixture = love.physics.newFixture(DeathParticle[currentDeathParticle].body, DeathParticle[currentDeathParticle].shape)
-	DeathParticle[currentDeathParticle].fixture:setSensor(false)
-	DeathParticle[currentDeathParticle].body:setMass(0.01)
-	DeathParticle[currentDeathParticle].fixture:setUserData("deathparticle")
-	DeathParticle[currentDeathParticle].fixture:setCategory(5)
-	DeathParticle[currentDeathParticle].fixture:setMask(4,3)
-	currentDeathParticle = currentDeathParticle + 1
+		DeathParticle[currentDeathParticle] = {}
+		DeathParticle[currentDeathParticle].size = math.random(2,4)
+		DeathParticle[currentDeathParticle].body = love.physics.newBody(world, objects.ball.body:getX() + math.random(-objects.ball.shape:getRadius(),objects.ball.shape:getRadius()), objects.ball.body:getY() + math.random(-objects.ball.shape:getRadius(),objects.ball.shape:getRadius()), "dynamic")
+		DeathParticle[currentDeathParticle].shape = love.physics.newRectangleShape(DeathParticle[currentDeathParticle].size,DeathParticle[currentDeathParticle].size)
+		DeathParticle[currentDeathParticle].fixture = love.physics.newFixture(DeathParticle[currentDeathParticle].body, DeathParticle[currentDeathParticle].shape)
+		DeathParticle[currentDeathParticle].fixture:setSensor(false)
+		DeathParticle[currentDeathParticle].body:setMass(0.01)
+		DeathParticle[currentDeathParticle].fixture:setUserData("deathparticle")
+		DeathParticle[currentDeathParticle].fixture:setCategory(5)
+		DeathParticle[currentDeathParticle].fixture:setMask(4,3)
+		currentDeathParticle = currentDeathParticle + 1
 	end
 	currentDeathParticle = 1
 end
 
 function distanceFrom(x1,y1,x2,y2)
 	local distance = math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) * 0.65
-	if distance > 255 then distance = 255 end
+	distance = distance>255 and 255 or distance
 	return math.floor(distance + .5)
 end
 
