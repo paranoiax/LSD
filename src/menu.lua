@@ -45,7 +45,6 @@ function button_check()
 end
 
 function menuCursor()
-	love.mouse.setVisible(false)	
 	love.graphics.setLine(3, "smooth")
 	love.graphics.setColor(10,10,10,200)
 	love.graphics.line(love.mouse:getX() -6, love.mouse:getY() -6, love.mouse.getX() + 10, love.mouse.getY() + 10)

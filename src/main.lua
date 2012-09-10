@@ -78,7 +78,8 @@ function endCallback(fixture1, fixture2, contact)
 end
 
 function love.load()	
-
+	love.mouse.setVisible(false)	
+	
 	explodeBall = false
 	BallExplode = false
 	explosionTime = 1
