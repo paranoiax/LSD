@@ -1,6 +1,6 @@
 return {
 	boundaries = 3400,
-	playerX, playerY = 45,100,
+	player = {45,100},
 	
 	walls = {
 		{20,160,60,40},
