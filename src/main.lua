@@ -85,8 +85,8 @@ function love.load()
 
 	debugmode = false
 	
-	f = love.graphics.newFont(48)
-	e = love.graphics.newFont(72)
+	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
+	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	d = love.graphics.newFont(14)
 	--love.mouse:setGrab(false)
 	
@@ -185,9 +185,9 @@ function love.load()
 	ball_menu_image = love.graphics.newImage("images/ball_anim_menu.png")
 	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
 	
-	button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -70,"Continue", "continue")
+	button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85,"Continue", "continue")
 	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3,"New Game", "new_game")
-	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +70,"Quit", "quit")
+	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +85,"Quit", "quit")
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
@@ -523,14 +523,14 @@ function INGAME_DRAW()
 			love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
 		end	
 		
-		love.graphics.setFont(f)
+		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
-		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 2 + camera.y, screenWidth, "center")
+		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 22 + camera.y, screenWidth, "center")
 		love.graphics.setColor(217,177,102)
-		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 0 + camera.y, screenWidth, "center")
+		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 20 + camera.y, screenWidth, "center")
 		
 		if win == true then
-			love.graphics.setFont(f)
+			love.graphics.setFont(e)
 			love.graphics.setColor(10,10,10)
 			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
 			love.graphics.setColor(217,177,102)
@@ -538,7 +538,7 @@ function INGAME_DRAW()
 		end
 		
 		if gameOver == true and win == false then
-			love.graphics.setFont(f)
+			love.graphics.setFont(e)
 			love.graphics.setColor(10,10,10)
 			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
 			love.graphics.setColor(217,177,102)
