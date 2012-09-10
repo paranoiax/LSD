@@ -150,7 +150,16 @@ function love.load()
 		currentLevel = 1
 	end
 	
-	love.filesystem.load("levels/level"..currentLevel..".lua")()	
+	local map = love.filesystem.load("levels/level"..currentLevel..".lua")()
+	boundaries = map.boundaries
+	playerX, playerY = unpack(map.player)
+	
+	for i,v in pairs{sensors=addSensor, walls=addWall} do
+		for _, data in ipairs(map[i]) do
+			v(unpack(data))
+		end
+	end
+	
 	if currentLevel > maxLevel then
 		love.filesystem.write("save.lua", currentLevel)
 	end	
