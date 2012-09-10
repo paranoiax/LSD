@@ -154,9 +154,9 @@ function love.load()
 	boundaries = map.boundaries
 	playerX, playerY = map.playerX, map.playerY
 	
-	for i,v in pairs{addSensor="sensors", addWall="walls"} do
-		for _, data in ipairs(map[v]) do
-			i(unpack(data))
+	for i,v in pairs{sensors=addSensor, walls=addWall} do
+		for _, data in ipairs(map[i]) do
+			v(unpack(data))
 		end
 	end
 	
