@@ -1,3 +1,4 @@
+return {
 	boundaries = 1000
 	playerX, playerY = 586,500
 	
@@ -17,3 +18,4 @@
 	addWall(220,330,220,40)
 	addWall(180,330,40,330)
 	addWall(40,620,140,40)
+}
