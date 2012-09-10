@@ -13,8 +13,9 @@ maxLevel = tonumber(maxLevel)
 
 function continue()
 	con_level = love.filesystem.read("save.lua")
-	con_level = tonumber(con_level)
+	con_level = tonumber(con_level)	
 	currentLevel = con_level
+	love.filesystem.write("save.lua", con_level)
 	GAMESTATE = "INGAME"
 	love.filesystem.load("main.lua")()
 	love.load()

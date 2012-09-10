@@ -84,7 +84,9 @@ function love.load()
 	explosionTime = 1
 
 	debugmode = false
-
+	
+	icon = love.graphics.newImage("images/icon.png")
+	love.graphics.setIcon(icon)
 	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	d = love.graphics.newFont(14)
@@ -185,7 +187,9 @@ function love.load()
 	ball_menu_image = love.graphics.newImage("images/ball_anim_menu.png")
 	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
 	
-	button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85,"Continue", "continue")
+	if currentLevel > 1 then
+		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85,"Continue", "continue")
+	end
 	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3,"New Game", "new_game")
 	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +85,"Quit", "quit")
 	
