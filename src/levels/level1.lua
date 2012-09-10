@@ -1,6 +1,6 @@
 return {
 	boundaries = 1000,
-	playerX, playerY = 586,500,
+	player = {586,500},
 	
 	sensors = {
 		{60,60,100,40},
