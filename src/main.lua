@@ -586,12 +586,12 @@ function MENU_DRAW()
 		love.graphics.setColor(255,255,255)
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 250)
-		
+
 		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Little Sticky Destroyer",2, 52, screenWidth, "center")
+		love.graphics.printf("Little Sticky Destroyer",2, 82, screenWidth, "center")
 		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Little Sticky Destroyer",0, 50, screenWidth, "center")
+		love.graphics.printf("Little Sticky Destroyer",0, 80, screenWidth, "center")
 		
 		button_draw()
 		menuCursor()
