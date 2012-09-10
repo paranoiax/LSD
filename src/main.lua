@@ -152,7 +152,7 @@ function love.load()
 	
 	local map = love.filesystem.load("levels/level"..currentLevel..".lua")()
 	boundaries = map.boundaries
-	playerX, playerY = map.playerX, map.playerY
+	playerX, playerY = unpack(map.player)
 	
 	for i,v in pairs{sensors=addSensor, walls=addWall} do
 		for _, data in ipairs(map[i]) do
