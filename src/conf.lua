@@ -9,6 +9,6 @@ function love.conf(t)
 	t.screen.fsaa = 2
 	t.identity = "LSD"
 	t.console = false
-	t.release = true
+	t.release = false
 
 end

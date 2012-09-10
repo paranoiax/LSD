@@ -134,12 +134,26 @@ function love.load()
 	shake = false
 	camera.time = 3
 
-	-- LEVEL --	
+	-- LEVEL --
+	
+	if not love.filesystem.exists("save.lua") then
+		love.filesystem.newFile("save.lua")
+		love.filesystem.write("save.lua", 1)
+	end
+
+	maxLevel = love.filesystem.read("save.lua")
+	maxLevel = tonumber(maxLevel)
+
+	if maxLevel > 1 then
+		currentLevel = maxLevel
+	elseif maxLevel == 1 then
+		currentLevel = 1
+	end
 	
 	love.filesystem.load("levels/level"..currentLevel..".lua")()	
 	if currentLevel > maxLevel then
 		love.filesystem.write("save.lua", currentLevel)
-	end
+	end	
 
 	-- LEVEL --
 
@@ -203,15 +217,34 @@ end
 
 function love.update(dt)
 
-MENU_UPDATE(dt)
-INGAME_UPDATE(dt)
+	MENU_UPDATE(dt)
+	INGAME_UPDATE(dt)
 	
 end
 
 function love.draw()
+		
+	MENU_DRAW()
+	INGAME_DRAW()
 
-MENU_DRAW()
-INGAME_DRAW()
+	if debugmode == true then
+		love.graphics.setColor(255,50,200)
+		love.graphics.setFont(d)
+		--love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
+		--love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
+		--love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
+		--for q = 1, #Sensor do 
+			--if Sensor[q].touching == 1 then
+				--love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
+			--end
+		--end
+		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
+		love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
+		--love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
+		love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
+		love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
+		love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
+	end
 	
 end
 
@@ -506,26 +539,7 @@ function INGAME_DRAW()
 		end
 		
 		drawGreyRectangle()
-		drawRedRectangle()
-		
-		if debugmode == true then
-			love.graphics.setColor(255,50,200)
-			love.graphics.setFont(d)
-			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-			love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-			love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
-			for q = 1, #Sensor do 
-				if Sensor[q].touching == 1 then
-					love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
-				end
-			end
-			love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-			love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
-			love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
-			love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
-			love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
-			love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
-		end	
+		drawRedRectangle()			
 		
 		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
@@ -577,4 +591,22 @@ function MENU_DRAW()
 		button_draw()
 		menuCursor()
 	end
+end
+
+function continue()
+	con_level = love.filesystem.read("save.lua")
+	con_level = tonumber(con_level)	
+	currentLevel = con_level
+	love.filesystem.write("save.lua", con_level)
+	GAMESTATE = "INGAME"
+	love.filesystem.load("main.lua")()
+	love.load()
+end
+
+function newGame()
+	currentLevel = 1
+	love.filesystem.write("save.lua", currentLevel)
+	GAMESTATE = "INGAME"
+	love.filesystem.load("main.lua")()
+	love.load()
 end
