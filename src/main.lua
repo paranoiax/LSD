@@ -31,12 +31,12 @@ function beginCallback(fixture1, fixture2, contact)
 		death = true
 	end
 	
-	for q = 1, #Sensor do
-		if Sensor[q].fixture == fixture1 or Sensor[q].fixture == fixture2 then
+	for i,v in ipairs(Sensor) do
+		if v.fixture == fixture1 or v.fixture == fixture2 then
 			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-			Sensor[q].touching = 1
-			collX = Sensor[q].body:getX()
-			collY = Sensor[q].body:getY()
+			v.touching = 1
+			collX = v.body:getX()
+			collY = v.body:getY()
 			end
 		end
 	end
@@ -53,12 +53,12 @@ function endCallback(fixture1, fixture2, contact)
 		end
 	end
 
-	for q = 1, #Sensor do
-		if Sensor[q].fixture == fixture1 or Sensor[q].fixture == fixture2 then
+	for i,v in ipairs(Sensor) do
+		if v.fixture == fixture1 or v.fixture == fixture2 then
 			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-				Sensor[q].touching = 0
-				Sensor[q].fixture:destroy()
-				Sensor[q].isDestroyed = true
+				v.touching = 0
+				v.fixture:destroy()
+				v.isDestroyed = true
 				explode = true
 				shake = true
 				TEsound.play(explosionList)
@@ -146,9 +146,7 @@ function love.load()
 		currentLevel = 1
 	end
 	
-	local map = love.filesystem.load("levels/level"..currentLevel..".lua")()
-	boundaries = map.boundaries
-	playerX, playerY = unpack(map.player)
+	map = love.filesystem.load("levels/level"..currentLevel..".lua")()
 	
 	for i,v in pairs{sensors=addSensor, walls=addWall} do
 		for _, data in ipairs(map[i]) do
@@ -166,7 +164,7 @@ function love.load()
 	objects.ball.image = love.graphics.newImage("images/ball_anim.png")
 	objects.ball.anim = newAnimation(objects.ball.image, 24, 24, 0.1, 0)
 	objects.ball.force = 0.95
-	objects.ball.body = love.physics.newBody(world, playerX, playerY, "dynamic")
+	objects.ball.body = love.physics.newBody(world, map.player[1], map.player[2], "dynamic")
 	objects.ball.shape = love.physics.newCircleShape(12)
 	objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1)
 	objects.ball.fixture:setRestitution(0)
@@ -181,12 +179,12 @@ function love.load()
 	objects.ball.canJump = false
 	objects.ball.isAlive = true
 
-	for q = 1, #Sensor do
-		addGreyRectangle(Sensor[q].x - Sensor[q].width / 2,Sensor[q].y - Sensor[q].height / 2,Sensor[q].width,Sensor[q].height)
+	for i,v in ipairs(Sensor) do
+		addGreyRectangle(v.x - v.width / 2, v.y - v.height / 2, v.width, v.height)
 	end
 
-	for q = 1, #Wall do
-		addRedRectangle(Wall[q].x - Wall[q].width / 2,Wall[q].y - Wall[q].height / 2,Wall[q].width,Wall[q].height)
+	for i,v in ipairs(Wall) do
+		addRedRectangle(v.x - v.width / 2,v.y - v.height / 2,v.width,v.height)
 	end
 
 	limit = 90
@@ -225,11 +223,15 @@ function love.update(dt)
 
 	MENU_UPDATE(dt)
 	INGAME_UPDATE(dt)
-	
+	if GAMESTATE == "EDITOR" then
+		Editor.update(dt)
+	end
 end
 
 function love.draw()
-	
+	if GAMESTATE == "EDITOR" then
+		Editor.draw()
+	end
 	MENU_DRAW()
 	INGAME_DRAW()
 
@@ -283,7 +285,7 @@ end
 
 function addSensor(x, y, width, height)
 	x = x + width / 2
-	y = y +height / 2
+	y = y + height / 2
 	Sensor[currentSensor] = {}
 	Sensor[currentSensor].body = love.physics.newBody(world, x, y, "static")
 	Sensor[currentSensor].shape = love.physics.newRectangleShape(width, height)
@@ -325,9 +327,9 @@ function addGreyRectangle(x,y,w,h)
 end
 
 function drawRedRectangle()
-	for q = 1, #Rectangle2 do
+	for i,v in ipairs(Rectangle2) do
 		love.graphics.setColor(255,255,255)
-		love.graphics.drawq(RedTiles,Rectangle2[q].quad,Rectangle2[q].x,Rectangle2[q].y)
+		love.graphics.drawq(RedTiles, v.quad, v.x, v.y)
 	end
 end
 
@@ -340,10 +342,10 @@ function addRedRectangle(x,y,w,h)
 end
 
 function drawGreyRectangle()
-	for q = 1, #Rectangle do
-		if Sensor[q].isDestroyed == false then
+	for i,v in ipairs(Rectangle) do
+		if not Sensor[i].isDestroyed then
 			love.graphics.setColor(255,255,255)
-			love.graphics.drawq(GreyTiles,Rectangle[q].quad,Rectangle[q].x,Rectangle[q].y)
+			love.graphics.drawq(GreyTiles, v.quad, v.x, v.y)
 		end
 	end
 end
@@ -419,8 +421,8 @@ function explosionTimer(dt)
 end
 
 function outOfBounds()
-	if objects.ball.body:getX() < -boundaries or objects.ball.body:getX() > boundaries or objects.ball.body:getY() < -boundaries or objects.ball.body:getY() > boundaries then
-		if win == false then
+	if objects.ball.body:getX() < -map.boundaries or objects.ball.body:getX() > map.boundaries or objects.ball.body:getY() < -map.boundaries or objects.ball.body:getY() > map.boundaries then
+		if not win then
 			gameOver = true
 		end
 	end
@@ -428,7 +430,7 @@ end
 
 function runNativeResolution()
 	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
-	if gameFullscreen == false then
+	if not gameFullscreen then
 		love.graphics.toggleFullscreen()
 	end
 end
@@ -440,20 +442,20 @@ function INGAME_UPDATE(dt)
 		objects.ball.anim:update(dt)	
 		explosionTimer(dt)
 		
-		for q = 1, #Sensor do
-			if Sensor[q].isDestroyed == true then
-				Sensor[q].body:setActive(false)
+		for i,v in ipairs(Sensor) do
+			if v.isDestroyed then
+				v.body:setActive(false)
 			end
 		end
 		
 		camera.x = objects.ball.body:getX() - screenWidth / 2
 		camera.y = objects.ball.body:getY() - screenHeight / 2
 		
-		if objects.ball.isAlive == false then
+		if not objects.ball.isAlive then
 			objects.ball.canJump = false
 		end			
 		
-		if objects.ball.sticky == true then
+		if objects.ball.sticky then
 			objects.ball.body:setLinearVelocity(0,0)
 			objects.ball.body:setAwake(false)		
 		end
@@ -461,31 +463,31 @@ function INGAME_UPDATE(dt)
 		if currentParticle > limit then
 			currentParticle = 1
 			limit = 90
-			for q = 1, #Particle do
-				Particle[q].fixture:destroy()
-				Particle[q].body:setActive(false)
-				Particle[q].body:destroy()
+			for i,v in ipairs(Particle) do
+				v.fixture:destroy()
+				v.body:setActive(false)
+				v.body:destroy()
 			end
 		end
 		
-		if explode == true then
-			for q = 1, #Particle do
-				Particle[q].fixture:destroy()
-				Particle[q].body:setActive(false)
-				Particle[q].body:destroy()
+		if explode then
+			for i,v in ipairs(Particle) do
+				v.fixture:destroy()
+				v.body:setActive(false)
+				v.body:destroy()
 			end
 			addParticle()
-			for q = 1, #Particle do
-				Particle[q].body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
+			for i,v in ipairs(Particle) do
+				v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
 			end
 			explode = false
 		end
 		
-		if death == true then
+		if death then
 			TEsound.play("sounds/death.wav")
 			addDeathParticle()
-			for q = 1, #DeathParticle do
-				DeathParticle[q].body:applyLinearImpulse(VelX / 500, VelY / 500)
+			for i,v in ipairs(DeathParticle) do
+				v.body:applyLinearImpulse(VelX / 500, VelY / 500)
 			end
 			death = false
 		end
@@ -514,33 +516,33 @@ function INGAME_DRAW()
 			draw_crosshair()
 		end	
 		
-		if objects.ball.isAlive == true then
+		if objects.ball.isAlive then
 			love.graphics.setColor(255,255,255)
 			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
 		end
 	   
-		if debugmode == true then
-			for q = 1, #Sensor do
-				if Sensor[q].touching == 1 then
+		if debugmode then
+			for i,v in ipairs(Sensor) do
+				if v.touching == 1 then
 					love.graphics.setColor(200, 0, 0, 60)
-					love.graphics.polygon("fill", Sensor[q].body:getWorldPoints(Sensor[q].shape:getPoints()))
+					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 				end
 			end
 		end
 		
-		for q = 1, #Wall do
+		for i,v in ipairs(Wall) do
 			love.graphics.setColor(166,38,27)
-			love.graphics.polygon("fill", Wall[q].body:getWorldPoints(Wall[q].shape:getPoints()))
+			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 		end
 		
-		for q = 1, #Particle do
+		for i,v in ipairs(Particle) do
 			love.graphics.setColor(69,69,69)
-			love.graphics.polygon("fill", Particle[q].body:getWorldPoints(Particle[q].shape:getPoints()))
+			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 		end
 		
-		for q = 1, #DeathParticle do
+		for i,v in ipairs(DeathParticle) do
 			love.graphics.setColor(202,143,84)
-			love.graphics.polygon("fill", DeathParticle[q].body:getWorldPoints(DeathParticle[q].shape:getPoints()))	
+			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
 		end
 		
 		drawGreyRectangle()
@@ -552,7 +554,7 @@ function INGAME_DRAW()
 		love.graphics.setColor(217,177,102)
 		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 20 + camera.y, screenWidth, "center")
 		
-		if win == true then
+		if win then
 			love.graphics.setFont(e)
 			love.graphics.setColor(10,10,10)
 			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
@@ -560,7 +562,7 @@ function INGAME_DRAW()
 			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
 		end
 		
-		if gameOver == true and win == false then
+		if gameOver and not win then
 			love.graphics.setFont(e)
 			love.graphics.setColor(10,10,10)
 			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")

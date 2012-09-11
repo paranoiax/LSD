@@ -17,7 +17,7 @@ function love.mousereleased(x,y,b)
 	end
 end
 
-function love.keypressed(key)
+function love.keypressed(key, ...)
 	if key == "escape" then
 		if GAMESTATE == "MENU" then
 			love.event.push("quit")
@@ -25,6 +25,8 @@ function love.keypressed(key)
 			GAMESTATE = "MENU"
 			love.filesystem.load("main.lua")()
 			love.load()
+		elseif GAMESTATE == "EDITOR" then
+			Editor.keypressed(key, ...)
 		end
 	elseif key == "r" or key == "enter" or key == "return" or key == " " then
 		if GAMESTATE == "INGAME" then
