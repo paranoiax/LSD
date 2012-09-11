@@ -85,6 +85,7 @@ function love.load()
 	love.graphics.setIcon(icon)
 	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
+	editor = love.graphics.newFont("fonts/DisplayOTF.otf", 35)
 	d = love.graphics.newFont(14)
 	--love.mouse:setGrab(false)
 
@@ -105,18 +106,14 @@ function love.load()
 	DeathParticle = {}
 	currentSensor = 1
 	currentObstacle = 1
-	currentParticle = 1
-	currentDeathParticle = 1
 	currentWall = 1
 
 	Rectangle = {}
-	currentRectangle = 1	
 	GreyTiles = love.graphics.newImage('images/quad_grey.png')
 	GreyTiles:setWrap("repeat","repeat")	
 	GreyTilesW, GreyTilesH = GreyTiles:getWidth(), GreyTiles:getHeight()
 
 	Rectangle2 = {}
-	currentRectangle2 = 1	
 	RedTiles = love.graphics.newImage('images/quad.png')
 	RedTiles:setWrap("repeat","repeat")	
 	RedTilesW, RedTilesH = RedTiles:getWidth(), GreyTiles:getHeight()
@@ -179,12 +176,15 @@ function love.load()
 	objects.ball.canJump = false
 	objects.ball.isAlive = true
 
-	for i,v in ipairs(Sensor) do
-		addGreyRectangle(v.x - v.width / 2, v.y - v.height / 2, v.width, v.height)
-	end
-
-	for i,v in ipairs(Wall) do
-		addRedRectangle(v.x - v.width / 2,v.y - v.height / 2,v.width,v.height)
+	for rectA,tab in pairs({[{"", "Grey"}]=Sensor, [{"2","Red"}]=Wall}) do
+		for i,v in ipairs(tab) do
+			local x, y, w, h = v.x - v.width / 2, v.y - v.height / 2, v.width, v.height
+			_G["Rectangle"..rectA[1]][i] = {
+				quad = love.graphics.newQuad(0, 0, w, h, _G[rectA[2].."TilesW"], _G[rectA[2].."TilesW"]),
+				x = x,
+				y = y
+			}
+		end
 	end
 
 	limit = 90
@@ -213,7 +213,8 @@ function love.load()
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
-		TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7)
+		TEsound.playLooping("sounds/music.mp3", "music")
+		TEsound.volume("music", 0.7)
 	end
 	
 end
@@ -238,7 +239,7 @@ function love.draw()
 		love.graphics.setColor(255,50,200)
 		love.graphics.setFont(d)
 		--[[love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-		love.graphics.print("Active Bodys: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
+		love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
 		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
 		for q = 1, #Sensor do 
 			if Sensor[q].touching == 1 then
@@ -317,27 +318,11 @@ function addWall(x, y, width, height)
 	currentWall = currentWall + 1	
 end
 
-function addGreyRectangle(x,y,w,h)
-	Rectangle[currentRectangle] = {}
-	Rectangle[currentRectangle].quad = love.graphics.newQuad(0, 0, w, h, GreyTilesW, GreyTilesW)
-	Rectangle[currentRectangle].x = x
-	Rectangle[currentRectangle].y = y
-	currentRectangle = currentRectangle + 1	
-end
-
 function drawRedRectangle()
 	for i,v in ipairs(Rectangle2) do
 		love.graphics.setColor(255,255,255)
 		love.graphics.drawq(RedTiles, v.quad, v.x, v.y)
 	end
-end
-
-function addRedRectangle(x,y,w,h)
-	Rectangle2[currentRectangle2] = {}
-	Rectangle2[currentRectangle2].quad = love.graphics.newQuad(0, 0, w, h, RedTilesW, RedTilesW)
-	Rectangle2[currentRectangle2].x = x
-	Rectangle2[currentRectangle2].y = y
-	currentRectangle2 = currentRectangle2 + 1
 end
 
 function drawGreyRectangle()
@@ -350,7 +335,7 @@ function drawGreyRectangle()
 end
 
 function addParticle()
-	while currentParticle < limit do
+	for currentParticle = 1, limit do
 		Particle[currentParticle] = {}
 		Particle[currentParticle].size = math.random(3,6)
 		Particle[currentParticle].body = love.physics.newBody(world, collX + math.random(-65,65), collY + math.random(-50,50), "dynamic")
@@ -361,13 +346,11 @@ function addParticle()
 		Particle[currentParticle].fixture:setUserData("particle")
 		Particle[currentParticle].fixture:setCategory(3)
 		Particle[currentParticle].fixture:setMask(4,5)
-		currentParticle = currentParticle + 1
 	end
-	currentParticle = 1
 end
 
 function addDeathParticle()
-	while currentDeathParticle < deathLimit do
+	for currentDeathParticle = 1, deathLimit do
 		DeathParticle[currentDeathParticle] = {}
 		DeathParticle[currentDeathParticle].size = math.random(2,4)
 		DeathParticle[currentDeathParticle].body = love.physics.newBody(world, objects.ball.body:getX() + math.random(-objects.ball.shape:getRadius(),objects.ball.shape:getRadius()), objects.ball.body:getY() + math.random(-objects.ball.shape:getRadius(),objects.ball.shape:getRadius()), "dynamic")
@@ -378,9 +361,7 @@ function addDeathParticle()
 		DeathParticle[currentDeathParticle].fixture:setUserData("deathparticle")
 		DeathParticle[currentDeathParticle].fixture:setCategory(5)
 		DeathParticle[currentDeathParticle].fixture:setMask(4,3)
-		currentDeathParticle = currentDeathParticle + 1
 	end
-	currentDeathParticle = 1
 end
 
 function distanceFrom(x1,y1,x2,y2)
@@ -390,9 +371,7 @@ function distanceFrom(x1,y1,x2,y2)
 end
 
 function checkWin()
-	if SensorsDestroyed == SensorsCount then
-		win = true		
-	end
+	win = SensorsDestroyed == SensorsCount
 	if win == true then
 		objects.ball.sticky = true
 		objects.ball.isAlive = false
@@ -457,16 +436,6 @@ function INGAME_UPDATE(dt)
 		if objects.ball.sticky then
 			objects.ball.body:setLinearVelocity(0,0)
 			objects.ball.body:setAwake(false)		
-		end
-		
-		if currentParticle > limit then
-			currentParticle = 1
-			limit = 90
-			for i,v in ipairs(Particle) do
-				v.fixture:destroy()
-				v.body:setActive(false)
-				v.body:destroy()
-			end
 		end
 		
 		if explode then

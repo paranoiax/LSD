@@ -1,11 +1,24 @@
 Editor = {}
-local data = {}
+local data = {
+	topbar = {
+		texts = {"Exit", "Clear", "Play"},
+		positions = {}
+	}
+}
 
 function Editor.load()
 	GAMESTATE = "EDITOR"
+	Editor.mode = "main"
+	love.mouse.setVisible(true)
 	-- load the editor
 	-- by default load level1.lua
 	Editor.setMap("level1")
+	
+	do
+		local masterWidth = screenWidth
+		for i,v in ipairs(data.topbar.texts) do
+		end
+	end
 end
 
 function Editor.setMap(filepath, notify)
