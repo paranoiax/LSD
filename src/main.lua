@@ -215,7 +215,7 @@ function love.load()
 		TEsound.stop("music")
 		TEsound.playLooping("sounds/music.mp3", "music")
 	end
-	camera.zoom = 1
+	
 end
 
 function love.update(dt)

@@ -1,15 +1,7 @@
 function love.mousepressed(x,y,b)
-	if GAMESTATE == "INGAME" then
-		if b == "l" then
-			aiming = true
-		elseif (b == "wu") or (b == "wd") then
-			local append = (b=="wu") and .01 or -.01
-			camera.zoom = camera.zoom + append
-			if (camera.zoom > 1.5) or (camera.zoom < .5) then
-				camera.zoom = camera.zoom - append
-			end
-		end
-	end
+	if b == "l" and GAMESTATE == "INGAME" then
+		aiming = true
+	end	
 end
 
 function love.mousereleased(x,y,b)
