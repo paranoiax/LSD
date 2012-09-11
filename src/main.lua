@@ -363,12 +363,6 @@ function addDeathParticle()
 	end
 end
 
-function distanceFrom(x1,y1,x2,y2)
-	local distance = math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2) * 0.65
-	distance = distance>255 and 255 or distance
-	return math.floor(distance + .5)
-end
-
 function checkWin()
 	win = SensorsDestroyed == SensorsCount
 	if win == true then

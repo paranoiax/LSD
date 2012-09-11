@@ -38,7 +38,7 @@ function Editor.setMap(filepath, notify)
 	
 	if filepath == "" then return end -- dont throw an error
 	Editor.map = love.filesystem.load("levels/"..filepath..".lua")()
-	print(Editor.parse(Editor.map))
+	--print(Editor.parse(Editor.map)) -- IT LOOKS LIKE CRAP :)
 end
 
 function Editor.saveMap()
@@ -87,7 +87,7 @@ function Editor.draw()
 			if love.mouse.isDown("l") then
 				data.topbar.selected = i
 			elseif data.topbar.selected == i then
-				---[[ debug
+				--[[ debug
 				table.insert(EditorSelected, str)
 				if #EditorSelected > 10 then
 					table.remove(EditorSelected, 1)
@@ -109,13 +109,13 @@ function Editor.draw()
 		love.graphics.setFont(editor)
 		love.graphics.printf(str, x, y+7, w, "center")
 		
-		---[[debug
+		--[[debug
 		love.graphics.printf(tostring(intersected), 0, 50*i, screenWidth, "left")
 		love.graphics.printf(tostring(alpha), 0, 50*i, screenWidth, "center")
 		--]]
 	end
 	
-	---[[ debug
+	--[[ debug
 	love.graphics.printf("Selected items:", 0, 300, screenWidth, "center")
 	for i,v in ipairs(EditorSelected) do
 		love.graphics.printf(v, 0, 50*i + 300, screenWidth, "center")
@@ -151,10 +151,4 @@ function Editor.parse(t, _no)
 	end
 	local ret = _no and "" or "return "
 	return s.."}"
-end
-
--- move to utility file later
-function intersect(x, y, w, h, x2, y2)
-	local endx, endy = x+w, y+h
-	return (x2<endx) and (x2>x) and (y2>y) and (y2<endy)
 end
