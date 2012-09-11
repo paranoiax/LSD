@@ -213,8 +213,7 @@ function love.load()
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
-		TEsound.playLooping("sounds/music.mp3", "music")
-		TEsound.volume("music", 0.7)
+		TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7)
 	end
 	
 end
