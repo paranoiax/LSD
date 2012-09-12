@@ -146,9 +146,7 @@ function love.load()
 	currentPack = "original"
 	while not love.filesystem.exists("levels/"..currentPack.."/level"..currentLevel..".lua") do
 		currentLevel = currentLevel - 1
-		if currentLevel <= 0 then
-			error("Couldn't find a level for that map-pack!")
-		end
+		assert(currentLevel > 0, "Couldn't find a level for that map-pack")
 	end
 	map = love.filesystem.load("levels/"..currentPack.."/level"..currentLevel..".lua")()
 	
