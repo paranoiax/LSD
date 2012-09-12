@@ -1,6 +1,6 @@
 require "camera"
-require "TEsound"
-require "AnAL"
+require "lib.TEsound"
+require "lib.AnAL"
 require "Loader"
 require "Editor"
 require "menu"
