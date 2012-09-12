@@ -85,7 +85,6 @@ function love.load()
 	love.graphics.setIcon(icon)
 	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
-	editor = love.graphics.newFont("fonts/DisplayOTF.otf", 30)
 	d = love.graphics.newFont(14)
 	--love.mouse:setGrab(false)
 

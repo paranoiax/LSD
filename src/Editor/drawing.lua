@@ -1,6 +1,6 @@
 local data = Editor.data
 local toolbarHeight = 60 -- remember to update the font in main.lua too!
-
+local editor = love.graphics.newFont("fonts/DisplayOTF.otf", toolbarHeight/1.5)
 local function init()
 	
 	do -- topbar menu
@@ -12,7 +12,7 @@ local function init()
 				masterX,
 				0,
 				buttonWidth,
-				toolbarHeight/2
+				toolbarHeight
 			}
 			masterX = masterX - 5
 		end
@@ -124,15 +124,15 @@ function Editor.draw()
 		
 		local alpha = intersected and ( (data.topbar.selected == i) and 50 or 100) or 255
 		
-		love.graphics.setColor(0, 0, 0, alpha)
+		love.graphics.setColor(255, 255, 255, alpha)
 		love.graphics.rectangle("fill", x, y, w, h)
 		
 		love.graphics.setColor(255, 128, 0)
 		love.graphics.setFont(editor)
-		love.graphics.printf(str, x, y+4, w, "center")
+		love.graphics.printf(str, x, y+15, w, "center")
 	end
 	
-	for i,v in ipairs(Editor.map) do --let the pain being
+	for i,v in ipairs(Editor.map) do --let the pain begin
 	
 	end
 	
