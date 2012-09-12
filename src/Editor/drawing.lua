@@ -1,5 +1,5 @@
 local data = Editor.data
-local toolbarHeight = 60 -- remember to update the font in main.lua too!
+local toolbarHeight = 60
 local editor = love.graphics.newFont("fonts/DisplayOTF.otf", toolbarHeight/1.5)
 local function init()
 	
@@ -46,7 +46,7 @@ function Editor.update(dt)
 	objects.ball.anim:update(dt)
 end
 
-EditorSelected = {}
+local EditorSelected = {}
 function Editor.draw()
 	local mx, my = love.mouse.getPosition()
 	
@@ -84,7 +84,7 @@ function Editor.draw()
 			data.toolbar.selected = nil
 		end
 		
-		local alpha = intersected and 200 or 255
+		local alpha = intersected and 100 or 255
 		love.graphics.setColor(255, 255, 255, alpha)
 		love.graphics.rectangle("fill", x, y, toolbarHeight, toolbarHeight)
 		love.graphics.setColor(255, 255, 255, 255)
