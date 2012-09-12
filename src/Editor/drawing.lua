@@ -43,7 +43,7 @@ local function init()
 end
 
 function Editor.update(dt)
-
+	objects.ball.anim:update(dt)
 end
 
 EditorSelected = {}
@@ -54,6 +54,9 @@ function Editor.draw()
 	love.graphics.setColor(255,255,255)
 	love.graphics.setBlendMode("alpha")
 	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+	
+	-- draw the map, it has to be under every component
+	Editor.drawMap()
 	
 	-- DRAW TOOLBAR BACKGROUND
 	love.graphics.setColor(236, 233, 216)
@@ -111,8 +114,9 @@ function Editor.draw()
 				
 				if i == 1 then
 					Editor.unload()
+					return
 				elseif i == 3 then
-					Editor.map = {}
+					Editor.setMap(true)
 				elseif i == 4 then
 					-- test the stupid map
 				end
@@ -132,8 +136,8 @@ function Editor.draw()
 		love.graphics.printf(str, x, y+15, w, "center")
 	end
 	
-	for i,v in ipairs(Editor.map) do --let the pain begin
-	
+	if data.selected then
+		-- draw the selected item, if its a circle, draw it, if its whatever, draw whatever.
 	end
 	
 	if Editor.debug then
@@ -143,6 +147,27 @@ function Editor.draw()
 			love.graphics.printf(v, 0, 50*i + 300, screenWidth, "center")
 		end
 	end
+end
+
+function Editor.drawMap()
+	camera:set()
+	local map = Editor.map
+	
+	do -- draw both types of walls
+		for _,typ in ipairs{"sensors", "walls"} do
+			for i,v in ipairs(data.map[typ]) do
+				love.graphics.setColor(255,255,255)
+				love.graphics.drawq(_G[v.tile.."Tiles"], v.quad, v.x, v.y)
+			end
+		end
+	end
+	
+	do-- draw the flaming character
+		local v = map.player
+		love.graphics.setColor(255, 255, 255, 255)
+		objects.ball.anim:draw(v[1] - objects.ball.shape:getRadius(), v[2] - objects.ball.shape:getRadius())
+	end
+	camera:unset()
 end
 
 return init

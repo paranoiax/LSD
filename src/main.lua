@@ -144,6 +144,12 @@ function love.load()
 	end
 	
 	currentPack = "original"
+	while not love.filesystem.exists("levels/"..currentPack.."/level"..currentLevel..".lua") do
+		currentLevel = currentLevel - 1
+		if currentLevel <= 0 then
+			error("Couldn't find a level for that map-pack!")
+		end
+	end
 	map = love.filesystem.load("levels/"..currentPack.."/level"..currentLevel..".lua")()
 	
 	for i,v in pairs{sensors=addSensor, walls=addWall} do

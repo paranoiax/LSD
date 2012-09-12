@@ -22,9 +22,34 @@ function Editor.setMap(filepath, notify)
 	-- this function sets the running map (in the editor)
 	
 	-- ask whether to save
+	if notify then
+		-- notify the setter to save if it was saved
+	end
 	
 	if filepath == "" then return end -- dont throw an error
-	Editor.map = love.filesystem.load("levels/"..filepath..".lua")()
+
+	Editor.map = filepath==true and loadstring(data.newmap)() or love.filesystem.load("levels/"..filepath..".lua")()
+	data.map = {}
+	
+	camera.x = Editor.map.player[1] - screenWidth / 2
+	camera.y = Editor.map.player[2] - screenHeight / 2
+	
+	for a,tab in pairs({["Grey"]="sensors", ["Red"]="walls"}) do
+		data.map[tab] = {}
+		if Editor.map[tab] then
+			for i,v in ipairs(Editor.map[tab]) do
+				local x, y, w, h = unpack(v)
+				local x2, y2, w2, h2 = x - w / 2, y - w / 2, w, h
+				data.map[tab][i] = {
+					quad = love.graphics.newQuad(0, 0, w2, h2, _G[a.."TilesW"], _G[a.."TilesW"]),
+					x = x2,
+					y = y2,
+					tile = a
+				}
+			end
+		end
+	end
+	
 	--print(Editor.parse(Editor.map)) -- IT LOOKS LIKE CRAP :)
 end
 
