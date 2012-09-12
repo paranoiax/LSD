@@ -25,9 +25,12 @@ local function init()
 		for i,v in ipairs(data.toolbar.components) do
 			if type(v) == "table" then
 				local index = #data.toolbar.positions + 1
+				local img = love.graphics.newImage("Editor/icons/"..v[2])
+				data.toolbar.img[v[3]] = img
+				
 				data.toolbar.positions[index] = {
 					i,
-					love.graphics.newImage("Editor/icons/"..v[2]),
+					img,
 					masterX,
 					0,
 					0,
@@ -77,6 +80,7 @@ function Editor.draw()
 					if #EditorSelected > 10 then
 						table.remove(EditorSelected, 1)
 					end
+					Editor.setTool(data.toolbar.components[index][3])
 				end
 				data.toolbar.selected = nil
 			end
@@ -147,6 +151,8 @@ function Editor.draw()
 			love.graphics.printf(v, 0, 50*i + 300, screenWidth, "center")
 		end
 	end
+	
+	Editor.drawCursor()
 end
 
 function Editor.drawMap()
@@ -169,6 +175,28 @@ function Editor.drawMap()
 		objects.ball.anim:draw(v[1] - objects.ball.shape:getRadius(), v[2] - objects.ball.shape:getRadius())
 	end
 	camera:unset()
+end
+
+function Editor.setCursor(name)
+	data.cursor = data.cursors[name] and ( data.toolbar.img[name] or love.graphics.newImage("Editor/icons/"..data.cursors[name]) ) or nil
+end
+
+function Editor.drawCursor()
+	local mx, my = love.mouse.getPosition()
+	if data.cursor then
+		data.cursorUpdate = false
+		love.graphics.setColor(255, 255, 255, 255)
+		love.graphics.draw(data.cursor, mx, my, 0, data.cursorScale, data.cursorScale)
+	else
+		data.cursorUpdate = true
+	end
+	if not (data.cursorUpdate == data.cursorMode) then  -- i assume this method will allow SELECT->PAN to work correctly, but it doesn't. :/
+		data.cursorMode = data.cursorUpdate
+		love.timer.sleep(0.01)
+		love.mouse.setVisible(data.cursorMode)
+		love.timer.sleep(0.01)
+	end
+	love.mouse.setPosition(mx, my)
 end
 
 return init

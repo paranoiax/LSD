@@ -4,17 +4,17 @@ local data = Editor.data
 
 function Editor.load()
 	require("Editor.data")
-	require("Editor.drawing")()
+	require"Editor.tools"
+	local startDrawing = require("Editor.drawing")
 	
 	GAMESTATE = "EDITOR"
 	Editor.mode = "main"
 	Editor.debug = true
-	love.mouse.setVisible(true)
+
 	-- load the editor
 	-- by default load level1.lua
 	Editor.setMap("original/level1")
-	
-	
+	startDrawing()
 end
 
 function Editor.setMap(filepath, notify)

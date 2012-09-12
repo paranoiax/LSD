@@ -1,3 +1,10 @@
+Editor.data.cursors = {
+	pan = {"pan.png"},
+	select = false
+}
+
+Editor.data.cursorScale = 42/800
+
 Editor.data.topbar = { -- only for the menu
 	texts = {"Exit", "Options", "Clear", "Play"},
 	positions = {}
@@ -6,6 +13,7 @@ Editor.data.topbar = { -- only for the menu
 Editor.data.newmap = "return {player={0,0},boundaries=200}"
 
 Editor.data.toolbar = {
+	img = {},
 	positions = {},
 	components = {
 		{ -- returns camera on the player
