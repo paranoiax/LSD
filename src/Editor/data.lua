@@ -3,6 +3,8 @@ Editor.data.topbar = { -- only for the menu
 	positions = {}
 }
 
+Editor.data.newmap = "return {player={0,0},boundaries=200}"
+
 Editor.data.toolbar = {
 	positions = {},
 	components = {

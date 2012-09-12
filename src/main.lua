@@ -441,6 +441,7 @@ function INGAME_UPDATE(dt)
 			addParticle()
 			for i,v in ipairs(Particle) do
 				v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
+				v.r, v.g, v.b = math.random(255),math.random(255),math.random(255)
 			end
 			explode = false
 		end
@@ -499,7 +500,7 @@ function INGAME_DRAW()
 		end
 		
 		for i,v in ipairs(Particle) do
-			love.graphics.setColor(math.random(255),math.random(255),math.random(255))
+			love.graphics.setColor(v.r, v.g, v.b)
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 		end
 		
