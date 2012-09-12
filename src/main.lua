@@ -464,6 +464,7 @@ end
 
 function INGAME_DRAW()
 	if GAMESTATE == "INGAME" then
+		math.randomseed(love.timer.getMicroTime())
 		love.graphics.setBackgroundColor(255,255,255)
 		love.graphics.setColor(255,255,255)
 		love.graphics.setBlendMode("alpha")
@@ -498,7 +499,7 @@ function INGAME_DRAW()
 		end
 		
 		for i,v in ipairs(Particle) do
-			love.graphics.setColor(69,69,69)
+			love.graphics.setColor(math.random(255),math.random(255),math.random(255))
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 		end
 		
