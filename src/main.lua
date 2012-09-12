@@ -34,7 +34,7 @@ function beginCallback(fixture1, fixture2, contact)
 	for i,v in ipairs(Sensor) do
 		if v.fixture == fixture1 or v.fixture == fixture2 then
 			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-			v.touching = 1
+			v.touching = true
 			collX = v.body:getX()
 			collY = v.body:getY()
 			end
@@ -56,7 +56,7 @@ function endCallback(fixture1, fixture2, contact)
 	for i,v in ipairs(Sensor) do
 		if v.fixture == fixture1 or v.fixture == fixture2 then
 			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
-				v.touching = 0
+				v.touching = false
 				v.fixture:destroy()
 				v.isDestroyed = true
 				explode = true
@@ -208,7 +208,7 @@ function love.load()
 		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85-85,"Continue", "continue")
 	end
 	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3-85,"New Game", "new_game")
-	button_spawn(screenWidth / 2 - f:getWidth("MapEditor") / 2,screenHeight / 4 * 3,"Map Editor", "mapedit")
+	button_spawn(screenWidth / 2 - f:getWidth("Map Editor") / 2,screenHeight / 4 * 3,"Map Editor", "mapedit") --now correctly centered
 	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +85,"Quit", "quit")
 	
 	if GAMESTATE == "MENU" then
@@ -241,7 +241,7 @@ function love.draw()
 		love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
 		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
 		for q = 1, #Sensor do 
-			if Sensor[q].touching == 1 then
+			if Sensor[q].touching == true then
 				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
 			end
 		end--]]--
@@ -289,7 +289,7 @@ function addSensor(x, y, width, height)
 	Sensor[currentSensor].body = love.physics.newBody(world, x, y, "static")
 	Sensor[currentSensor].shape = love.physics.newRectangleShape(width, height)
 	Sensor[currentSensor].fixture = love.physics.newFixture(Sensor[currentSensor].body, Sensor[currentSensor].shape)
-	Sensor[currentSensor].touching = 0
+	Sensor[currentSensor].touching = false
 	Sensor[currentSensor].isDestroyed = false
 	Sensor[currentSensor].fixture:setSensor(false)
 	Sensor[currentSensor].fixture:setUserData("sensor")
@@ -484,7 +484,7 @@ function INGAME_DRAW()
 	   
 		if debugmode then
 			for i,v in ipairs(Sensor) do
-				if v.touching == 1 then
+				if v.touching == true then
 					love.graphics.setColor(200, 0, 0, 60)
 					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 				end
