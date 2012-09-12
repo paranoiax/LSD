@@ -34,21 +34,38 @@ function Editor.setMap(filepath, notify)
 	camera.x = Editor.map.player[1] - screenWidth / 2
 	camera.y = Editor.map.player[2] - screenHeight / 2
 	
-	for a,tab in pairs({["Grey"]="sensors", ["Red"]="walls"}) do
+	for i,v in pairs{sensors=addSensor, walls=addWall} do
+		for _, data in ipairs(map[i]) do
+			v(unpack(data))
+		end
+	end
+	
+	for rectA,tab in pairs({[{"", "Grey"}]=Sensor, [{"2","Red"}]=Wall}) do
+		for i,v in ipairs(tab) do
+			local x, y, w, h = v.x - v.width / 2, v.y - v.height / 2, v.width, v.height
+			_G["Rectangle"..rectA[1]][i] = {
+				quad = love.graphics.newQuad(0, 0, w, h, _G[rectA[2].."TilesW"], _G[rectA[2].."TilesW"]),
+				x = x,
+				y = y
+			}
+		end
+	end
+	--[[
+	for tile,tab in pairs({["Grey"]="sensors", ["Red"]="walls"}) do
 		data.map[tab] = {}
 		if Editor.map[tab] then
 			for i,v in ipairs(Editor.map[tab]) do
 				local x, y, w, h = unpack(v)
 				local x2, y2, w2, h2 = x - w / 2, y - w / 2, w, h
 				data.map[tab][i] = {
-					quad = love.graphics.newQuad(0, 0, w2, h2, _G[a.."TilesW"], _G[a.."TilesW"]),
+					quad = love.graphics.newQuad(x+w/2, y+h/2, w2, h2, _G[tile.."TilesW"], _G[tile.."TilesW"]),
 					x = x2,
 					y = y2,
-					tile = a
+					tile = tile
 				}
 			end
 		end
-	end
+	end]]
 	
 	--print(Editor.parse(Editor.map)) -- IT LOOKS LIKE CRAP :)
 end

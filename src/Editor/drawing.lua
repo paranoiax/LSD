@@ -154,10 +154,11 @@ function Editor.drawMap()
 	local map = Editor.map
 	
 	do -- draw both types of walls
-		for _,typ in ipairs{"sensors", "walls"} do
-			for i,v in ipairs(data.map[typ]) do
+		for _,typ in ipairs{"Rectangle", "Rectangle2"} do
+			for i,v in ipairs(_G[typ]) do
+				local tile = type=="Rectangle" and "GreyTiles" or "RedTiles"
 				love.graphics.setColor(255,255,255)
-				love.graphics.drawq(_G[v.tile.."Tiles"], v.quad, v.x, v.y)
+				love.graphics.drawq(_G[tile], v.quad, v.x, v.y)
 			end
 		end
 	end
