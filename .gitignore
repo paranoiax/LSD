@@ -22,3 +22,4 @@ stylecop.*
 ~$*
 *.dbmdl
 Desktop.ini
+*.lnk

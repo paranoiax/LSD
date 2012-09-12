@@ -3,6 +3,7 @@ Editor.data = {}
 local data = Editor.data
 
 function Editor.load()
+	require("Editor.data")
 	require("Editor.drawing")()
 	
 	GAMESTATE = "EDITOR"
