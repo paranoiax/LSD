@@ -3,7 +3,7 @@ Editor.data = {}
 local data = Editor.data
 
 function Editor.load()
-	require("Editor.data")
+	require"Editor.data"
 	require"Editor.tools"
 	local startDrawing = require("Editor.drawing")
 	
@@ -34,15 +34,9 @@ function Editor.setMap(filepath, notify)
 	camera.x = Editor.map.player[1] - screenWidth / 2
 	camera.y = Editor.map.player[2] - screenHeight / 2
 	
-	for i,v in pairs{sensors=addSensor, walls=addWall} do
-		for _, data in ipairs(map[i]) do
-			v(unpack(data))
-		end
-	end
-	
-	for rectA,tab in pairs({[{"", "Grey"}]=Sensor, [{"2","Red"}]=Wall}) do
+	for rectA,tab in pairs{[{"", "Grey"}]=Editor.map.sensors, [{"2","Red"}]=Editor.map.walls} do
 		for i,v in ipairs(tab) do
-			local x, y, w, h = v.x - v.width / 2, v.y - v.height / 2, v.width, v.height
+			local x, y, w, h = unpack(v)
 			_G["Rectangle"..rectA[1]][i] = {
 				quad = love.graphics.newQuad(0, 0, w, h, _G[rectA[2].."TilesW"], _G[rectA[2].."TilesW"]),
 				x = x,
