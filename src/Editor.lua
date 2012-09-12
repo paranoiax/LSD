@@ -8,6 +8,7 @@ function Editor.load()
 	
 	GAMESTATE = "EDITOR"
 	Editor.mode = "main"
+	Editor.debug = true
 	love.mouse.setVisible(true)
 	-- load the editor
 	-- by default load level1.lua

@@ -4,6 +4,7 @@ Editor.data.topbar = { -- only for the menu
 }
 
 Editor.data.toolbar = {
+	positions = {},
 	components = {
 		{ -- returns camera on the player
 			"Lie camera on character",
@@ -19,6 +20,11 @@ Editor.data.toolbar = {
 			"Pan",
 			"pan.png",
 			"pan"
+		},
+		{
+			"Zoom",
+			"zoom.png",
+			"zoom"
 		},
 		"[seperator]",
 		{
