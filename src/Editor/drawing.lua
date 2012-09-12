@@ -132,6 +132,10 @@ function Editor.draw()
 		love.graphics.printf(str, x, y+4, w, "center")
 	end
 	
+	for i,v in ipairs(Editor.map) do --let the pain being
+	
+	end
+	
 	if Editor.debug then
 		love.graphics.setColor(0, 0, 0)
 		love.graphics.printf("Selected items:", 0, 300, screenWidth, "center")

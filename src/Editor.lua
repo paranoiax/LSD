@@ -12,7 +12,7 @@ function Editor.load()
 	love.mouse.setVisible(true)
 	-- load the editor
 	-- by default load level1.lua
-	Editor.setMap("level1")
+	Editor.setMap("original/level1")
 	
 	
 end

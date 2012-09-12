@@ -7,7 +7,7 @@ function nextLevel(dt)
 		winTimer = winTimer - dt
 	end
 	if winTimer < 0 then
-		if love.filesystem.exists("levels/level"..currentLevel + 1 ..".lua") then
+		if love.filesystem.exists("levels/" .. currentPack .."/level"..currentLevel + 1 ..".lua") then
 			currentLevel = currentLevel + 1
 			if currentLevel > maxLevel then
 				love.filesystem.write("save.lua", currentLevel)

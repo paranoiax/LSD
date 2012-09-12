@@ -136,6 +136,7 @@ function love.load()
 
 	maxLevel = love.filesystem.read("save.lua")
 	maxLevel = tonumber(maxLevel)
+	print(maxLevel)
 
 	if maxLevel > 1 then
 		currentLevel = maxLevel
@@ -143,7 +144,8 @@ function love.load()
 		currentLevel = 1
 	end
 	
-	map = love.filesystem.load("levels/level"..currentLevel..".lua")()
+	currentPack = "original"
+	map = love.filesystem.load("levels/"..currentPack.."/level"..currentLevel..".lua")()
 	
 	for i,v in pairs{sensors=addSensor, walls=addWall} do
 		for _, data in ipairs(map[i]) do

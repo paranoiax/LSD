@@ -1,0 +1,3 @@
+return {
+	maxLevels = 5
+}
