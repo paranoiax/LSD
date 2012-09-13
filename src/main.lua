@@ -73,12 +73,13 @@ function endCallback(fixture1, fixture2, contact)
 end
 
 function love.load()	
-	love.mouse.setVisible(false)	
+	love.mouse.setVisible(false)
 	
 	explodeBall = false
 	BallExplode = false
 	explosionTime = 1
 
+	particleEffects = true
 	debugmode = false
 	
 	icon = love.graphics.newImage("images/icon.png")
@@ -443,19 +444,23 @@ function INGAME_UPDATE(dt)
 				v.body:setActive(false)
 				v.body:destroy()
 			end
-			addParticle()
-			for i,v in ipairs(Particle) do
-				v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
-				--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
+			if particleEffects == true then
+				addParticle()
+				for i,v in ipairs(Particle) do
+					v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
+					--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
+				end
 			end
 			explode = false
 		end
 		
 		if death then
 			TEsound.play("sounds/death.wav")
-			addDeathParticle()
-			for i,v in ipairs(DeathParticle) do
-				v.body:applyLinearImpulse(VelX / 500, VelY / 500)
+			if particleEffects == true then
+				addDeathParticle()
+				for i,v in ipairs(DeathParticle) do
+					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
+				end
 			end
 			death = false
 		end
