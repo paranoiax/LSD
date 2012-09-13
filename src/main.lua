@@ -269,14 +269,6 @@ function ball_launch()
 	end
 end
 
-function draw_crosshair()		
-	if objects.ball.canJump == true then
-		love.graphics.setColor(202,143,84,255)---distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
-		love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
-		love.graphics.setColor(255,255,255,255)
-	end
-end
-
 function aim_crosshair()
 	love.mouse.setVisible(false)
 	love.graphics.setColor(202,143,84)
@@ -486,8 +478,10 @@ function INGAME_DRAW()
 		
 		love.graphics.setLine(3, "smooth")
 		
-		if aiming == true then
-			draw_crosshair()
+		if aiming and objects.ball.canJump then
+			love.graphics.setColor(202,143,84,255)---distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
+			love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
+			love.graphics.setColor(255,255,255,255)
 		end	
 		
 		if objects.ball.isAlive then
