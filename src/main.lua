@@ -82,6 +82,7 @@ function love.load()
 	debugmode = false
 	
 	icon = love.graphics.newImage("images/icon.png")
+	cursorImg = love.graphics.newImage("images/cursor.png")
 	love.graphics.setIcon(icon)
 	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
