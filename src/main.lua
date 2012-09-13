@@ -426,8 +426,8 @@ function INGAME_UPDATE(dt)
 			end
 		end
 		
-		camera.x = objects.ball.body:getX() - screenWidth / 2
-		camera.y = objects.ball.body:getY() - screenHeight / 2
+		camera.x = camera.x - (camera.x - (objects.ball.body:getX() - screenWidth / 2)) * dt * camera.speed
+		camera.y = camera.y - (camera.y - (objects.ball.body:getY() - screenHeight / 2)) * dt * camera.speed
 		
 		if not objects.ball.isAlive then
 			objects.ball.canJump = false
