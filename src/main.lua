@@ -445,7 +445,7 @@ function INGAME_UPDATE(dt)
 			addParticle()
 			for i,v in ipairs(Particle) do
 				v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
-				v.r, v.g, v.b = math.random(255),math.random(255),math.random(255)
+				--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
 			end
 			explode = false
 		end
@@ -469,7 +469,7 @@ end
 
 function INGAME_DRAW()
 	if GAMESTATE == "INGAME" then
-		math.randomseed(love.timer.getMicroTime())
+		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!
 		love.graphics.setBackgroundColor(255,255,255)
 		love.graphics.setColor(255,255,255)
 		love.graphics.setBlendMode("alpha")
@@ -504,7 +504,7 @@ function INGAME_DRAW()
 		end
 		
 		for i,v in ipairs(Particle) do
-			love.graphics.setColor(v.r, v.g, v.b)
+			love.graphics.setColor(69,69,69) --(v.r, v.g, v.b)
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 		end
 		
