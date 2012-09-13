@@ -5,6 +5,8 @@ require "Loader"
 require "Editor"
 require "menu"
 require "controls"
+local cron = require 'lib.cron'
+local tween = require 'lib.tween'
 
 explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
 
@@ -50,6 +52,8 @@ function endCallback(fixture1, fixture2, contact)
 			objects.ball.canJump = false
 			explodeBall = false
 			explosionTime = 1
+			tween.resetAll()
+			cron.reset()
 		end
 	end
 
@@ -62,7 +66,7 @@ function endCallback(fixture1, fixture2, contact)
 				explode = true
 				shake = true
 				TEsound.play(explosionList)
-				SensorsDestroyed = SensorsDestroyed + 1
+				SensorsDestroyed = SensorsDestroyed + 1				
 			end
 		end
 	end
@@ -103,11 +107,16 @@ function love.load()
 	Sensor = {}
 	Obstacle = {}
 	Particle = {}
+	ParticleAlpha = {255}
 	Wall = {}
 	DeathParticle = {}
+	DeathParticleAlpha = {255}
 	currentSensor = 1
 	currentObstacle = 1
 	currentWall = 1
+	
+	tween.resetAll()
+	cron.reset()
 
 	Rectangle = {}
 	GreyTiles = love.graphics.newImage('images/quad_grey.png')
@@ -266,6 +275,14 @@ function ball_launch()
 	local x,y = objects.ball.body:getPosition()
 	if objects.ball.canJump == true then
 		objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
+	end
+end
+
+function draw_crosshair()		
+	if objects.ball.canJump == true then
+		love.graphics.setColor(202,143,84,-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
+		love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
+		love.graphics.setColor(255,255,255,255)
 	end
 end
 
@@ -430,7 +447,8 @@ function INGAME_UPDATE(dt)
 			objects.ball.body:setAwake(false)		
 		end
 		
-		if explode then
+		if explode then			
+			ParticleAlpha = {255}
 			for i,v in ipairs(Particle) do
 				v.fixture:destroy()
 				v.body:setActive(false)
@@ -443,6 +461,7 @@ function INGAME_UPDATE(dt)
 					--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
 				end
 			end
+			cron.after(1, tweenExplosion)
 			explode = false
 		end
 		
@@ -454,6 +473,7 @@ function INGAME_UPDATE(dt)
 					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
 				end
 			end
+			cron.after(1.25, tweenDeath)			
 			death = false
 		end
 		
@@ -462,6 +482,8 @@ function INGAME_UPDATE(dt)
 		nextLevel(dt)
 		game_over(dt)
 		outOfBounds()
+		cron.update(dt)
+		tween.update(dt)
 	end
 end
 
@@ -478,10 +500,8 @@ function INGAME_DRAW()
 		
 		love.graphics.setLine(3, "smooth")
 		
-		if aiming and objects.ball.canJump then
-			love.graphics.setColor(202,143,84,255)---distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
-			love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
-			love.graphics.setColor(255,255,255,255)
+		if aiming == true then
+			draw_crosshair()
 		end	
 		
 		if objects.ball.isAlive then
@@ -504,12 +524,12 @@ function INGAME_DRAW()
 		end
 		
 		for i,v in ipairs(Particle) do
-			love.graphics.setColor(69,69,69) --(v.r, v.g, v.b)
+			love.graphics.setColor(69,69,69,ParticleAlpha[1]) --(v.r, v.g, v.b)
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-		end
+		end		
 		
 		for i,v in ipairs(DeathParticle) do
-			love.graphics.setColor(202,143,84)
+			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
 		end
 		
@@ -585,4 +605,18 @@ function newGame()
 	GAMESTATE = "INGAME"
 	love.filesystem.load("main.lua")()
 	love.load()
+end
+
+function tweenDeath()
+	tween(1, DeathParticleAlpha, {0}, "linear", tweenDeathOver)
+end
+
+function tweenDeathOver()
+	if gameOver == false then
+		DeathParticleAlpha = {255}
+	end
+end
+
+function tweenExplosion()
+	tween(1.5, ParticleAlpha, {0}, "linear")
 end

@@ -29,7 +29,7 @@ function game_over(dt)
 		gameOverTimer = gameOverTimer - dt * 1.5
 	end
 	if gameOverTimer < 0 then
-		currentLevel = currentLevel
+		currentLevel = currentLevel		
 		love.filesystem.load("main.lua")()
 		love.load()
 	end
