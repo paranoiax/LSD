@@ -83,7 +83,10 @@ function love.load()
 	BallExplode = false
 	explosionTime = 1
 
-	particleEffects = true
+	options = {}
+	options.particleEffects = true
+	options.shakeScreen = true
+	
 	debugmode = false
 	
 	icon = love.graphics.newImage("images/icon.png")
@@ -454,7 +457,7 @@ function INGAME_UPDATE(dt)
 				v.body:setActive(false)
 				v.body:destroy()
 			end
-			if particleEffects == true then
+			if options.particleEffects == true then
 				addParticle()
 				for i,v in ipairs(Particle) do
 					v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
@@ -467,7 +470,7 @@ function INGAME_UPDATE(dt)
 		
 		if death then
 			TEsound.play("sounds/death.wav")
-			if particleEffects == true then
+			if options.particleEffects == true then
 				addDeathParticle()
 				for i,v in ipairs(DeathParticle) do
 					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
@@ -496,7 +499,9 @@ function INGAME_DRAW()
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 		
 		camera:set()
-		camera:shake()
+		if options.shakeScreen then
+			camera:shake()
+		end
 		
 		love.graphics.setLine(3, "smooth")
 		
