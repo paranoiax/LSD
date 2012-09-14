@@ -233,9 +233,17 @@ function love.load()
 	if currentLevel > 1 then
 		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85-85,"Continue", "continue")
 	end
-	button_spawn(screenWidth / 2 - f:getWidth("New Game") / 2,screenHeight / 4 * 3-85,"New Game", "new_game")
-	button_spawn(screenWidth / 2 - f:getWidth("Map Editor") / 2,screenHeight / 4 * 3,"Map Editor", "mapedit") --now correctly centered
-	button_spawn(screenWidth / 2 - f:getWidth("Quit") / 2,screenHeight / 4 * 3 +85,"Quit", "quit")
+	
+	local menu = {
+		{"New Game", "new_game"},
+		{"Map Editor", "mapedit"},
+		{"Quit", "quit"}
+	}
+	local menuY = screenHeight / 4 * 3-85
+	for i,v in ipairs(menu) do
+		button_spawn(screenWidth/2 - f:getWidth(v[1])/2, menuY, v[1], v[2])
+		menuY = menuY + 85
+	end
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
