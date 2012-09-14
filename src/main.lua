@@ -65,7 +65,9 @@ function endCallback(fixture1, fixture2, contact)
 				v.isDestroyed = true
 				explode = true
 				shake = true
-				TEsound.play(explosionList)
+				if options.audio.sfx then
+					TEsound.play(explosionList)
+				end
 				SensorsDestroyed = SensorsDestroyed + 1				
 			end
 		end
@@ -83,9 +85,14 @@ function love.load()
 	BallExplode = false
 	explosionTime = 1
 
-	options = {}
-	options.particleEffects = true
-	options.shakeScreen = true
+	options = {
+		graphics = {},
+		audio = {}
+	}
+	options.graphics.particleEffects = true
+	options.graphics.shakeScreen = true
+	options.audio.music = true
+	options.audio.sfx = true
 	
 	debugmode = false
 	
@@ -232,7 +239,9 @@ function love.load()
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
-		TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
+		if options.audio.music then
+			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
+		end
 	end
 	
 end
@@ -457,7 +466,7 @@ function INGAME_UPDATE(dt)
 				v.body:setActive(false)
 				v.body:destroy()
 			end
-			if options.particleEffects == true then
+			if options.graphics.particleEffects == true then
 				addParticle()
 				for i,v in ipairs(Particle) do
 					v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
@@ -469,8 +478,10 @@ function INGAME_UPDATE(dt)
 		end
 		
 		if death then
-			TEsound.play("sounds/death.wav")
-			if options.particleEffects == true then
+			if options.audio.sfx then
+				TEsound.play("sounds/death.wav")
+			end
+			if options.graphics.particleEffects == true then
 				addDeathParticle()
 				for i,v in ipairs(DeathParticle) do
 					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
@@ -499,7 +510,7 @@ function INGAME_DRAW()
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 		
 		camera:set()
-		if options.shakeScreen then
+		if options.graphics.shakeScreen then
 			camera:shake()
 		end
 		
