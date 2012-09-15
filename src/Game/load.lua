@@ -1,17 +1,16 @@
 Game = gs:new()
+require "Game.drawing"
 
 function Game:init()
-	require "Game.drawing"
 end
 
 function Game:leave()
+	---[[
 	for i,v in pairs(world:getBodyList()) do
-		if objects.ball.body ~= protected then
-			v:destroy()
+		if v~=objects.ball.body then
+			pcall(function() v.destroy() end)
 		end
-		--v.shape:destroy()
-	end
-	
+	end--]]
 end
 
 function Game:enter(old, pack, level)
@@ -51,7 +50,6 @@ function Game:enter(old, pack, level)
 	
 	limit = 90
 	deathLimit = 70
-	SensorsCount = #Sensor
 	SensorsDestroyed = 0
 
 	win = false
@@ -59,8 +57,23 @@ function Game:enter(old, pack, level)
 	gameOver = false
 	gameOverTimer = 3
 	
-	collectgarbage()
-	
+	objects.ball = {}
+	objects.ball.image = love.graphics.newImage("images/ball_anim.png")
+	objects.ball.anim = newAnimation(objects.ball.image, 24, 24, 0.1, 0)
+	objects.ball.force = 0.95
+	objects.ball.body = love.physics.newBody(world, 0, 0, "dynamic")
+	objects.ball.shape = love.physics.newCircleShape(12)
+	objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1)
+	objects.ball.fixture:setRestitution(0)
+	objects.ball.body:setLinearDamping(0.2)
+	objects.ball.body:setFixedRotation(true)
+	objects.ball.fixture:setFriction(1)
+	objects.ball.fixture:setUserData("ball")
+	objects.ball.body:setMass(0.3)
+	objects.ball.fixture:setCategory(4)
+	objects.ball.fixture:setMask(3)
+	objects.ball.sticky = false
+	objects.ball.canJump = false
 	objects.ball.isAlive = true
 	
 	if not love.filesystem.exists("save.lua") then
@@ -101,7 +114,14 @@ function Game:enter(old, pack, level)
 		end
 	end
 	
+	SensorsCount = #Sensor
 	collectgarbage()
+end
+
+function Game:mousepressed(x, y, b)
+	if b == "l" then
+		aiming = true
+	end	
 end
 
 function Game:mousereleased(x, y, b)
@@ -152,6 +172,7 @@ function Game:update(dt)
 		objects.ball.isAlive = false
 		objects.ball.canJump = false
 		death = true
+		print"explosion time!"
 		explodeBall = false
 		gameOver = true
 		explosionTime = 0
@@ -182,7 +203,7 @@ function Game:update(dt)
 			v.body:setActive(false)
 			v.body:destroy()
 		end
-		if options.graphics.particleEffects == true then
+		if options.graphics.particleEffects then
 			addParticle()
 			for i,v in ipairs(Particle) do
 				v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
@@ -239,10 +260,11 @@ function Game:update(dt)
 	end
 	
 	if gameOverTimer < 0 then
+		gameOver = false
 		gs.switch(Game, currentPack, currentLevel)
 	end
 	
-	gameOver = ( (objects.ball.body:getX() < -map.boundaries or objects.ball.body:getX() > map.boundaries or objects.ball.body:getY() < -map.boundaries or objects.ball.body:getY() > map.boundaries) and (not win) )
+	gameOver = (objects.ball.body:getX() < -map.boundaries or objects.ball.body:getX() > map.boundaries or objects.ball.body:getY() < -map.boundaries or objects.ball.body:getY() > map.boundaries) or (not win)
 end
 
 
@@ -269,6 +291,7 @@ function beginCallback(fixture1, fixture2, contact)
 		VelX, VelY = objects.ball.body:getLinearVelocity()
 		objects.ball.isAlive = false
 		death = true
+		print"oops! hit a wall!"
 	end
 	
 	for i,v in ipairs(Sensor) do
@@ -386,7 +409,7 @@ function tweenDeath()
 end
 
 function tweenDeathOver()
-	if gameOver == false then
+	if not gameOver then
 		DeathParticleAlpha = {255}
 	end
 end

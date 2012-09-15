@@ -49,12 +49,14 @@ function Game:draw(mx,my)
 	end
 	
 	-- draw red and grey rectangle
-	for i,v in pairs{Grey="", Red="2"} do
+	for ti,v in pairs{Grey="", Red="2"} do
 		local tab = _G["Rectangle"..v]
-		local tile = _G[i.."Tiles"]
+		local tile = _G[ti.."Tiles"]
 		for i,v in ipairs(tab) do
-			love.graphics.setColor(255,255,255)
-			love.graphics.drawq(tile, v.quad, v.x, v.y)
+			if not _G[ti=="Red" and "Wall" or "Sensor"][i].isDestroyed then
+				love.graphics.setColor(255,255,255)
+				love.graphics.drawq(tile, v.quad, v.x, v.y)
+			end
 		end
 	end			
 	
@@ -80,12 +82,13 @@ function Game:draw(mx,my)
 		love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
 	end
 	
+	camera:unset()
+	
 	-- CROSSHAIR
 	love.graphics.setColor(202,143,84)
-	love.graphics.line(mx -7 +camera.x, my -7 + camera.y, love.mouse.getX() + 7 + camera.x, love.mouse.getY() + 7 + camera.y)
-	love.graphics.line(mx +7 +camera.x, my -7 + camera.y, love.mouse.getX() -7 + camera.x, love.mouse.getY() + 7 + camera.y)
+	love.graphics.line(mx -7, my - 7, mx + 7, my + 7)
+	love.graphics.line(mx +7, my - 7, mx - 7, my + 7)
 	
-	camera:unset()
 	
 	love.graphics.setColor(0,0,0,180)
 	love.graphics.rectangle("fill", 0, screenHeight - 50, screenWidth * explosionTime, 50)
