@@ -1,3 +1,4 @@
+gs = require "lib.hump.gamestate"
 require "camera"
 require "lib.TEsound"
 require "lib.AnAL"
@@ -8,7 +9,7 @@ require "controls"
 local cron = require 'lib.cron'
 local tween = require 'lib.tween'
 
-explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
+local explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
 
 function beginCallback(fixture1, fixture2, contact)
 
@@ -250,43 +251,6 @@ function love.load()
 		if options.audio.music then
 			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
 		end
-	end
-	
-end
-
-function love.update(dt)
-
-	MENU_UPDATE(dt)
-	INGAME_UPDATE(dt)
-	if GAMESTATE == "EDITOR" then
-		Editor.update(dt)
-	end
-end
-
-function love.draw()
-	if GAMESTATE == "EDITOR" then
-		Editor.draw()
-	end
-	MENU_DRAW()
-	INGAME_DRAW()
-
-	if debugmode == true then
-		love.graphics.setColor(255,50,200)
-		love.graphics.setFont(d)
-		--[[love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-		love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
-		for q = 1, #Sensor do 
-			if Sensor[q].touching == true then
-				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
-			end
-		end--]]--
-		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-		love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
-		--love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
-		love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
-		love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
-		love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
 	end
 	
 end
@@ -585,30 +549,6 @@ function INGAME_DRAW()
 		aim_crosshair()
 		camera:unset()
 		draw_timer()
-	end
-end
-
-function MENU_UPDATE(dt)
-	if GAMESTATE == "MENU" then
-		ball_menu_anim:update(dt)
-		button_check()
-	end
-end
-
-function MENU_DRAW()
-	if GAMESTATE == "MENU" then
-		love.graphics.setColor(255,255,255)
-		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 250)
-
-		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Little Sticky Destroyer",2, 82, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Little Sticky Destroyer",0, 80, screenWidth, "center")
-		
-		button_draw()
-		menuCursor()
 	end
 end
 
