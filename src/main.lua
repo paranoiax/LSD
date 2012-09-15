@@ -30,7 +30,7 @@ function love.load()
 	options.audio.music = true
 	options.audio.sfx = true
 	
-	debugmode = false
+	debugmode = true
 	
 	icon = love.graphics.newImage("images/icon.png")
 	cursorImg = love.graphics.newImage("images/cursor.png")
@@ -58,11 +58,13 @@ function love.load()
 	RedTiles:setWrap("repeat","repeat")	
 	RedTilesW, RedTilesH = RedTiles:getWidth(), GreyTiles:getHeight()
 	
+
 	objects.ball = {}
 	objects.ball.image = love.graphics.newImage("images/ball_anim.png")
 	objects.ball.anim = newAnimation(objects.ball.image, 24, 24, 0.1, 0)
 	objects.ball.force = 0.95
 	objects.ball.body = love.physics.newBody(world, 0, 0, "dynamic")
+	protected = objects.ball.body
 	objects.ball.shape = love.physics.newCircleShape(12)
 	objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1)
 	objects.ball.fixture:setRestitution(0)

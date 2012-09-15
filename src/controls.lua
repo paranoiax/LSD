@@ -25,22 +25,26 @@ function love.draw()
     gs.draw(mx, my)
 
 	if debugmode == true then
+		pcall( function()
+		--camera:unset()
 		love.graphics.setColor(255,50,200)
 		love.graphics.setFont(d)
-		--[[love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-		love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
+		---[[
+		love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() ,love.mouse.getY() ),10 ,15 )
+		love.graphics.print("Active Bodies: "..world:getBodyCount(),10,35)
+		love.graphics.print("Particles per Explosion: "..limit,10 ,55 )
 		for q = 1, #Sensor do 
 			if Sensor[q].touching == true then
-				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
+				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 ,115 )
 			end
 		end--]]--
-		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-		love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
-		--love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
-		love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
-		love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
-		love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
+		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 , 75 )
+		love.graphics.print('Press "R" to restart!',10 , 95 )
+		love.graphics.print("Time until explosion: "..explosionTime,10 , 135 )
+		love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 , 155 )
+		love.graphics.print("Current Level: "..currentLevel,10 , 175 )
+		love.graphics.print("Current Gamestate: "..GAMESTATE,10 , 195 )
+		end )
 	end
 	
 end

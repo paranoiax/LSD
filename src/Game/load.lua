@@ -4,7 +4,18 @@ function Game:init()
 	require "Game.drawing"
 end
 
+function Game:leave()
+	for i,v in pairs(world:getBodyList()) do
+		if objects.ball.body ~= protected then
+			v:destroy()
+		end
+		--v.shape:destroy()
+	end
+	
+end
+
 function Game:enter(old, pack, level)
+	collectgarbage()
 	love.mouse.setVisible(false)
 	currentPack = pack
 	currentLevel = level
@@ -17,15 +28,14 @@ function Game:enter(old, pack, level)
 	explosionTime = 1
 	
 	Sensor = {}
-	Obstacle = {}
 	Particle = {}
 	ParticleAlpha = {255}
 	Wall = {}
 	DeathParticle = {}
 	DeathParticleAlpha = {255}
 	currentSensor = 1
-	currentObstacle = 1
 	currentWall = 1
+	Rectangle, Rectangle2 = {}, {}
 	
 	tween.resetAll()
 	cron.reset()
@@ -48,6 +58,10 @@ function Game:enter(old, pack, level)
 	winTimer = 3
 	gameOver = false
 	gameOverTimer = 3
+	
+	collectgarbage()
+	
+	objects.ball.isAlive = true
 	
 	if not love.filesystem.exists("save.lua") then
 		love.filesystem.newFile("save.lua")
@@ -72,7 +86,6 @@ function Game:enter(old, pack, level)
 	
 	for i,v in pairs{sensors=addSensor, walls=addWall} do
 		for _, data in ipairs(map[i]) do
-			print("creating" .. i .. ", index:".._)
 			v(unpack(data))
 		end
 	end
@@ -87,6 +100,8 @@ function Game:enter(old, pack, level)
 			}
 		end
 	end
+	
+	collectgarbage()
 end
 
 function Game:mousereleased(x, y, b)
