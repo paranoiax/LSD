@@ -2,7 +2,14 @@
 Editor = gs:new()
 require("Editor.drawing")
 Editor.data = {}
-local data = Editor.data
+local data = setmetatable({}, {
+	__index = function(_,k,v)
+		return rawget(Editor.data, k)
+	end,
+	__newindex = function(t,k,v)
+		rawset(Editor.data, k, v)
+	end
+})
 
 function Editor:init()
 	require"Editor.data"

@@ -59,7 +59,7 @@ function Menu:mousereleased(x, y, b)
 				if v.id == "quit" then
 					love.event.push("quit")
 				elseif (v.id == "continue") or (v.id == "new_game") then
-					currentLevel = (v.id == "continue") and tonumber(love.filesystem.read("save.lua")) or 1
+					currentLevel = (v.id == "continue") and tonumber( tostring( love.filesystem.read("save.lua") ) ) or 1
 					currentPack = (v.id == "continue") and "original" or "original" -- the first "original" you can load the active pack
 					love.filesystem.write("save.lua", currentLevel)
 					gs.switch(Game, currentPack, currentLevel)

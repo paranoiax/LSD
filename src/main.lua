@@ -57,7 +57,7 @@ function love.load()
 	RedTiles = love.graphics.newImage('images/quad.png')
 	RedTiles:setWrap("repeat","repeat")	
 	RedTilesW, RedTilesH = RedTiles:getWidth(), GreyTiles:getHeight()
-
+	
 	objects.ball = {}
 	objects.ball.image = love.graphics.newImage("images/ball_anim.png")
 	objects.ball.anim = newAnimation(objects.ball.image, 24, 24, 0.1, 0)
@@ -76,17 +76,6 @@ function love.load()
 	objects.ball.sticky = false
 	objects.ball.canJump = false
 	objects.ball.isAlive = true
-
-	for rectA,tab in pairs({[{"", "Grey"}]=Sensor, [{"2","Red"}]=Wall}) do
-		for i,v in ipairs(tab) do
-			local x, y, w, h = v.x - v.width / 2, v.y - v.height / 2, v.width, v.height
-			_G["Rectangle"..rectA[1]][i] = {
-				quad = love.graphics.newQuad(0, 0, w, h, _G[rectA[2].."TilesW"], _G[rectA[2].."TilesW"]),
-				x = x,
-				y = y
-			}
-		end
-	end
 	
 	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
 	if not gameFullscreen then

@@ -16,8 +16,6 @@ function Game:enter(old, pack, level)
 	BallExplode = false
 	explosionTime = 1
 	
-	button = {}
-	objects = {}
 	Sensor = {}
 	Obstacle = {}
 	Particle = {}
@@ -51,7 +49,7 @@ function Game:enter(old, pack, level)
 	gameOver = false
 	gameOverTimer = 3
 	
-		if not love.filesystem.exists("save.lua") then
+	if not love.filesystem.exists("save.lua") then
 		love.filesystem.newFile("save.lua")
 		love.filesystem.write("save.lua", 1)
 	end
@@ -66,15 +64,29 @@ function Game:enter(old, pack, level)
 	end
 	map = love.filesystem.load("levels/"..currentPack.."/level"..currentLevel..".lua")()
 	
+	if currentLevel > maxLevel then
+		love.filesystem.write("save.lua", currentLevel)
+	end
+	
+	objects.ball.body:setPosition(map.player[1], map.player[2])
+	
 	for i,v in pairs{sensors=addSensor, walls=addWall} do
 		for _, data in ipairs(map[i]) do
+			print("creating" .. i .. ", index:".._)
 			v(unpack(data))
 		end
 	end
 	
-	if currentLevel > maxLevel then
-		love.filesystem.write("save.lua", currentLevel)
-	end	
+	for rectA,tab in pairs({[{"", "Grey"}]=Sensor, [{"2","Red"}]=Wall}) do
+		for i,v in ipairs(tab) do
+			local x, y, w, h = v.x - v.width / 2, v.y - v.height / 2, v.width, v.height
+			_G["Rectangle"..rectA[1]][i] = {
+				quad = love.graphics.newQuad(0, 0, w, h, _G[rectA[2].."TilesW"], _G[rectA[2].."TilesW"]),
+				x = x,
+				y = y
+			}
+		end
+	end
 end
 
 function Game:mousereleased(x, y, b)
@@ -92,9 +104,9 @@ end
 function Game:keypressed(key, unicode)
 	if key == "r" or key == "enter" or key == "return" or key == " " then
 		-- restart the map (retry)
-		gs:switch(Game, currentPack, currentLevel)
+		gs.switch(Game, currentPack, currentLevel)
 	elseif key == "escape" then
-		gs:switch(Menu)
+		gs.switch(Menu)
 	end
 end
 
@@ -199,11 +211,11 @@ function Game:update(dt)
 			if currentLevel > maxLevel then
 				love.filesystem.write("save.lua", currentLevel)
 			end
-			gs:switch(Game, currentPack, currentLevel)
+			gs.switch(Game, currentPack, currentLevel)
 		else
 			currentLevel = 1
 			love.filesystem.write("save.lua", currentLevel)
-			gs:switch(Menu)
+			gs.switch(Menu)
 		end
 	end	
 	
@@ -212,7 +224,7 @@ function Game:update(dt)
 	end
 	
 	if gameOverTimer < 0 then
-		gs:switch(Game, currentPack, currentLevel)
+		gs.switch(Game, currentPack, currentLevel)
 	end
 	
 	gameOver = ( (objects.ball.body:getX() < -map.boundaries or objects.ball.body:getX() > map.boundaries or objects.ball.body:getY() < -map.boundaries or objects.ball.body:getY() > map.boundaries) and (not win) )
