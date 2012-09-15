@@ -7,20 +7,10 @@ end
 
 function love.mousereleased(x,y,b)
 	gs.mousereleased(x, y, b)
-	if b == "l" and GAMESTATE == "INGAME" then
-		ball_launch(x,y)
-		aiming = false
-		if objects.ball.canJump == true then
-			objects.ball.sticky = false
-		end				
-	end
-	if b == "l" and GAMESTATE == "MENU" then
-		button_click(x,y)
-	end
 end
 
-function love.keypressed(key, ...)
-	gs.keypressed(x, y, b)
+function love.keypressed(key, unicode)
+	gs.keypressed(key, unicode)
 	if GAMESTATE == "EDITOR" then
 		Editor.keypressed(key, ...)
 	elseif GAMESTATE == "INGAME" then
@@ -42,19 +32,11 @@ end
 function love.update(dt)
 	gs.update(dt)
 	INGAME_UPDATE(dt)
-	if GAMESTATE == "EDITOR" then
-		Editor.update(dt)
-	end
 end
 
 function love.draw()
 	local mx,my = love.mouse.getPosition()
     gs.draw(mx, my)
-	
-	if GAMESTATE == "EDITOR" then
-		Editor.draw()
-	end
-	INGAME_DRAW()
 
 	if debugmode == true then
 		love.graphics.setColor(255,50,200)

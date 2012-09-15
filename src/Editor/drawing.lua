@@ -45,12 +45,12 @@ local function init()
 	end
 end
 
-function Editor.update(dt)
+function Editor:update(dt)
 	objects.ball.anim:update(dt)
 end
 
 local EditorSelected = {}
-function Editor.draw()
+function Editor:draw()
 	local mx, my = love.mouse.getPosition()
 	
 	love.graphics.setBackgroundColor(255,255,255)

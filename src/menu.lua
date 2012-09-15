@@ -1,29 +1,10 @@
-menu = gs:new()
+Menu = gs:new()
 
 function button_spawn(x,y,text, id)
 	table.insert(button, {x = x, y = y, text = text, id = id, mouseover = false})
 end
 
-function button_click(x,y)
-	for i,v in ipairs(button) do
-		if x > v.x and
-		x < v.x + f:getWidth(v.text) and
-		y > v.y and
-		y < v.y + f:getHeight(v.text) then
-			if v.id == "quit" then
-				love.event.push("quit")
-			elseif v.id == "continue" then
-				continue()
-			elseif v.id == "new_game" then
-				newGame()
-			elseif v.id == "mapedit" then
-				Editor.load()
-			end
-		end
-	end
-end
-
-function menu:update(dt)
+function Menu:update(dt)
 	ball_menu_anim:update(dt)
 	
 	for i,v in ipairs(button) do		
@@ -38,7 +19,25 @@ function menu:update(dt)
 	end
 end
 
-function menu:draw()
+function Menu:mousereleased(x, y, b)
+	if b == "l" then
+		for i,v in ipairs(button) do
+			if (x > v.x) and (x < v.x + f:getWidth(v.text)) and (y > v.y) and (y < v.y + f:getHeight(v.text)) then
+				if v.id == "quit" then
+					love.event.push("quit")
+				elseif v.id == "continue" then
+					continue()
+				elseif v.id == "new_game" then
+					newGame()
+				elseif v.id == "mapedit" then
+					Editor.load()
+				end
+			end
+		end
+	end
+end
+
+function Menu:draw()
 	love.graphics.setColor(255,255,255)
 	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 	ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 250)
@@ -61,4 +60,16 @@ function menu:draw()
 	
 	love.graphics.setColor(255,255,255)
 	love.graphics.draw(cursorImg, love.mouse.getX(), love.mouse.getY())	
+end
+
+function continue()
+	currentLevel = tonumber(love.filesystem.read("save.lua"))
+	love.filesystem.write("save.lua", currentLevel)
+	gs:switch(Game, currentPack, currentLevel)
+end
+
+function newGame()
+	currentLevel = 1
+	love.filesystem.write("save.lua", currentLevel)
+	gs:switch(Game, currentPack, currentLevel)
 end

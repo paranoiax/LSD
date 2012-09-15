@@ -1,13 +1,24 @@
-gs = require "lib.hump.gamestate"
-require "camera"
-require "lib.TEsound"
-require "lib.AnAL"
-require "Loader"
-require "Editor"
-require "menu"
-require "controls"
-local cron = require 'lib.cron'
-local tween = require 'lib.tween'
+do
+	local updates = {
+		{"lib.hump.gamestate", "gs"},
+		"camera",
+		"lib.TEsound",
+		"lib.AnAL",
+		"Loader",
+		"Editor",
+		"menu",
+		"controls"
+		{"lib.cron", "cron"},
+		{"lib.tween", "tween"}
+	}
+	for i,v in ipairs(updates) do
+		if type(v) == "table" then
+			_G[v[2]] = require(v[1])
+		else
+			require(v)
+		end
+	end
+end
 
 local explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
 
@@ -155,9 +166,7 @@ function love.load()
 		love.filesystem.write("save.lua", 1)
 	end
 
-	maxLevel = love.filesystem.read("save.lua")
-	maxLevel = tonumber(maxLevel)
-	print(maxLevel)
+	maxLevel = tonumber( love.filesystem.read("save.lua") )
 
 	if maxLevel > 1 then
 		currentLevel = maxLevel
@@ -224,7 +233,11 @@ function love.load()
 	gameOver = false
 	gameOverTimer = 3
 	
-	runNativeResolution()
+	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
+	if not gameFullscreen then
+		love.graphics.toggleFullscreen()
+	end
+	
 	scaleX = screenWidth / 1280
 	scaleY = screenHeight / 720
 	
@@ -253,33 +266,6 @@ function love.load()
 		end
 	end
 	
-end
-
-function ball_launch()
-	local x,y = objects.ball.body:getPosition()
-	if objects.ball.canJump == true then
-		objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
-	end
-end
-
-function draw_crosshair()		
-	if objects.ball.canJump == true then
-		love.graphics.setColor(202,143,84,-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
-		love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
-		love.graphics.setColor(255,255,255,255)
-	end
-end
-
-function aim_crosshair()
-	love.mouse.setVisible(false)
-	love.graphics.setColor(202,143,84)
-	love.graphics.line(love.mouse:getX() -7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() + 7 + camera.x, love.mouse.getY() + 7 + camera.y)
-	love.graphics.line(love.mouse:getX() +7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() -7 + camera.x, love.mouse.getY() + 7 + camera.y)
-end
-
-function draw_timer()
-	love.graphics.setColor(0,0,0,180)
-	love.graphics.rectangle("fill", 0, screenHeight - 50, screenWidth * explosionTime, 50)
 end
 
 function addSensor(x, y, width, height)
@@ -315,22 +301,6 @@ function addWall(x, y, width, height)
 	Wall[currentWall].width = width
 	Wall[currentWall].height = height
 	currentWall = currentWall + 1	
-end
-
-function drawRedRectangle()
-	for i,v in ipairs(Rectangle2) do
-		love.graphics.setColor(255,255,255)
-		love.graphics.drawq(RedTiles, v.quad, v.x, v.y)
-	end
-end
-
-function drawGreyRectangle()
-	for i,v in ipairs(Rectangle) do
-		if not Sensor[i].isDestroyed then
-			love.graphics.setColor(255,255,255)
-			love.graphics.drawq(GreyTiles, v.quad, v.x, v.y)
-		end
-	end
 end
 
 function addParticle()
@@ -397,178 +367,6 @@ function outOfBounds()
 			gameOver = true
 		end
 	end
-end
-
-function runNativeResolution()
-	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
-	if not gameFullscreen then
-		love.graphics.toggleFullscreen()
-	end
-end
-
-function INGAME_UPDATE(dt)
-	if GAMESTATE == "INGAME" then
-		world:update(dt)
-		TEsound.cleanup()		
-		objects.ball.anim:update(dt)	
-		explosionTimer(dt)
-		
-		for i,v in ipairs(Sensor) do
-			if v.isDestroyed then
-				v.body:setActive(false)
-			end
-		end
-		
-		camera.x = camera.x - (camera.x - (objects.ball.body:getX() - screenWidth / 2)) * dt * camera.speed
-		camera.y = camera.y - (camera.y - (objects.ball.body:getY() - screenHeight / 2)) * dt * camera.speed
-		
-		if not objects.ball.isAlive then
-			objects.ball.canJump = false
-		end			
-		
-		if objects.ball.sticky then
-			objects.ball.body:setLinearVelocity(0,0)
-			objects.ball.body:setAwake(false)		
-		end
-		
-		if explode then			
-			ParticleAlpha = {255}
-			for i,v in ipairs(Particle) do
-				v.fixture:destroy()
-				v.body:setActive(false)
-				v.body:destroy()
-			end
-			if options.graphics.particleEffects == true then
-				addParticle()
-				for i,v in ipairs(Particle) do
-					v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
-					--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
-				end
-			end
-			cron.after(1, tweenExplosion)
-			explode = false
-		end
-		
-		if death then
-			if options.audio.sfx then
-				TEsound.play("sounds/death.wav")
-			end
-			if options.graphics.particleEffects == true then
-				addDeathParticle()
-				for i,v in ipairs(DeathParticle) do
-					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
-				end
-			end
-			cron.after(1.25, tweenDeath)			
-			death = false
-		end
-		
-		camera:timer(dt)
-		checkWin()
-		nextLevel(dt)
-		game_over(dt)
-		outOfBounds()
-		cron.update(dt)
-		tween.update(dt)
-	end
-end
-
-function INGAME_DRAW()
-	if GAMESTATE == "INGAME" then
-		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!
-		love.graphics.setBackgroundColor(255,255,255)
-		love.graphics.setColor(255,255,255)
-		love.graphics.setBlendMode("alpha")
-		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-		
-		camera:set()
-		if options.graphics.shakeScreen then
-			camera:shake()
-		end
-		
-		love.graphics.setLine(3, "smooth")
-		
-		if aiming == true then
-			draw_crosshair()
-		end	
-		
-		if objects.ball.isAlive then
-			love.graphics.setColor(255,255,255)
-			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
-		end
-	   
-		if debugmode then
-			for i,v in ipairs(Sensor) do
-				if v.touching == true then
-					love.graphics.setColor(200, 0, 0, 60)
-					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-				end
-			end
-		end
-		
-		for i,v in ipairs(Wall) do
-			love.graphics.setColor(166,38,27)
-			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-		end
-		
-		for i,v in ipairs(Particle) do
-			love.graphics.setColor(69,69,69,ParticleAlpha[1]) --(v.r, v.g, v.b)
-			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-		end		
-		
-		for i,v in ipairs(DeathParticle) do
-			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
-			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
-		end
-		
-		drawGreyRectangle()
-		drawRedRectangle()			
-		
-		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10)
-		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 22 + camera.y, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
-		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 20 + camera.y, screenWidth, "center")
-		
-		if win then
-			love.graphics.setFont(e)
-			love.graphics.setColor(10,10,10)
-			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-			love.graphics.setColor(217,177,102)
-			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
-		end
-		
-		if gameOver and not win then
-			love.graphics.setFont(e)
-			love.graphics.setColor(10,10,10)
-			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-			love.graphics.setColor(217,177,102)
-			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
-		end
-		
-		aim_crosshair()
-		camera:unset()
-		draw_timer()
-	end
-end
-
--- loading main.lua again is: unresourceful (many resources, unless lua garbage collects it..)
-function continue()
-	con_level = love.filesystem.read("save.lua")
-	con_level = tonumber(con_level)	
-	currentLevel = con_level
-	love.filesystem.write("save.lua", con_level)
-	GAMESTATE = "INGAME"
-	love.filesystem.load("main.lua")()
-	love.load()
-end
-
-function newGame()
-	currentLevel = 1
-	love.filesystem.write("save.lua", currentLevel)
-	GAMESTATE = "INGAME"
-	love.filesystem.load("main.lua")()
-	love.load()
 end
 
 function tweenDeath()

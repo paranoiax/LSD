@@ -1,4 +1,4 @@
-Editor = {}
+Editor = gs:new()
 Editor.data = {}
 local data = Editor.data
 
@@ -75,7 +75,7 @@ function Editor.unload() -- unloads all hooks and returns to menu
 	love.load()
 end
 
-function Editor.keypressed(key)
+function Editor:keypressed(key, unicode)
 	if key == "escape" then
 		Editor.unload()
 	elseif key == "f2" then
