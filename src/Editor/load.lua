@@ -1,20 +1,66 @@
+--if true then return end
 Editor = gs:new()
+require("Editor.drawing")
 Editor.data = {}
 local data = Editor.data
 
-function Editor.load()
+function Editor:init()
 	require"Editor.data"
 	require"Editor.tools"
-	local startDrawing = require("Editor.drawing")
+	local toolbarHeight = 60
+	editor = love.graphics.newFont("fonts/DisplayOTF.otf", toolbarHeight/1.5)
 	
-	GAMESTATE = "EDITOR"
+	do -- topbar menu
+		local masterX = screenWidth - 5
+		for i,v in ipairs(data.topbar.texts) do
+			local buttonWidth = editor:getWidth(v) + 10
+			masterX = masterX - buttonWidth
+			data.topbar.positions[i] = {
+				masterX,
+				0,
+				buttonWidth,
+				toolbarHeight
+			}
+			masterX = masterX - 5
+		end
+	end
+	
+	do -- tools
+		local masterX = 0
+		local imgWidth = toolbarHeight
+		local scale = (imgWidth/800)
+		for i,v in ipairs(data.toolbar.components) do
+			if type(v) == "table" then
+				local index = #data.toolbar.positions + 1
+				local img = love.graphics.newImage("Editor/icons/"..v[2])
+				data.toolbar.img[v[3]] = img
+				
+				data.toolbar.positions[index] = {
+					i,
+					img,
+					masterX,
+					0,
+					0,
+					scale,
+					scale
+				}
+				masterX = masterX + imgWidth
+			else
+				masterX = masterX + 20
+			end
+		end
+	end
+end
+
+function Editor:enter()
+	
 	Editor.mode = "main"
 	Editor.debug = true
 
 	-- load the editor
 	-- by default load level1.lua
 	Editor.setMap("original/level1")
-	startDrawing()
+
 end
 
 function Editor.setMap(filepath, notify)
@@ -70,9 +116,7 @@ end
 
 function Editor.unload() -- unloads all hooks and returns to menu
 	Editor.setMap("", true)
-	GAMESTATE = "MENU"
-	love.filesystem.load("main.lua")()
-	love.load()
+	gs.switch(Menu)
 end
 
 function Editor:keypressed(key, unicode)

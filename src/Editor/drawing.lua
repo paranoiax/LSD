@@ -1,49 +1,13 @@
-local data = Editor.data
+local data = setmetatable({}, {
+	__index = function(_,k,v)
+		return rawget(Editor.data, k)
+	end,
+	__newindex = function(t,k,v)
+		rawset(Editor.data, k, v)
+	end
+})
+
 local toolbarHeight = 60
-local editor = love.graphics.newFont("fonts/DisplayOTF.otf", toolbarHeight/1.5)
-local function init()
-	
-	do -- topbar menu
-		local masterX = screenWidth - 5
-		for i,v in ipairs(data.topbar.texts) do
-			local buttonWidth = editor:getWidth(v) + 10
-			masterX = masterX - buttonWidth
-			data.topbar.positions[i] = {
-				masterX,
-				0,
-				buttonWidth,
-				toolbarHeight
-			}
-			masterX = masterX - 5
-		end
-	end
-	
-	do -- tools
-		local masterX = 0
-		local imgWidth = toolbarHeight
-		local scale = (imgWidth/800)
-		for i,v in ipairs(data.toolbar.components) do
-			if type(v) == "table" then
-				local index = #data.toolbar.positions + 1
-				local img = love.graphics.newImage("Editor/icons/"..v[2])
-				data.toolbar.img[v[3]] = img
-				
-				data.toolbar.positions[index] = {
-					i,
-					img,
-					masterX,
-					0,
-					0,
-					scale,
-					scale
-				}
-				masterX = masterX + imgWidth
-			else
-				masterX = masterX + 20
-			end
-		end
-	end
-end
 
 function Editor:update(dt)
 	objects.ball.anim:update(dt)

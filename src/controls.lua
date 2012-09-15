@@ -11,27 +11,13 @@ end
 
 function love.keypressed(key, unicode)
 	gs.keypressed(key, unicode)
-	if GAMESTATE == "EDITOR" then
-		Editor.keypressed(key, ...)
-	elseif GAMESTATE == "INGAME" then
-		if key == "r" or key == "enter" or key == "return" or key == " " then
-			love.filesystem.load("main.lua")()
-			love.load()
-		elseif key == "escape" then
-			GAMESTATE = "MENU"
-			love.filesystem.load("main.lua")()
-			love.load()
-		end
-	elseif GAMESTATE == "MENU" then
-		if key == "escape" then
-			love.event.push("quit")
-		end
-	end
 end
 
 function love.update(dt)
+	TEsound.cleanup(dt)
+	cron.update(dt)
+	tween.update(dt)
 	gs.update(dt)
-	INGAME_UPDATE(dt)
 end
 
 function love.draw()
