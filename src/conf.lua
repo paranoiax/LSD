@@ -9,7 +9,7 @@ function love.conf(t)
 	t.screen.fullscreen= false
 	t.screen.fsaa = 2
 	t.identity = "LSD"
-	t.console = true
+	t.console = false
 	t.release = false
 
 end
