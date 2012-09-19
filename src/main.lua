@@ -39,6 +39,13 @@ function beginCallback(fixture1, fixture2, contact)
 			v.touching = true
 			collX = v.body:getX()
 			collY = v.body:getY()
+			explosionWidth = v.width
+			explosionHeight = v.height
+			limit = ((v.width + v.height) / 2)
+			if limit < 20 then
+				limit = 20
+			elseif limit > 90 then
+				limit = 90 end
 			end
 		end
 	end
@@ -62,11 +69,11 @@ function endCallback(fixture1, fixture2, contact)
 			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
 				v.touching = false
 				v.fixture:destroy()
-				v.isDestroyed = true
+				v.isDestroyed = true				
 				explode = true
 				shake = true
 				TEsound.play(explosionList)
-				SensorsDestroyed = SensorsDestroyed + 1				
+				SensorsDestroyed = SensorsDestroyed + 1
 			end
 		end
 	end
@@ -84,7 +91,7 @@ function love.load()
 	explosionTime = 1
 
 	particleEffects = true
-	debugmode = false
+	debugmode = true
 	
 	icon = love.graphics.newImage("images/icon.png")
 	cursorImg = love.graphics.newImage("images/cursor.png")
@@ -130,6 +137,8 @@ function love.load()
 
 	collX = 0
 	collY = 0
+	explosionWidth = 0
+	explosionHeight = 0
 	VelX = 0
 	VelY = 0
 	explode = false
@@ -204,7 +213,7 @@ function love.load()
 	end
 
 	limit = 90
-	deathLimit = 70
+	deathLimit = 65
 	SensorsCount = #Sensor
 	SensorsDestroyed = 0
 
@@ -249,25 +258,6 @@ function love.draw()
 	end
 	MENU_DRAW()
 	INGAME_DRAW()
-
-	if debugmode == true then
-		love.graphics.setColor(255,50,200)
-		love.graphics.setFont(d)
-		--[[love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-		love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-		love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
-		for q = 1, #Sensor do 
-			if Sensor[q].touching == true then
-				love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
-			end
-		end--]]--
-		love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-		love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
-		--love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
-		love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
-		love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
-		love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
-	end
 	
 end
 
@@ -353,7 +343,7 @@ function addParticle()
 	for currentParticle = 1, limit do
 		Particle[currentParticle] = {}
 		Particle[currentParticle].size = math.random(3,6)
-		Particle[currentParticle].body = love.physics.newBody(world, collX + math.random(-65,65), collY + math.random(-50,50), "dynamic")
+		Particle[currentParticle].body = love.physics.newBody(world, collX + math.random(-explosionWidth / 2,explosionWidth / 2), collY + math.random(-explosionHeight / 2,explosionHeight / 2), "dynamic")
 		Particle[currentParticle].shape = love.physics.newRectangleShape(Particle[currentParticle].size,Particle[currentParticle].size)
 		Particle[currentParticle].fixture = love.physics.newFixture(Particle[currentParticle].body, Particle[currentParticle].shape,1)
 		Particle[currentParticle].fixture:setSensor(false)
@@ -361,6 +351,7 @@ function addParticle()
 		Particle[currentParticle].fixture:setUserData("particle")
 		Particle[currentParticle].fixture:setCategory(3)
 		Particle[currentParticle].fixture:setMask(4,5)
+		Particle[currentParticle].isDestroyed = false
 	end
 end
 
@@ -450,14 +441,19 @@ function INGAME_UPDATE(dt)
 		if explode then			
 			ParticleAlpha = {255}
 			for i,v in ipairs(Particle) do
-				v.fixture:destroy()
-				v.body:setActive(false)
-				v.body:destroy()
+				if not v.isDestroyed then
+					v.fixture:destroy()
+					v.body:setActive(false)
+					v.body:destroy()
+					v.isDestroyed = true
+				end
 			end
 			if particleEffects == true then
 				addParticle()
 				for i,v in ipairs(Particle) do
-					v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
+					if not v.isDestroyed then
+						v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
+					end
 					--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
 				end
 			end
@@ -516,21 +512,42 @@ function INGAME_DRAW()
 					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 				end
 			end
-		end
-		
-		for i,v in ipairs(Wall) do
-			love.graphics.setColor(166,38,27)
-			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-		end
+			for i,v in ipairs(Wall) do
+				love.graphics.setColor(166,38,27)
+				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
+			end
+		end		
 		
 		for i,v in ipairs(Particle) do
-			love.graphics.setColor(69,69,69,ParticleAlpha[1]) --(v.r, v.g, v.b)
-			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
+			if not v.isDestroyed then
+				love.graphics.setColor(69,69,69,ParticleAlpha[1]) --(v.r, v.g, v.b)
+				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
+			end
 		end		
 		
 		for i,v in ipairs(DeathParticle) do
 			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
+		end
+		
+		if debugmode == true then
+			love.graphics.setColor(255,50,200)
+			love.graphics.setFont(d)
+			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
+			love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
+			love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
+			for q = 1, #Sensor do 
+				if Sensor[q].touching == true then
+					love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
+				end
+			end
+			love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
+			love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
+			love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
+			love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
+			love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
+			love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
+			love.graphics.print("Explosion: "..explosionWidth .. ', ' .. explosionHeight,10 + camera.x, 215 + camera.y)
 		end
 		
 		drawGreyRectangle()
