@@ -10,9 +10,13 @@ local tween = require 'lib.tween'
 
 explosionList = {"sounds/explosion.wav", "sounds/explosion2.wav", "sounds/explosion3.wav", "sounds/explosion4.wav"}
 
+function checkValues(a, b, c)
+	return (a==c) or (b==c)
+end
+
 function beginCallback(fixture1, fixture2, contact)
 
-	if ( (fixture1:getUserData() == "wall") or (fixture2:getUserData() == "wall") ) and ( (fixture1:getUserData() == "ball") or (fixture2:getUserData() == "ball") ) then
+	if (not options.cheats.SensorsAreFtw) and checkValues(fixture1:getUserData(), fixture2:getUserData(), "wall") and checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 		objects.ball.sticky = true
 		objects.ball.canJump = true
 		if win == false then
@@ -20,22 +24,22 @@ function beginCallback(fixture1, fixture2, contact)
 		end
 	end
 	
-	if ( (fixture1:getUserData() == "sensor") or (fixture2:getUserData() == "sensor") ) and ( (fixture1:getUserData() == "ball") or (fixture2:getUserData() == "ball") ) then
+	if ( options.cheats.SensorsAreFtw or checkValues(fixture1:getUserData(), fixture2:getUserData(), "sensor") ) and checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 		objects.ball.sticky = true
 		objects.ball.canJump = true
 		explosionTime = 1
 		explodeBall = true
 	end
 	
-	if ( (fixture1:getUserData() == "wall") or (fixture2:getUserData() == "wall") ) and ( (fixture1:getUserData() == "ball") or (fixture2:getUserData() == "ball") ) then
+	if (not options.cheats.SensorsAreFtw) and checkValues(fixture1:getUserData(), fixture2:getUserData(), "wall") and checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 		VelX, VelY = objects.ball.body:getLinearVelocity()
 		objects.ball.isAlive = false
 		death = true
 	end
 	
 	for i,v in ipairs(Sensor) do
-		if v.fixture == fixture1 or v.fixture == fixture2 then
-			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
+		if checkValues(fixture1, fixture2, v.fixture) then
+			if checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 			v.touching = true
 			collX = v.body:getX()
 			collY = v.body:getY()
@@ -53,8 +57,8 @@ end
 
 function endCallback(fixture1, fixture2, contact)
 
-	if fixture1:getUserData() == "sensor" or fixture2:getUserData() == "sensor" or fixture1:getUserData() == "wall" or fixture2:getUserData() == "wall" then
-		if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
+	if checkValues(fixture1:getUserData(), fixture2:getUserData(), "sensor") or checkValues(fixture1:getUserData(), fixture2:getUserData(), "wall") then
+		if checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") and (not options.cheats.SensorsAreFtw) then
 			objects.ball.sticky = false
 			objects.ball.canJump = false
 			explodeBall = false
@@ -65,8 +69,8 @@ function endCallback(fixture1, fixture2, contact)
 	end
 
 	for i,v in ipairs(Sensor) do
-		if v.fixture == fixture1 or v.fixture == fixture2 then
-			if fixture1:getUserData() == "ball" or fixture2:getUserData() == "ball" then
+		if checkValues(fixture1, fixture2, v.fixture) then
+			if checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 				v.touching = false
 				v.fixture:destroy()
 				v.isDestroyed = true				
@@ -100,8 +104,9 @@ function love.load()
 	options.audio.music = true
 	options.audio.sfx = true
 	options.graphics.particleEffects = true
-	options.graphics.shakeScreen = not true
-	options.cheats.timeOut = not true
+	options.graphics.shakeScreen = true
+	options.cheats.timeOut = false
+	options.cheats.SensorsAreFtw = false
 	
 	debugmode = true
 	
@@ -409,7 +414,7 @@ function explosionTimer(dt)
 	if explodeBall == true and SensorsDestroyed > 0 then
 		explosionTime =  explosionTime - dt * 1.25 * multiplier
 	end
-	if (explosionTime < 0) and options.cheats.timeOut then
+	if (explosionTime < 0) and (not options.cheats.timeOut) then
 		objects.ball.sticky = true
 		objects.ball.isAlive = false
 		objects.ball.canJump = false
