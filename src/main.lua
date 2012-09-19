@@ -608,7 +608,7 @@ function INGAME_DRAW()
 		
 		aim_crosshair()
 		camera:unset()
-		if options.cheats.timeOut then
+		if not options.cheats.timeOut then
 			draw_timer()
 		end
 	end
