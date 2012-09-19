@@ -75,21 +75,32 @@ function Editor.mousepressed(x, y, b)
 	end
 end
 
+function love.keyboard.isShiftDown()
+	return love.keyboard.isDown"lshift" or love.keyboard.isDown"rshift"
+end
+function love.keyboard.isAltDown()
+	return love.keyboard.isDown"lalt" or love.keyboard.isDown"ralt"
+end
+
+
 function Editor.keypressed(key)
 	if key == "escape" then
 		Editor.unload()
 	end
+	
+	local concentration = love.keyboard.isShiftDown() and 1.5 or (love.keyboard.isAltDown() and .5 or 1)
+	
 	if key == 'a' and gui.w >10 then
-		gui.w = gui.w - 10
+		gui.w = gui.w - (10*concentration)
 	end
 	if key == 'd' then
-		gui.w = gui.w + 10
+		gui.w = gui.w + (10*concentration)
 	end
-	if key == 'w' then
-		gui.h = gui.h + 10
+	if key == 'w' and gui.h > 10 then
+		gui.h = gui.h - (10*concentration)
 	end
-	if key == 's' and gui.h > 10 then
-		gui.h = gui.h - 10
+	if key == 's' then
+		gui.h = gui.h + (10*concentration)
 	end
 	if key == 'r' then
 		if currentObject == "wall" then
