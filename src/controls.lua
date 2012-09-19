@@ -90,13 +90,13 @@ function Editor.keypressed(key)
 	
 	local concentration = love.keyboard.isShiftDown() and 1.5 or (love.keyboard.isAltDown() and .5 or 1)
 	
-	if key == 'a' and gui.w >10 then
+	if key == 'a' then
 		gui.w = gui.w - (10*concentration)
 	end
 	if key == 'd' then
 		gui.w = gui.w + (10*concentration)
 	end
-	if key == 'w' and gui.h > 10 then
+	if key == 'w' then
 		gui.h = gui.h - (10*concentration)
 	end
 	if key == 's' then
