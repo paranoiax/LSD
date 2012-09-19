@@ -38,7 +38,8 @@ function loveframes.debug.draw()
 	local fps				= love.timer.getFPS()
 	local deltatime			= love.timer.getDelta()
 	
-	
+	love.graphics.push()
+	love.graphics.translate(0, screenHeight-250-100)
 	-- font for debug text
 	love.graphics.setFont(font)
 	
@@ -100,11 +101,12 @@ function loveframes.debug.draw()
 	love.graphics.print("Delta Time: " ..deltatime, 15, 230)
 	love.graphics.print("Total Objects: " ..#objects, 15, 240)
 	
+	love.graphics.pop()
+	
 	-- outline the object that the mouse is hovering over
 	love.graphics.setColor(255, 204, 51, 255)
 	love.graphics.setLine(2, "smooth")
 	love.graphics.rectangle("line", topcol.x - 1, topcol.y - 1, topcol.width + 2, topcol.height + 2)
-
 end
 
 --[[---------------------------------------------------------
