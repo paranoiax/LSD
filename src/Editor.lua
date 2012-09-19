@@ -124,7 +124,7 @@ function Editor.unload() -- unloads all hooks and returns to menu
 	love.load()
 end
 
-local function generateCode() --If this code works, it was written by Kai. If not, I don't know who wrote it.
+function generateCode() --If this code works, it was written by Kai. If not, I don't know who wrote it.
   local ret = '' -- I am not sure if we need this, but too scared to delete. 
   ret = "return {\n\n"
   
