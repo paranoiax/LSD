@@ -1,116 +1,152 @@
 Editor = {}
-Editor.data = {}
-local data = Editor.data
+collision = require 'collision'
 
-function Editor.load()
-	require"Editor.data"
-	require"Editor.tools"
-	local startDrawing = require("Editor.drawing")
-	
+function Editor.load()	
 	GAMESTATE = "EDITOR"
-	Editor.mode = "main"
-	Editor.debug = true
+	love.filesystem.load("main.lua")()
+	love.load()
+	if not love.filesystem.exists('maps') then
+		love.filesystem.mkdir('maps')
+	end
+end
+	
+	Editor.speed = 4
+	maps = love.filesystem.enumerate('maps')
+	maps = #maps
+	ground = love.graphics.getHeight() - 160
+	object = {}
+	currentObject = "wall"	
+	walls = {}
+	player = {}
+	player.isSet = false
+	sensors = {}
+	gui = {
+		w  = 50,
+		h  = 50
+	}
+	love.graphics.setLine(4, 'smooth')
+	
+	playerX, playerY = 0,0
+	
+	font = {
+		default = love.graphics.newFont(12),
+		huge    = love.graphics.newFont(32)}
+		
+	--ALL YOUR BASE ARE BELONG TO US
+	playerImg = love.graphics.newImage("images/player.png")
 
-	-- load the editor
-	-- by default load level1.lua
-	Editor.setMap("original/level1")
-	startDrawing()
+function Editor.update(dt)
+	if love.keyboard.isDown("up") then
+		camera.y = camera.y - 100 * dt * Editor.speed
+	end
+	if love.keyboard.isDown("down") then
+		camera.y = camera.y + 100 * dt * Editor.speed
+	end
+	if love.keyboard.isDown("left") then
+		camera.x = camera.x - 100 * dt * Editor.speed
+	end
+	if love.keyboard.isDown("right") then
+		camera.x = camera.x + 100 * dt * Editor.speed
+	end
+
+	if love.keyboard.isDown("rshift") or love.keyboard.isDown("lshift") then --This is crap code but it's 3 a.m. and I need to get this working.
+		Editor.speed = 8
+	else
+		Editor.speed = 4
+	end
 end
 
-function Editor.setMap(filepath, notify)
-	-- notify means it will first ask for confirmation if a map exists and not saved
-	-- this function sets the running map (in the editor)
-	
-	-- ask whether to save
-	if notify then
-		-- notify the setter to save if it was saved
+function Editor.draw()
+	local width = love.graphics.getWidth()
+	local x, y = love.mouse.getPosition()
+	x, y = x + camera.x, y + camera.y
+	love.graphics.setColor(255,255,255)
+	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+	love.graphics.setColor(100, 50, 0)
+	love.graphics.line(-4, ground, width+4, ground)
+	love.graphics.setColor(255, 255, 255)
+	love.graphics.print('Width:  ' .. gui.w, 0, 768)
+	love.graphics.print('Height: ' .. gui.h, width*0.2, 768)
+	love.graphics.print('Maps: ' .. maps, width*0.4, 768)
+	love.graphics.print('object: ' .. currentObject, width*0.6, 768)
+	love.graphics.setFont(font.default)
+	love.graphics.setColor(255,255,255)
+	for i = 1,9 do
+		if love.filesystem.exists('maps/level'..i..'.lua') then
+			love.graphics.setColor(255,255,255)
+		else
+			love.graphics.setColor(128,128,128,200)
+		end
+		love.graphics.print('level'..i..'.lua', width*(i-1)/9, 784)
+	end
+	camera:set()	
+	for i, v in ipairs(walls) do	
+		love.graphics.setColor(255,0,0)
+		love.graphics.rectangle('fill', v.x, v.y, v.w, v.h)
+	end
+	for i, v in ipairs(sensors) do	
+		love.graphics.setColor(120,120,120)
+		love.graphics.rectangle('fill', v.x, v.y, v.w, v.h)
 	end
 	
-	if filepath == "" then return end -- dont throw an error
-
-	Editor.map = filepath==true and loadstring(data.newmap)() or love.filesystem.load("levels/"..filepath..".lua")()
-	data.map = {}
-	
-	camera.x = Editor.map.player[1] - screenWidth / 2
-	camera.y = Editor.map.player[2] - screenHeight / 2
-	
-	for rectA,tab in pairs{[{"", "Grey"}]=Editor.map.sensors, [{"2","Red"}]=Editor.map.walls} do
-		for i,v in ipairs(tab) do
-			local x, y, w, h = unpack(v)
-			_G["Rectangle"..rectA[1]][i] = {
-				quad = love.graphics.newQuad(0, 0, w, h, _G[rectA[2].."TilesW"], _G[rectA[2].."TilesW"]),
-				x = x,
-				y = y
-			}
-		end
+	love.graphics.setColor(255,255,255)
+	if player.isSet then
+		love.graphics.draw(playerImg, playerX - playerImg:getWidth() / 2, playerY - playerImg:getHeight() / 2)
 	end
-	--[[
-	for tile,tab in pairs({["Grey"]="sensors", ["Red"]="walls"}) do
-		data.map[tab] = {}
-		if Editor.map[tab] then
-			for i,v in ipairs(Editor.map[tab]) do
-				local x, y, w, h = unpack(v)
-				local x2, y2, w2, h2 = x - w / 2, y - w / 2, w, h
-				data.map[tab][i] = {
-					quad = love.graphics.newQuad(x+w/2, y+h/2, w2, h2, _G[tile.."TilesW"], _G[tile.."TilesW"]),
-					x = x2,
-					y = y2,
-					tile = tile
-				}
-			end
-		end
-	end]]
 	
-	--print(Editor.parse(Editor.map)) -- IT LOOKS LIKE CRAP :)
-end
-
-function Editor.saveMap()
-	-- saves the map
+	if currentObject == "wall" then
+		love.graphics.setColor(255,0,0,150)
+	end
+	if currentObject == "sensor" then
+		love.graphics.setColor(0,0,0,150)
+	end
+	if currentObject == "player" then
+		love.graphics.setColor(255,255,255,150)
+		love.graphics.draw(playerImg, x - playerImg:getWidth() / 2, y - playerImg:getHeight() / 2)
+	end
+	if y < 769 and currentObject ~= "player" then
+		x, y = (math.floor((x / 10)) * 10), (math.floor((y / 10)) * 10) --snap to grid
+		love.graphics.rectangle('fill', x, y, gui.w, gui.h)
+	end
+	camera:unset()
 end
 
 function Editor.unload() -- unloads all hooks and returns to menu
-	Editor.setMap("", true)
+	camera.x = 0
+	camera.y = 0
+	sensors = {}
+	walls = {}
+	object = {}
+	playerX, playerY = 0,0
+	player.isSet = false
 	GAMESTATE = "MENU"
 	love.filesystem.load("main.lua")()
 	love.load()
 end
 
-function Editor.keypressed(key)
-	if key == "escape" then
-		Editor.unload()
-	elseif key == "f2" then
-		Editor.saveMap()
-	elseif key == "f1" then
-		Editor.showTileSelector()
-	end
-end
-
-function Editor.parse(t, _no)
-	print(type(t))
-	assert(type(t) == "table", "not a table!")
-	local s = "{"
-	for k, v in pairs(t) do
-		local tk, tv = type(k), type(v)
-		if tk == "boolean" then
-			k = k and "[true]" or "[false]"
-		elseif tk == "string" then
-			if string.find(k, "[%c%p%s]") then
-				k = '["'..k..'"]'
-			end
-		elseif tk == "number" then
-			k = "["..k.."]"
-		elseif tk == "table" then
-			k = "["..Editor.parse(k).."]"
-		end
-		if tv == "boolean" then
-			v = v and "true" or "false"
-		elseif tv == "string" then
-			v = string.format("%q", v)
-		elseif tv == "table" then
-			v = Editor.parse(v, true)
-		end
-		s = s..k.."="..v..","
-	end
-	local ret = _no and "" or "return "
-	return s.."}"
+local function generateCode() --If this code works, it was written by Kai. If not, I don't know who wrote it.
+  local ret = '' -- I am not sure if we need this, but too scared to delete. 
+  ret = "return {\n\n"
+  
+  if player.isSet then
+	ret = ret .. '\t' .. 'player = {' .. math.floor(playerX + .5) .. ', ' .. math.floor(playerY + .5) .. '},\n'
+  end
+  ret = ret .. '\t' .. 'boundaries = 5000,\n\n'
+  
+  ret = ret .. '\t' .. 'walls = {\n'
+  
+  for i, v in ipairs(walls) do
+    ret = ret .. '\t' .. '{' .. v.x .. ', ' .. v.y+v.h .. ', ' .. v.w .. ', ' .. v.h .. '},\n' --Magic. Do not touch.
+  end
+  
+  ret = ret .. '\t' .. '},\n\n' -- drunk, fix later
+  
+  ret = ret .. '\t' .. 'sensors = {\n'
+  for i, v in ipairs(sensors) do
+    ret = ret .. "        {" .. v.x .. ', ' .. v.y+v.h .. ', ' .. v.w .. ', ' .. v.h .. '},\n'
+  end
+  
+  ret = ret .. '\t' .. '}\n\n}'
+  
+  return ret
 end
