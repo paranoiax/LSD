@@ -492,7 +492,7 @@ function skin.DrawProgressBar(object)
 	love.graphics.setColor(unpack(skin.controls.progressbar_bar_color))
 	love.graphics.rectangle("fill", object:GetX(), object:GetY(), object.progress, object:GetHeight())
 	gradientcolor = {skin.controls.progressbar_bar_color[1], skin.controls.progressbar_bar_color[2] - 20, skin.controls.progressbar_bar_color[3], 255}
-	skin.DrawGradient(object:GetX(), object:GetY(), object.progress, object:GetHeight(),  gradientcolor)
+	skin.DrawGradient(object:GetX(), object:GetY(), object.progress, object:GetHeight(), gradientcolor)
 	love.graphics.setFont(font)
 	love.graphics.setColor(unpack(skin.controls.progressbar_text_color))
 	love.graphics.print(object.value .. "/" ..object.max, object:GetX() + object:GetWidth()/2 - twidth/2, object:GetY() + object:GetHeight()/2 - theight/2)
