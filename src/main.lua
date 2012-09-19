@@ -1,3 +1,4 @@
+require("lib.loveframes.init")
 require "camera"
 require "lib.TEsound"
 require "lib.AnAL"
@@ -253,7 +254,7 @@ function love.load()
 	local menu = {
 		{"New Game", "new_game"},
 		{"Map Editor", "mapedit"},
-		{"Quit", "quit"}
+		{"Options", "options"}
 	}
 	local menuY = screenHeight / 4 * 3-85
 	for i,v in ipairs(menu) do
@@ -271,7 +272,7 @@ function love.load()
 end
 
 function love.update(dt)
-
+	loveframes.update(dt)
 	MENU_UPDATE(dt)
 	INGAME_UPDATE(dt)
 	if GAMESTATE == "EDITOR" then
@@ -285,7 +286,7 @@ function love.draw()
 	end
 	MENU_DRAW()
 	INGAME_DRAW()
-	
+	loveframes.draw()
 end
 
 function ball_launch()

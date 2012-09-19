@@ -1,4 +1,5 @@
 function love.mousepressed(x,y,b)
+	loveframes.mousepressed(x, y, b)
 	if GAMESTATE == "EDITOR" then
 		Editor.mousepressed(x, y, b)
 	end
@@ -11,6 +12,7 @@ function love.mousepressed(x,y,b)
 end
 
 function love.mousereleased(x,y,b)
+	loveframes.mousereleased(x, y, b)
 	if b == "l" and GAMESTATE == "INGAME" then
 		ball_launch(x,y)
 		aiming = false
@@ -23,7 +25,12 @@ function love.mousereleased(x,y,b)
 	end
 end
 
+function love.keyreleased(key)
+	loveframes.keyreleased(key)
+end
+
 function love.keypressed(key, ...)
+	loveframes.keypressed(key, ...)
 	if GAMESTATE == "EDITOR" then
 		Editor.keypressed(key, ...)
 	elseif GAMESTATE == "INGAME" then

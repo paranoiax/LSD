@@ -20,7 +20,7 @@ function button_click(x,y)
 		x < v.x + f:getWidth(v.text) and
 		y > v.y and
 		y < v.y + f:getHeight(v.text) then
-			if v.id == "quit" then
+			if v.id == "options" then
 				love.event.push("quit")
 			elseif v.id == "continue" then
 				continue()
