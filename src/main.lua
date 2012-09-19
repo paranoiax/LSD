@@ -1,4 +1,4 @@
-require("lib.loveframes.init")
+require "lib.loveframes.init"
 require "camera"
 require "lib.TEsound"
 require "lib.AnAL"
@@ -90,7 +90,8 @@ function endCallback(fixture1, fixture2, contact)
 
 end
 
-function love.load()	
+function love.load()
+	require "options"
 	love.mouse.setVisible(false)
 	
 	explodeBall = false
@@ -287,6 +288,9 @@ function love.draw()
 	MENU_DRAW()
 	INGAME_DRAW()
 	loveframes.draw()
+	if GAMESTATE=="MENU" or GAMESTATE=="OPTIONS" then
+		menuCursor()
+	end
 end
 
 function ball_launch()
@@ -616,14 +620,16 @@ function INGAME_DRAW()
 end
 
 function MENU_UPDATE(dt)
-	if GAMESTATE == "MENU" then
+	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
 		ball_menu_anim:update(dt)
-		button_check()
+		if GAMESTATE == "MENU" then
+			button_check()
+		end
 	end
 end
 
 function MENU_DRAW()
-	if GAMESTATE == "MENU" then
+	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
 		love.graphics.setColor(255,255,255)
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 250)
@@ -634,8 +640,9 @@ function MENU_DRAW()
 		love.graphics.setColor(217,177,102)
 		love.graphics.printf("Little Sticky Destroyer",0, 80, screenWidth, "center")
 		
-		button_draw()
-		menuCursor()
+		if GAMESTATE == "MENU" then
+			button_draw()
+		end
 	end
 end
 

@@ -21,7 +21,7 @@ function button_click(x,y)
 		y > v.y and
 		y < v.y + f:getHeight(v.text) then
 			if v.id == "options" then
-				love.event.push("quit")
+				showOptions()
 			elseif v.id == "continue" then
 				continue()
 			elseif v.id == "new_game" then

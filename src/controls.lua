@@ -46,6 +46,9 @@ function love.keypressed(key, ...)
 		if key == "escape" then
 			love.event.push("quit")
 		end
+	elseif GAMESTATE == "OPTIONS" and key=="escape" then
+		GAMESTATE = "MENU"
+		closeOptions()
 	end
 end
 
