@@ -72,7 +72,9 @@ function endCallback(fixture1, fixture2, contact)
 				v.isDestroyed = true				
 				explode = true
 				shake = true
-				TEsound.play(explosionList)
+				if options.audio.sfx then
+					TEsound.play(explosionList)
+				end
 				SensorsDestroyed = SensorsDestroyed + 1
 			end
 		end
@@ -90,7 +92,17 @@ function love.load()
 	BallExplode = false
 	explosionTime = 1
 
-	particleEffects = true
+	options = {
+		graphics = {},
+		audio = {},
+		cheats = {}
+	}
+	options.audio.music = true
+	options.audio.sfx = true
+	options.graphics.particleEffects = true
+	options.graphics.shakeScreen = not true
+	options.cheats.timeOut = not true
+	
 	debugmode = true
 	
 	icon = love.graphics.newImage("images/icon.png")
@@ -246,7 +258,9 @@ function love.load()
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
-		TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
+		if options.audio.music then
+			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
+		end
 	end
 	
 end
@@ -395,7 +409,7 @@ function explosionTimer(dt)
 	if explodeBall == true and SensorsDestroyed > 0 then
 		explosionTime =  explosionTime - dt * 1.25 * multiplier
 	end
-	if explosionTime < 0 then
+	if (explosionTime < 0) and options.cheats.timeOut then
 		objects.ball.sticky = true
 		objects.ball.isAlive = false
 		objects.ball.canJump = false
@@ -456,7 +470,7 @@ function INGAME_UPDATE(dt)
 					v.isDestroyed = true
 				end
 			end
-			if particleEffects == true then
+			if options.graphics.particleEffects == true then
 				addParticle()
 				for i,v in ipairs(Particle) do
 					if not v.isDestroyed then
@@ -470,8 +484,10 @@ function INGAME_UPDATE(dt)
 		end
 		
 		if death then
-			TEsound.play("sounds/death.wav")
-			if particleEffects == true then
+			if options.audio.sfx then
+				TEsound.play("sounds/death.wav")
+			end
+			if options.graphics.particleEffects == true then
 				addDeathParticle()
 				for i,v in ipairs(DeathParticle) do
 					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
@@ -500,7 +516,9 @@ function INGAME_DRAW()
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 		
 		camera:set()
-		camera:shake()
+		if options.graphics.shakeScreen then
+			camera:shake()
+		end
 		
 		love.graphics.setLine(3, "smooth")
 		
@@ -585,7 +603,9 @@ function INGAME_DRAW()
 		
 		aim_crosshair()
 		camera:unset()
-		draw_timer()
+		if options.cheats.timeOut then
+			draw_timer()
+		end
 	end
 end
 
