@@ -729,7 +729,10 @@ slowmo.time = {t = 1}
 
 function slowmo:start()
 	if options.graphics.slowmotion then
-		blur = true
+		local canvasSupported = love.graphics.isSupported("canvas")
+		if canvasSupported then
+			blur = true
+		end
 		self.time = {t = 0.20}
 		cron.after(0.35, slowmoStop)
 	end
