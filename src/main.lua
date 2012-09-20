@@ -278,8 +278,11 @@ function love.load()
 		end
 	end
 	
-	canvas = love.graphics.newCanvas()
-	canvas:clear()
+	canvasSupported = love.graphics.isSupported("canvas")
+	if canvasSupported then
+		canvas = love.graphics.newCanvas()
+		canvas:clear()
+	end
 	blur = false
 	
 end
@@ -728,11 +731,8 @@ slowmo = {}
 slowmo.time = {t = 1}
 
 function slowmo:start()
-	if options.graphics.slowmotion then
-		local canvasSupported = love.graphics.isSupported("canvas")
-		if canvasSupported then
-			blur = true
-		end
+	if options.graphics.slowmotion and canvasSupported then
+		blur = true
 		self.time = {t = 0.20}
 		cron.after(0.35, slowmoStop)
 	end
