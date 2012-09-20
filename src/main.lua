@@ -65,7 +65,7 @@ function endCallback(fixture1, fixture2, contact)
 			explodeBall = false
 			explosionTime = 1
 			tween.resetAll()
-			cron.reset()
+			cron.reset()			
 		end
 	end
 
@@ -91,6 +91,7 @@ function endCallback(fixture1, fixture2, contact)
 end
 
 function love.load()
+
 	require "options"
 	love.mouse.setVisible(false)
 	
@@ -111,7 +112,7 @@ function love.load()
 	options.cheats.SensorsAreFtw = false
 	options.cheats.colorfulExplosion = false
 	
-	debugmode = true
+	debugmode = false
 	
 	icon = love.graphics.newImage("images/icon.png")
 	cursorImg = love.graphics.newImage("images/cursor.png")
@@ -198,7 +199,7 @@ function love.load()
 	
 	if currentLevel > maxLevel then
 		love.filesystem.write("save.lua", currentLevel)
-	end	
+	end
 
 	-- LEVEL --
 
@@ -275,6 +276,7 @@ function love.load()
 end
 
 function love.update(dt)
+	dt = dt * slowmo.time.t
 	loveframes.update(dt)
 	MENU_UPDATE(dt)
 	INGAME_UPDATE(dt)
@@ -407,9 +409,11 @@ end
 function checkWin()
 	win = SensorsDestroyed == SensorsCount
 	if win == true then
+		slowmo:start()
+		shake = false
 		objects.ball.sticky = true
 		objects.ball.isAlive = false
-		objects.ball.canJump = false
+		objects.ball.canJump = false		
 	end
 end
 
@@ -683,4 +687,16 @@ end
 
 function tweenExplosion()
 	tween(1.5, ParticleAlpha, {0}, "linear")
+end
+
+slowmo = {}
+slowmo.time = {t = 1}
+
+function slowmo:start()
+	self.time = {t = 0.20}
+	cron.after(0.35, slowmoStop)
+end
+
+function slowmoStop()
+	slowmo.time = {t = 1}
 end
