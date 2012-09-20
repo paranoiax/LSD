@@ -15,11 +15,36 @@ frame:SetName("Options" .. generateWhitespace(150) .. "Press ESC to return to me
 frame:SetVisible(false)
 frame:ShowCloseButton(false)
 
+options = {
+	graphics = {},
+	audio = {},
+	cheats = {}
+}
+options.audio.music = true
+options.audio.sfx = true
+options.graphics.particleEffects = true
+options.graphics.shakeScreen = true
+options.graphics.slowmotion = true
+options.graphics.motionblur = true
+options.cheats.timeOut = false
+options.cheats.SensorsAreFtw = false
+options.cheats.colorfulExplosion = false
+
+local strfrm = string.format
+function string.format(...)
+	local args = {...}
+	local t = {}
+	for i,v in ipairs(args) do
+		t[i] = tostring(v)
+	end
+	return strfrm(unpack(t))
+end
+
 local tabs = loveframes.Create("tabs", frame)
 tabs:SetPos(5, 30)
 do
 	local w, h = frame:GetSize()
-	tabs:SetSize(w-5, h-5)
+	tabs:SetSize(w-10, h-35)
 end
 
 local tabItems = {
@@ -27,7 +52,30 @@ local tabItems = {
 	{"Audio"},
 	{"Graphics",
 		{
-			
+			{
+				"Particle Effects",
+				"checkbox",
+				"particleEffects",
+				"Toggles the particle effects that appear when you or a wall explode"
+			},
+			{
+				"Shake Screen",
+				"checkbox",
+				"shakeScreen",
+				"Toggles the screen shaking effect that occurs when you leave a wall"
+			},
+			{
+				"Slow Motion",
+				"checkbox",
+				"slowmotion",
+				"Toggles the slowmotion effect"
+			},
+			{
+				"Motion Blur",
+				"checkbox",
+				"motionblur",
+				"Toggles the motion blur effect, may not be available on all systems"
+			}
 		}
 	},
 	{"Cheats",
@@ -43,18 +91,40 @@ local tabPanels = {}
 
 function updatePanel(panel, i)
 	if i == 3 then
+		local y = 0
+		for i,v in ipairs(tabItems[i][2]) do
+			local item = loveframes.Create(v[2])
+			panel:AddItem(item)
+			if item == "checkbox" then
+				item:SetPosition(0, y)
+				item:SetText(v[1])
+				item:SetSize(5,5)
+				item.OnChanged = function(object)
+					options.graphics[v[3]] = object:GetChecked()
+				end
+			end
+			
+			if v[4] then
+				local tooltip = loveframes.Create("tooltip")
+				tooltip:SetObject(item)
+				tooltip:SetText(tostring(v[4]))
+			end
+			y = 20
+		end
 	end
 	return panel
 end
+
 for i,v in ipairs(tabItems) do
 	local panel = loveframes.Create"list"
 	panel:SetAutoScroll(true)
-	panel:SetDisplayType("vetical")
+	panel:SetDisplayType("vertical")
+	panel:SetPadding(5)
 	
 	local text1 = loveframes.Create("text")
 	panel:AddItem(text1)
 	text1:SetText(v[1])
-	text1:SetPos(5, 5)
+	text1:SetPos(0, 0)
 	updatePanel(panel, i)
 	
 	tabs:AddTab(v[1], panel)
