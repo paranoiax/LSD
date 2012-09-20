@@ -18,12 +18,8 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin dui enim, porta e
 	- desc: draws debug information
 --]]---------------------------------------------------------
 function loveframes.debug.draw()
-
-	-- get the current debug setting
-	local debug = loveframes.config["DEBUG"]
-	
 	-- do not draw anthing if debug is off
-	if debug == false then
+	if not debugmode then
 		return
 	end
 	
@@ -39,24 +35,13 @@ function loveframes.debug.draw()
 	local deltatime			= love.timer.getDelta()
 	
 	love.graphics.push()
-	love.graphics.translate(0, screenHeight-250-100)
+	love.graphics.translate(0, screenHeight-190-100)
 	-- font for debug text
 	love.graphics.setFont(font)
 	
 	love.graphics.setColor(0, 0, 0, 150)
-	love.graphics.rectangle("fill", 5, 5, 200, 250)
-	
-	love.graphics.setColor(0, 0, 0, 50)
-	love.graphics.rectangle("fill", 10, 10, 190, 20)
-	love.graphics.setColor(255, 0, 0, 255)
-	love.graphics.print("Library Information", 15, 15)
-	
-	love.graphics.setColor(255, 255, 255, 255)
-	love.graphics.print("Author: " ..author, 15, 30)
-	love.graphics.print("Version: " ..version, 15, 40)
-	love.graphics.print("Stage: " ..stage, 15, 50)
-	love.graphics.print("Base Directory: " ..basedir, 15, 60)
-	
+	love.graphics.rectangle("fill", 5, 75, 200, 190)
+
 	-- object information box
 	love.graphics.setColor(0, 0, 0, 50)
 	love.graphics.rectangle("fill", 10, 80, 190, 20)

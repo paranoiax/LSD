@@ -1,3 +1,4 @@
+debugmode = true
 require "lib.loveframes.init"
 require "camera"
 require "lib.TEsound"
@@ -120,8 +121,6 @@ function love.load()
 	if options.cheats.SensorsAreFtw then
 		options.cheats.timeOut = true
 	end
-	
-	debugmode = true
 	
 	icon = love.graphics.newImage("images/icon.png")
 	cursorImg = love.graphics.newImage("images/cursor.png")
