@@ -95,10 +95,9 @@ function updatePanel(panel, i)
 		for i,v in ipairs(tabItems[i][2]) do
 			local item = loveframes.Create(v[2])
 			panel:AddItem(item)
-			if item == "checkbox" then
-				item:SetPosition(0, y)
+			if v[2] == "checkbox" then
 				item:SetText(v[1])
-				item:SetSize(5,5)
+				item:SetWidth(10)
 				item.OnChanged = function(object)
 					options.graphics[v[3]] = object:GetChecked()
 				end

@@ -7,6 +7,7 @@ require "Loader"
 require "Editor"
 require "menu"
 require "controls"
+require "options"
 local cron = require 'lib.cron'
 local tween = require 'lib.tween'
 
@@ -95,29 +96,12 @@ motionFrames = 4 -- number of frames to store for motion; must be at least 1 (th
 alphaMultiplier = 85 -- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
 
 function love.load()
-	
-	require "options"
 	love.mouse.setVisible(false)
 	
 	explodeBall = false
 	BallExplode = false
 	explosionTime = 1
 
-	options = {
-		graphics = {},
-		audio = {},
-		cheats = {}
-	}
-	options.audio.music = true
-	options.audio.sfx = true
-	options.graphics.particleEffects = true
-	options.graphics.shakeScreen = true
-	options.graphics.slowmotion = true
-	options.graphics.motionblur = true
-	options.cheats.timeOut = false
-	options.cheats.SensorsAreFtw = false
-	options.cheats.colorfulExplosion = false
-	
 	if options.cheats.SensorsAreFtw then
 		options.cheats.timeOut = true
 	end
@@ -184,7 +168,6 @@ function love.load()
 
 	maxLevel = love.filesystem.read("save.lua")
 	maxLevel = tonumber(maxLevel)
-	print(maxLevel)
 
 	if maxLevel > 1 then
 		currentLevel = maxLevel
@@ -292,7 +275,9 @@ end
 
 function love.update(dt)
 	dt = dt * slowmo.time.t
-	loveframes.update(dt)
+	if GAMESTATE == "OPTIONS" then
+		loveframes.update(dt)
+	end
 	MENU_UPDATE(dt)
 	INGAME_UPDATE(dt)
 	if GAMESTATE == "EDITOR" then
@@ -306,7 +291,9 @@ function love.draw()
 	end
 	MENU_DRAW()
 	INGAME_DRAW()
-	loveframes.draw()
+	if GAMESTATE == "OPTIONS" then
+		loveframes.draw()
+	end
 	if GAMESTATE=="MENU" or GAMESTATE=="OPTIONS" then
 		menuCursor()
 	end
@@ -626,7 +613,7 @@ function INGAME_DRAW()
 				end
 			end
 			love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-			love.graphics.print('Press "R" to restart!',10 + camera.x, 95 + camera.y)
+			love.graphics.print(string.format("Option list: graphics; shake:%s, pfx:%s, slomo:%s, blur:%s", options.graphics.shakeScreen, options.graphics.particleEffects, options.graphics.slowmotion, options.graphics.motionblur),10 + camera.x, 95 + camera.y)
 			love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
 			love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
 			love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
