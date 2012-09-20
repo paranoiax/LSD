@@ -607,8 +607,8 @@ end
 --]]---------------------------------------------------------
 function skin.DrawOverList(object)
 
-	love.graphics.setColor(unpack(skin.controls.list_border_color))
-	skin.OutlinedRectangle(object:GetX(), object:GetY(), object:GetWidth(), object:GetHeight())
+	--love.graphics.setColor(unpack(skin.controls.list_border_color))
+	--skin.OutlinedRectangle(object:GetX(), object:GetY(), object:GetWidth(), object:GetHeight())
 	
 end
 
