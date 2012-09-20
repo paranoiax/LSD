@@ -122,7 +122,7 @@ function love.load()
 	icon = love.graphics.newImage("images/icon.png")
 	cursorImg = love.graphics.newImage("images/cursor.png")
 	love.graphics.setIcon(icon)
-	f = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
+	f = love.graphics.newFont("fonts/DisplayOTF.otf", 60)
 	e = love.graphics.newFont("fonts/DisplayOTF.otf", 90)
 	d = love.graphics.newFont(14)
 	--love.mouse:setGrab(false)
@@ -256,7 +256,7 @@ function love.load()
 	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
 	
 	if currentLevel > 1 then
-		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight / 4 * 3 -85-85,"Continue", "continue")
+		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight -275,"Continue", "continue")
 	end
 	
 	local menu = {
@@ -265,10 +265,10 @@ function love.load()
 		{"Options", "options"},
 		{"Quit", "quit"},
 	}
-	local menuY = screenHeight / 4 * 3-85
+	local menuY = screenHeight -220
 	for i,v in ipairs(menu) do
 		button_spawn(screenWidth/2 - f:getWidth(v[1])/2, menuY, v[1], v[2])
-		menuY = menuY + 85
+		menuY = menuY + 55
 	end
 	
 	if GAMESTATE == "MENU" then
@@ -675,13 +675,13 @@ function MENU_DRAW()
 	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
 		love.graphics.setColor(255,255,255)
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-		ball_menu_anim:draw(screenWidth / 2 - 96, screenHeight / 2 - 250)
+		ball_menu_anim:draw(screenWidth / 2 - 96, 170)
 
 		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Little Sticky Destroyer",2, 82, screenWidth, "center")
+		love.graphics.printf("Little Sticky Destroyer",2, 22, screenWidth, "center")
 		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Little Sticky Destroyer",0, 80, screenWidth, "center")
+		love.graphics.printf("Little Sticky Destroyer",0, 20, screenWidth, "center")
 		
 		if GAMESTATE == "MENU" then
 			button_draw()
@@ -740,5 +740,4 @@ end
 
 function slowmoStop()
 	slowmo.time = {t = 1}
-	blur = false
 end
