@@ -18,7 +18,7 @@ loveframes.config["DIRECTORY"]         = "lib/loveframes"
 loveframes.config["DEFAULTSKIN"]       = "Orange"
 loveframes.config["ACTIVESKIN"]        = "Orange"
 loveframes.config["INDEXSKINIMAGES"]   = true
-loveframes.config["DEBUG"]             = false
+loveframes.config["DEBUG"]             = true
 
 loveframes.drawcount 		= 0
 loveframes.hoverobject 		= false

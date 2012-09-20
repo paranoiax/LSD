@@ -12,23 +12,37 @@ tabs:SetPos(5, 30)
 tabs:SetSize(490, 265)
 
 local tabItems = {
-	"General",
-	"Audio",
-	"Graphics",
-	"Cheats"
+	{"General"},
+	{"Audio"},
+	{"Graphics",
+		{
+			
+		}
+	},
+	{"Cheats",
+		{
+		
+		}
+	}
 }
+
+local subItems 
 
 local tabPanels = {}
 
-function preparePanel(i)
-	local panel = loveframes.Create"panel"
-	local text1 = loveframes.Create("text", panel)
-	text1:SetText(tabItems[i])
-	
+function updatePanel(panel, i)
+	if i == 3 then
+	end
 	return panel
 end
 for i,v in ipairs(tabItems) do
-	tabs:AddTab(v, preparePanel(i))
+	local panel = loveframes.Create"list"
+	local text1 = loveframes.Create("text", panel)
+	text1:SetText(v[1])
+	text1:SetPos(10, 10)
+	updatePanel(panel, i)
+	
+	tabs:AddTab(v[1], panel)
 end
 
 function showOptions()

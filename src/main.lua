@@ -117,7 +117,11 @@ function love.load()
 	options.cheats.SensorsAreFtw = false
 	options.cheats.colorfulExplosion = false
 	
-	debugmode = false
+	if options.cheats.SensorsAreFtw then
+		options.cheats.timeOut = true
+	end
+	
+	debugmode = true
 	
 	icon = love.graphics.newImage("images/icon.png")
 	cursorImg = love.graphics.newImage("images/cursor.png")
