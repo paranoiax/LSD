@@ -28,6 +28,8 @@ function button_click(x,y)
 				newGame()
 			elseif v.id == "mapedit" then
 				Editor.load()
+			elseif v.id == "quit" then
+				love.event.push("quit")
 			end
 		end
 	end

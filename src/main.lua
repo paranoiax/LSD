@@ -109,6 +109,7 @@ function love.load()
 	options.graphics.shakeScreen = true
 	options.cheats.timeOut = false
 	options.cheats.SensorsAreFtw = false
+	options.cheats.colorfulExplosion = false
 	
 	debugmode = true
 	
@@ -255,7 +256,8 @@ function love.load()
 	local menu = {
 		{"New Game", "new_game"},
 		{"Map Editor", "mapedit"},
-		{"Options", "options"}
+		{"Options", "options"},
+		{"Quit", "quit"},
 	}
 	local menuY = screenHeight / 4 * 3-85
 	for i,v in ipairs(menu) do
@@ -486,7 +488,11 @@ function INGAME_UPDATE(dt)
 					if not v.isDestroyed then
 						v.body:applyLinearImpulse(math.random(-30,30),math.random(-40,20))
 					end
-					--v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
+					if options.cheats.colorfulExplosion then
+						v.r, v.g, v.b = math.random(255),math.random(255),math.random(255) --Colorful Explosions / Set a boolean variable for "original mappack completed" if true activate this (maybe)
+					else
+						v.r, v.g, v.b = 69,69,69
+					end
 				end
 			end
 			cron.after(1, tweenExplosion)
@@ -556,7 +562,7 @@ function INGAME_DRAW()
 		
 		for i,v in ipairs(Particle) do
 			if not v.isDestroyed then
-				love.graphics.setColor(69,69,69,ParticleAlpha[1]) --(v.r, v.g, v.b)
+				love.graphics.setColor(v.r,v.g,v.b,ParticleAlpha[1]) --(v.r, v.g, v.b)
 				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 			end
 		end		
