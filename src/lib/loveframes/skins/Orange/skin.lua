@@ -56,7 +56,7 @@ skin.controls.progressbar_text_color				= {0, 0, 0, 255}
 skin.controls.progressbar_text_font					= smallfont
 
 -- list
-skin.controls.list_border_color						= bordercolor
+skin.controls.list_border_color						= {0,0,0,0} or bordercolor
 skin.controls.list_body_color 						= {232, 232, 232, 255}
 
 -- scrollbar
