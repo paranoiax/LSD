@@ -90,8 +90,11 @@ function endCallback(fixture1, fixture2, contact)
 
 end
 
-function love.load()
+motionFrames = 4 -- number of frames to store for motion; must be at least 1 (the current frame)
+alphaMultiplier = 85 -- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
 
+function love.load()
+	
 	require "options"
 	love.mouse.setVisible(false)
 	
@@ -108,6 +111,8 @@ function love.load()
 	options.audio.sfx = true
 	options.graphics.particleEffects = true
 	options.graphics.shakeScreen = true
+	options.graphics.slowmotion = true
+	options.graphics.motionblur = true
 	options.cheats.timeOut = false
 	options.cheats.SensorsAreFtw = false
 	options.cheats.colorfulExplosion = false
@@ -272,6 +277,10 @@ function love.load()
 			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
 		end
 	end
+	
+	canvas = love.graphics.newCanvas()
+	canvas:clear()
+	blur = false
 	
 end
 
@@ -451,7 +460,8 @@ function runNativeResolution()
 	end
 end
 
-function INGAME_UPDATE(dt)
+function INGAME_UPDATE(dt2)
+	dt = dt2
 	if GAMESTATE == "INGAME" then
 		world:update(dt)
 		TEsound.cleanup()		
@@ -498,7 +508,8 @@ function INGAME_UPDATE(dt)
 						v.r, v.g, v.b = 69,69,69
 					end
 				end
-			end
+			end		
+			
 			cron.after(1, tweenExplosion)
 			explode = false
 		end
@@ -523,18 +534,18 @@ function INGAME_UPDATE(dt)
 		game_over(dt)
 		outOfBounds()
 		cron.update(dt)
-		tween.update(dt)
+		tween.update(dt)		
 	end
 end
 
 function INGAME_DRAW()
-	if GAMESTATE == "INGAME" then
-		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!
+	if GAMESTATE == "INGAME" then	
+		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!		
 		love.graphics.setBackgroundColor(255,255,255)
 		love.graphics.setColor(255,255,255)
 		love.graphics.setBlendMode("alpha")
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-		
+			
 		camera:set()
 		if options.graphics.shakeScreen then
 			camera:shake()
@@ -562,18 +573,39 @@ function INGAME_DRAW()
 				love.graphics.setColor(166,38,27)
 				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 			end
-		end		
+		end
+		
+		if options.graphics.motionblur then
+			if blur then
+				love.graphics.setBlendMode("subtractive")			
+				love.graphics.setCanvas(canvas)
+				blurAlpha = math.clamp(dt*alphaMultiplier*255, motionFrames, 255)
+				love.graphics.setColor(0, 0, 0, blurAlpha)
+				--Makes the transparency low as it adds to the canvas.
+				love.graphics.rectangle('fill', 0+camera.x, 0+camera.y, screenWidth,screenHeight)
+				--Adds a background so the trails don't stick.
+				love.graphics.setBlendMode("alpha")
+			end
+		end
 		
 		for i,v in ipairs(Particle) do
 			if not v.isDestroyed then
 				love.graphics.setColor(v.r,v.g,v.b,ParticleAlpha[1]) --(v.r, v.g, v.b)
 				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 			end
-		end		
+		end
 		
 		for i,v in ipairs(DeathParticle) do
 			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
+		end
+		
+		if options.graphics.motionblur then
+			if blur then
+				love.graphics.setCanvas()
+				love.graphics.setColor(255,255,255,255)			
+				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
+			end
 		end
 		
 		if debugmode == true then
@@ -622,10 +654,11 @@ function INGAME_DRAW()
 		end
 		
 		aim_crosshair()
-		camera:unset()
+		camera:unset()		
 		if not options.cheats.timeOut then
 			draw_timer()
 		end
+		
 	end
 end
 
@@ -676,27 +709,33 @@ function newGame()
 end
 
 function tweenDeath()
-	tween(1, DeathParticleAlpha, {0}, "linear", tweenDeathOver)
-end
-
-function tweenDeathOver()
-	if gameOver == false then
-		DeathParticleAlpha = {255}
+	if not gameOver and SensorsDestroyed < #Sensor then
+		tween(1, DeathParticleAlpha, {0}, "linear", tweenDeathOver)
 	end
 end
 
+function tweenDeathOver()	
+	DeathParticleAlpha = {255}
+end
+
 function tweenExplosion()
-	tween(1.5, ParticleAlpha, {0}, "linear")
+	if not gameOver and SensorsDestroyed < #Sensor then
+		tween(1.5, ParticleAlpha, {0}, "linear")
+	end
 end
 
 slowmo = {}
 slowmo.time = {t = 1}
 
 function slowmo:start()
-	self.time = {t = 0.20}
-	cron.after(0.35, slowmoStop)
+	if options.graphics.slowmotion then
+		blur = true
+		self.time = {t = 0.20}
+		cron.after(0.35, slowmoStop)
+	end
 end
 
 function slowmoStop()
 	slowmo.time = {t = 1}
+	blur = false
 end

@@ -24,3 +24,12 @@ function distanceFrom(x1,y1,x2,y2)
 	distance = distance>255 and 255 or distance
 	return math.floor(distance + .5)
 end
+
+function math.clamp(input, mini, maxi)
+	if input < mini then
+		input = mini
+	elseif input > maxi then
+		input = maxi
+	end
+	return input
+end

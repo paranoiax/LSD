@@ -27,6 +27,8 @@ end
 function game_over(dt)
 	if gameOver == true then
 		gameOverTimer = gameOverTimer - dt * 1.5
+		slowmo:start()
+		shake = false
 	end
 	if gameOverTimer < 0 then
 		currentLevel = currentLevel		
