@@ -51,8 +51,8 @@ function beginCallback(fixture1, fixture2, contact)
 			limit = ((v.width + v.height) / 2)
 			if limit < 20 then
 				limit = 20
-			elseif limit > 90 then
-				limit = 90 end
+			elseif limit > 85 then
+				limit = 85 end
 			end
 		end
 	end
@@ -80,7 +80,11 @@ function endCallback(fixture1, fixture2, contact)
 				explode = true
 				shake = true
 				if options.audio.sfx then
-					TEsound.play(explosionList)
+					if SensorsDestroyed == #Sensor - 1 and options.graphics.slowmotion then
+						TEsound.play(explosionList, nil, nil, 0.7)
+					else
+						TEsound.play(explosionList)
+					end
 				end
 				SensorsDestroyed = SensorsDestroyed + 1
 			end
@@ -224,8 +228,8 @@ function love.load()
 		end
 	end
 
-	limit = 90
-	deathLimit = 65
+	limit = 85
+	deathLimit = 45
 	SensorsCount = #Sensor
 	SensorsDestroyed = 0
 
@@ -260,7 +264,7 @@ function love.load()
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
 		if options.audio.music then
-			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.7) --to lower volume as intended without need for additonal line
+			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.65) --to lower volume as intended without need for additonal line
 		end
 	end
 	
@@ -509,7 +513,11 @@ function INGAME_UPDATE(dt2)
 		
 		if death then
 			if options.audio.sfx then
-				TEsound.play("sounds/death.wav")
+				if options.graphics.slowmotion then
+					TEsound.play("sounds/death.wav", nil, nil, 0.5)
+				else
+					TEsound.play("sounds/death.wav")
+				end
 			end
 			if options.graphics.particleEffects == true then
 				addDeathParticle()
