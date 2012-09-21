@@ -96,8 +96,8 @@ function endCallback(fixture1, fixture2, contact)
 
 end
 
-motionFrames = 4 -- number of frames to store for motion; must be at least 1 (the current frame)
-alphaMultiplier = 85 -- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
+motionFrames = 10 -- number of frames to store for motion; must be at least 1 (the current frame)
+alphaMultiplier = 100-- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
 
 function love.load()
 	love.mouse.setVisible(false)
@@ -554,6 +554,19 @@ function INGAME_DRAW()
 		
 		love.graphics.setLine(3, "smooth")
 		
+		if options.graphics.motionblur then
+			if blur then
+				love.graphics.setBlendMode("subtractive")			
+				love.graphics.setCanvas(canvas)
+				blurAlpha = math.clamp(dt*alphaMultiplier*255, motionFrames, 255)
+				love.graphics.setColor(0, 0, 0, blurAlpha)
+				--Makes the transparency low as it adds to the canvas.
+				love.graphics.rectangle('fill', 0+camera.x, 0+camera.y, screenWidth,screenHeight)
+				--Adds a background so the trails don't stick.
+				love.graphics.setBlendMode("alpha")
+			end
+		end
+		
 		if aiming == true then
 			draw_crosshair()
 		end	
@@ -574,20 +587,7 @@ function INGAME_DRAW()
 				love.graphics.setColor(166,38,27)
 				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 			end
-		end
-		
-		if options.graphics.motionblur then
-			if blur then
-				love.graphics.setBlendMode("subtractive")			
-				love.graphics.setCanvas(canvas)
-				blurAlpha = math.clamp(dt*alphaMultiplier*255, motionFrames, 255)
-				love.graphics.setColor(0, 0, 0, blurAlpha)
-				--Makes the transparency low as it adds to the canvas.
-				love.graphics.rectangle('fill', 0+camera.x, 0+camera.y, screenWidth,screenHeight)
-				--Adds a background so the trails don't stick.
-				love.graphics.setBlendMode("alpha")
-			end
-		end
+		end		
 		
 		for i,v in ipairs(Particle) do
 			if not v.isDestroyed then
@@ -599,15 +599,7 @@ function INGAME_DRAW()
 		for i,v in ipairs(DeathParticle) do
 			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
-		end
-		
-		if options.graphics.motionblur then
-			if blur then
-				love.graphics.setCanvas()
-				love.graphics.setColor(255,255,255,255)			
-				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
-			end
-		end
+		end		
 		
 		if debugmode == true then
 			love.graphics.setColor(255,50,200)
@@ -630,7 +622,15 @@ function INGAME_DRAW()
 		end
 		
 		drawGreyRectangle()
-		drawRedRectangle()			
+		drawRedRectangle()
+		
+		if options.graphics.motionblur then
+			if blur then
+				love.graphics.setCanvas()
+				love.graphics.setColor(255,255,255,255)			
+				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
+			end
+		end
 		
 		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10)
