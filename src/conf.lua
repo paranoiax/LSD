@@ -7,7 +7,7 @@ function love.conf(t)
 	t.title = 'LSD - Little Sticky Destroyer'
 	t.screen.vsync = false
 	t.screen.fullscreen= false
-	t.screen.fsaa = 2
+	t.screen.fsaa = 0
 	t.identity = "LSD"
 	t.console = false
 	t.release = false
