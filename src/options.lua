@@ -26,6 +26,7 @@ options.graphics.particleEffects = true
 options.graphics.shakeScreen = true
 options.graphics.slowmotion = true
 options.graphics.motionblur = true
+options.graphics.vignette = true -- seriously cuts the framerate
 options.cheats.timeOut = false
 options.cheats.SensorsAreFtw = false
 options.cheats.colorfulExplosion = false

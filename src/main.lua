@@ -119,6 +119,7 @@ function love.load()
 	--love.mouse:setGrab(false)
 
 	bg = love.graphics.newImage("images/bg.jpg")
+	vignetteImg = love.graphics.newImage("images/vignette.jpg")
 
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 9.81 * 64, true)
@@ -655,11 +656,13 @@ function INGAME_DRAW()
 		end
 		
 		aim_crosshair()
-		camera:unset()		
+		camera:unset()	
+		
 		if not options.cheats.timeOut then
 			draw_timer()
 		end
 		
+		drawVignette()		
 	end
 end
 
@@ -738,4 +741,13 @@ end
 
 function slowmoStop()
 	slowmo.time = {t = 1}
+end
+
+function drawVignette()
+	if options.graphics.vignette then
+		love.graphics.setColor(255,255,255,255)
+		love.graphics.setBlendMode("multiplicative")
+		love.graphics.draw(vignetteImg,0,0,0,scaleX,scaleY)
+		love.graphics.setBlendMode("alpha")
+	end
 end
