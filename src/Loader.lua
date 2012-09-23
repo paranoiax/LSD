@@ -13,6 +13,14 @@ function nextLevel(dt)
 				love.filesystem.write("save.lua", currentLevel)
 			end
 		else
+			-- DEMO ONLY
+			if demo then
+				if not love.filesystem.exists("completed.lua") then
+					love.filesystem.newFile("completed.lua")
+					love.filesystem.write("completed.lua", "true")
+				end
+			end
+			-- END DEMO ONLY
 			GAMESTATE = "MENU"
 			currentLevel = 1
 			love.filesystem.write("save.lua", currentLevel)

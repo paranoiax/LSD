@@ -5,10 +5,10 @@ end
 function button_draw()
 	for i,v in ipairs(button) do		
 		love.graphics.setFont(f)
-		love.graphics.setColor(10,10,10)
+		love.graphics.setColor(10,10,10,menuAlpha)
 		love.graphics.print(v.text, v.x, v.y)
 		if v.mouseover == true then
-			love.graphics.setColor(217,177,102)
+			love.graphics.setColor(217,177,102,menuAlpha)
 			love.graphics.print(v.text, v.x -2, v.y -2)
 		end
 	end
@@ -36,7 +36,7 @@ function button_click(x,y)
 end
 
 function button_check()
-	for i,v in ipairs(button) do		
+	for i,v in ipairs(button) do
 		if love.mouse:getX() < v.x + f:getWidth(v.text) and
 		love.mouse:getX() > v.x and
 		love.mouse:getY() < v.y + f:getHeight(v.text) and
@@ -50,5 +50,5 @@ end
 
 function menuCursor()
 	love.graphics.setColor(255,255,255)
-	love.graphics.draw(cursorImg, love.mouse.getX(), love.mouse.getY())	
+	love.graphics.draw(cursorImg, love.mouse.getX(), love.mouse.getY())
 end

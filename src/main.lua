@@ -1,4 +1,5 @@
 debugmode = true
+demo = true
 require "lib.loveframes.init"
 require "camera"
 require "lib.TEsound"
@@ -139,6 +140,9 @@ function love.load()
 	currentSensor = 1
 	currentObstacle = 1
 	currentWall = 1
+	menuAlpha = 0
+	gameAlpha = 0
+	titleY = -100
 	
 	tween.resetAll()
 	cron.reset()
@@ -169,6 +173,10 @@ function love.load()
 	if not love.filesystem.exists("save.lua") then
 		love.filesystem.newFile("save.lua")
 		love.filesystem.write("save.lua", 1)
+	end
+	
+	if love.filesystem.exists("completed.lua") and demo then
+		options.cheats.colorfulExplosion = love.filesystem.read("completed.lua")
 	end
 
 	maxLevel = love.filesystem.read("save.lua")
@@ -250,12 +258,19 @@ function love.load()
 		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight -275,"Continue", "continue")
 	end
 	
-	local menu = {
-		{"New Game", "new_game"},
-		{"Map Editor", "mapedit"},
-		{"Options", "options"},
-		{"Quit", "quit"},
-	}
+	if not demo then
+		menu = {
+			{"New Game", "new_game"},
+			{"Map Editor", "mapedit"},
+			{"Options", "options"},
+			{"Quit", "quit"},
+		}
+	else
+		menu = {
+			{"New Game", "new_game"},
+			{"Quit", "quit"},
+		}
+	end
 	local menuY = screenHeight -220
 	for i,v in ipairs(menu) do
 		button_spawn(screenWidth/2 - f:getWidth(v[1])/2, menuY, v[1], v[2])
@@ -288,6 +303,7 @@ function love.update(dt)
 	if GAMESTATE == "EDITOR" then
 		Editor.update(dt)
 	end
+	tween.update(dt)
 end
 
 function love.draw()
@@ -301,7 +317,7 @@ function love.draw()
 	end
 	if GAMESTATE=="MENU" or GAMESTATE=="OPTIONS" then
 		menuCursor()
-	end
+	end	
 end
 
 function ball_launch()
@@ -315,19 +331,19 @@ function draw_crosshair()
 	if objects.ball.canJump == true then
 		love.graphics.setColor(202,143,84,-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
 		love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
-		love.graphics.setColor(255,255,255,255)
+		love.graphics.setColor(255,255,255,gameAlpha)
 	end
 end
 
 function aim_crosshair()
 	love.mouse.setVisible(false)
-	love.graphics.setColor(202,143,84)
+	love.graphics.setColor(202,143,84,gameAlpha)
 	love.graphics.line(love.mouse:getX() -7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() + 7 + camera.x, love.mouse.getY() + 7 + camera.y)
 	love.graphics.line(love.mouse:getX() +7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() -7 + camera.x, love.mouse.getY() + 7 + camera.y)
 end
 
 function draw_timer()
-	love.graphics.setColor(0,0,0,180)
+	love.graphics.setColor(0,0,0,((180 / 255) * gameAlpha))
 	love.graphics.rectangle("fill", 0, screenHeight - 50, screenWidth * explosionTime, 50)
 end
 
@@ -368,7 +384,7 @@ end
 
 function drawRedRectangle()
 	for i,v in ipairs(Rectangle2) do
-		love.graphics.setColor(255,255,255)
+		love.graphics.setColor(255,255,255,gameAlpha)
 		love.graphics.drawq(RedTiles, v.quad, v.x, v.y)
 	end
 end
@@ -376,7 +392,7 @@ end
 function drawGreyRectangle()
 	for i,v in ipairs(Rectangle) do
 		if not Sensor[i].isDestroyed then
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(255,255,255,gameAlpha)
 			love.graphics.drawq(GreyTiles, v.quad, v.x, v.y)
 		end
 	end
@@ -461,6 +477,7 @@ end
 function INGAME_UPDATE(dt2)
 	dt = dt2
 	if GAMESTATE == "INGAME" then
+		tweenGameAlpha(dt)
 		world:update(dt)
 		TEsound.cleanup()		
 		objects.ball.anim:update(dt)	
@@ -535,8 +552,7 @@ function INGAME_UPDATE(dt2)
 		nextLevel(dt)
 		game_over(dt)
 		outOfBounds()
-		cron.update(dt)
-		tween.update(dt)		
+		cron.update(dt)	
 	end
 end
 
@@ -544,10 +560,9 @@ function INGAME_DRAW()
 	if GAMESTATE == "INGAME" then	
 		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!		
 		love.graphics.setBackgroundColor(255,255,255)
-		love.graphics.setColor(255,255,255)
+		love.graphics.setColor(255,255,255,gameAlpha)
 		love.graphics.setBlendMode("alpha")
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-			
 		camera:set()
 		if options.graphics.shakeScreen then
 			camera:shake()
@@ -560,6 +575,7 @@ function INGAME_DRAW()
 				love.graphics.setBlendMode("subtractive")			
 				love.graphics.setCanvas(canvas)
 				blurAlpha = math.clamp(dt*alphaMultiplier*255, motionFrames, 255)
+				blurAlpha = ((blurAlpha / 255) * gameAlpha)
 				love.graphics.setColor(0, 0, 0, blurAlpha)
 				--Makes the transparency low as it adds to the canvas.
 				love.graphics.rectangle('fill', 0+camera.x, 0+camera.y, screenWidth,screenHeight)
@@ -573,19 +589,19 @@ function INGAME_DRAW()
 		end	
 		
 		if objects.ball.isAlive then
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(255,255,255,gameAlpha)
 			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
 		end
 	   
 		if debugmode then
 			for i,v in ipairs(Sensor) do
 				if v.touching == true then
-					love.graphics.setColor(200, 0, 0, 60)
+					love.graphics.setColor(200, 0, 0, 60,gameAlpha)
 					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 				end
 			end
 			for i,v in ipairs(Wall) do
-				love.graphics.setColor(166,38,27)
+				love.graphics.setColor(166,38,27,gameAlpha)
 				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 			end
 		end		
@@ -603,7 +619,7 @@ function INGAME_DRAW()
 		end		
 		
 		if debugmode == true then
-			love.graphics.setColor(255,50,200)
+			love.graphics.setColor(255,50,200,gameAlpha)
 			love.graphics.setFont(d)
 			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
 			love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
@@ -628,46 +644,49 @@ function INGAME_DRAW()
 		if options.graphics.motionblur then
 			if blur then
 				love.graphics.setCanvas()
-				love.graphics.setColor(255,255,255,255)			
+				love.graphics.setColor(255,255,255,gameAlpha)			
 				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
 			end
 		end
 		
 		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10)
+		love.graphics.setColor(10,10,10,gameAlpha)
 		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 22 + camera.y, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
+		love.graphics.setColor(217,177,102,gameAlpha)
 		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 20 + camera.y, screenWidth, "center")
 		
 		if win then
 			love.graphics.setFont(e)
-			love.graphics.setColor(10,10,10)
+			love.graphics.setColor(10,10,10,gameAlpha)
 			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-			love.graphics.setColor(217,177,102)
+			love.graphics.setColor(217,177,102,gameAlpha)
 			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
 		end
 		
 		if gameOver and not win then
 			love.graphics.setFont(e)
-			love.graphics.setColor(10,10,10)
+			love.graphics.setColor(10,10,10,gameAlpha)
 			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-			love.graphics.setColor(217,177,102)
+			love.graphics.setColor(217,177,102,gameAlpha)
 			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
 		end
 		
 		aim_crosshair()
-		camera:unset()	
+		camera:unset()
 		
 		if not options.cheats.timeOut then
 			draw_timer()
 		end
 		
-		drawVignette()		
+		drawVignette()
+		
 	end
 end
 
 function MENU_UPDATE(dt)
 	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
+		tweenTitleY(dt)
+		tweenMenuAlpha(dt)
 		ball_menu_anim:update(dt)
 		if GAMESTATE == "MENU" then
 			button_check()
@@ -676,21 +695,22 @@ function MENU_UPDATE(dt)
 end
 
 function MENU_DRAW()
-	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
-		love.graphics.setColor(255,255,255)
+	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then	
+		love.graphics.setBackgroundColor(0,0,0)
+		love.graphics.setColor(255,255,255,menuAlpha)
 		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 		ball_menu_anim:draw(screenWidth / 2 - 96, 170)
 
 		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10)
-		love.graphics.printf("Little Sticky Destroyer",2, 22, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
-		love.graphics.printf("Little Sticky Destroyer",0, 20, screenWidth, "center")
+		love.graphics.setColor(10,10,10,menuAlpha)
+		love.graphics.printf("Little Sticky Destroyer",2, titleY+2, screenWidth, "center")
+		love.graphics.setColor(217,177,102,menuAlpha)
+		love.graphics.printf("Little Sticky Destroyer",0, titleY, screenWidth, "center")
 		
 		if GAMESTATE == "MENU" then
 			button_draw()
 		end
-	end
+	end	
 end
 
 -- loading main.lua again is: unresourceful (many resources, unless lua garbage collects it..)
@@ -745,9 +765,26 @@ end
 
 function drawVignette()
 	if options.graphics.vignette then
-		love.graphics.setColor(255,255,255,255)
+		love.graphics.setColor(255,255,255,gameAlpha)
 		love.graphics.setBlendMode("multiplicative")
 		love.graphics.draw(vignetteImg,0,0,0,scaleX,scaleY)
 		love.graphics.setBlendMode("alpha")
 	end
+end
+
+function tweenMenuAlpha(dt)
+	menuAlpha = menuAlpha + 350 * dt
+	if menuAlpha >= 255 then menuAlpha = 255 end
+end
+
+function tweenGameAlpha(dt)
+	gameAlpha = gameAlpha + 350 * dt
+	if gameAlpha >= 255 then
+	gameAlpha = 255	
+	end
+end
+
+function tweenTitleY(dt)
+	titleY = titleY + 200 * dt
+	if titleY >= 20 then titleY = 20 end
 end
