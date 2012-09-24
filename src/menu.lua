@@ -5,10 +5,10 @@ end
 function button_draw()
 	for i,v in ipairs(button) do		
 		love.graphics.setFont(f)
-		love.graphics.setColor(10,10,10,menuAlpha)
+		love.graphics.setColor(10,10,10)
 		love.graphics.print(v.text, v.x, v.y)
 		if v.mouseover == true then
-			love.graphics.setColor(217,177,102,menuAlpha)
+			love.graphics.setColor(217,177,102)
 			love.graphics.print(v.text, v.x -2, v.y -2)
 		end
 	end

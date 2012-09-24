@@ -60,8 +60,6 @@ function Editor.draw()
 	local width = love.graphics.getWidth()
 	local x, y = love.mouse.getPosition()
 	x, y = x + camera.x, y + camera.y
-	love.graphics.setColor(255,255,255)
-	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 	love.graphics.setColor(100, 50, 0)
 	love.graphics.line(-4, ground, width+4, ground)
 	love.graphics.setColor(255, 255, 255)

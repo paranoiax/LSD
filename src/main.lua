@@ -1,5 +1,5 @@
 debugmode = true
-demo = true
+demo = false
 require "lib.loveframes.init"
 require "camera"
 require "lib.TEsound"
@@ -140,7 +140,6 @@ function love.load()
 	currentSensor = 1
 	currentObstacle = 1
 	currentWall = 1
-	menuAlpha = 0
 	gameAlpha = 0
 	titleY = -100
 	
@@ -304,9 +303,14 @@ function love.update(dt)
 		Editor.update(dt)
 	end
 	tween.update(dt)
+	tweenGameAlpha(dt)
 end
 
 function love.draw()
+	love.graphics.setBackgroundColor(255,255,255)
+	love.graphics.setColor(255,255,255,gameAlpha)
+	love.graphics.setBlendMode("alpha")
+	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
 	if GAMESTATE == "EDITOR" then
 		Editor.draw()
 	end
@@ -317,7 +321,8 @@ function love.draw()
 	end
 	if GAMESTATE=="MENU" or GAMESTATE=="OPTIONS" then
 		menuCursor()
-	end	
+	end
+	drawVignette()
 end
 
 function ball_launch()
@@ -476,8 +481,7 @@ end
 
 function INGAME_UPDATE(dt2)
 	dt = dt2
-	if GAMESTATE == "INGAME" then
-		tweenGameAlpha(dt)
+	if GAMESTATE == "INGAME" then		
 		world:update(dt)
 		TEsound.cleanup()		
 		objects.ball.anim:update(dt)	
@@ -559,10 +563,7 @@ end
 function INGAME_DRAW()
 	if GAMESTATE == "INGAME" then	
 		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!		
-		love.graphics.setBackgroundColor(255,255,255)
-		love.graphics.setColor(255,255,255,gameAlpha)
-		love.graphics.setBlendMode("alpha")
-		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+		
 		camera:set()
 		if options.graphics.shakeScreen then
 			camera:shake()
@@ -678,15 +679,12 @@ function INGAME_DRAW()
 			draw_timer()
 		end
 		
-		drawVignette()
-		
 	end
 end
 
 function MENU_UPDATE(dt)
 	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
 		tweenTitleY(dt)
-		tweenMenuAlpha(dt)
 		ball_menu_anim:update(dt)
 		if GAMESTATE == "MENU" then
 			button_check()
@@ -695,16 +693,13 @@ function MENU_UPDATE(dt)
 end
 
 function MENU_DRAW()
-	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then	
-		love.graphics.setBackgroundColor(0,0,0)
-		love.graphics.setColor(255,255,255,menuAlpha)
-		love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
 		ball_menu_anim:draw(screenWidth / 2 - 96, 170)
 
 		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10,menuAlpha)
+		love.graphics.setColor(10,10,10)
 		love.graphics.printf("Little Sticky Destroyer",2, titleY+2, screenWidth, "center")
-		love.graphics.setColor(217,177,102,menuAlpha)
+		love.graphics.setColor(217,177,102)
 		love.graphics.printf("Little Sticky Destroyer",0, titleY, screenWidth, "center")
 		
 		if GAMESTATE == "MENU" then
@@ -770,11 +765,6 @@ function drawVignette()
 		love.graphics.draw(vignetteImg,0,0,0,scaleX,scaleY)
 		love.graphics.setBlendMode("alpha")
 	end
-end
-
-function tweenMenuAlpha(dt)
-	menuAlpha = menuAlpha + 350 * dt
-	if menuAlpha >= 255 then menuAlpha = 255 end
 end
 
 function tweenGameAlpha(dt)
