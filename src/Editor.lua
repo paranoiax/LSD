@@ -13,7 +13,6 @@ end
 	Editor.speed = 4
 	maps = love.filesystem.enumerate('maps')
 	maps = #maps
-	ground = love.graphics.getHeight() - 160
 	object = {}
 	currentObject = "wall"	
 	walls = {}
@@ -75,9 +74,7 @@ function Editor.draw()
 	local width = love.graphics.getWidth()
 	local x, y = love.mouse.getPosition()
 	x, y = x + camera.x, y + camera.y
-	love.graphics.setColor(100, 50, 0)
-	love.graphics.line(-4, ground, width+4, ground)
-	love.graphics.setColor(255, 255, 255)
+	love.graphics.setColor(0, 0, 0)
 	love.graphics.print('Width:  ' .. gui.w, 0, 768)
 	love.graphics.print('Height: ' .. gui.h, width*0.2, 768)
 	love.graphics.print('Maps: ' .. maps, width*0.4, 768)
@@ -86,9 +83,9 @@ function Editor.draw()
 	love.graphics.setColor(255,255,255)
 	for i = 1,9 do
 		if love.filesystem.exists('maps/level'..i..'.lua') then
-			love.graphics.setColor(255,255,255)
+			love.graphics.setColor(0,0,0)
 		else
-			love.graphics.setColor(128,128,128,200)
+			love.graphics.setColor(0,0,0,180)
 		end
 		love.graphics.print('level'..i..'.lua', width*(i-1)/9, 784)
 	end
@@ -119,7 +116,7 @@ function Editor.draw()
 		love.graphics.setColor(255,255,255,150)
 		love.graphics.draw(playerImg, x - playerImg:getWidth() / 2, y - playerImg:getHeight() / 2)
 	end
-	if y < 769 and currentObject ~= "player" then
+	if currentObject ~= "player" then
 		x, y = (math.floor((x / 10)) * 10), (math.floor((y / 10)) * 10) --snap to grid
 		--love.graphics.rectangle('fill', x, y, gui.w, gui.h)
 		love.graphics.setColor(255,255,255,150)

@@ -76,7 +76,7 @@ function endCallback(fixture1, fixture2, contact)
 		if checkValues(fixture1, fixture2, v.fixture) then
 			if checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 				v.touching = false
-				v.fixture:destroy()
+				--v.fixture:destroy()
 				v.isDestroyed = true				
 				explode = true
 				shake = true

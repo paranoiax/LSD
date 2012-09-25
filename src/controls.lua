@@ -55,7 +55,7 @@ function love.keypressed(key, ...)
 end
 
 function Editor.mousepressed(x, y, b)
-	if b == 'l' and y < 769 then
+	if b == 'l' then
 		x, y = x + camera.x, y + camera.y
 		if currentObject == "player" and #player < 1 then
 			player.isSet = true
@@ -79,14 +79,7 @@ function Editor.mousepressed(x, y, b)
 	end
 	if b == 'r' then
 		collision.Remove(x + camera.x, y + camera.y)
-	end
-	if b == 'l' and y >= 769 then
-		if x < love.graphics.getWidth()*0.2 then
-			gui.focus = 'w'
-		elseif x < love.graphics.getWidth()*0.4 then
-			gui.focus = 'h'
-		end
-	end
+	end	
 end
 
 function love.keyboard.isShiftDown()
