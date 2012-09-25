@@ -37,10 +37,12 @@ function love.keypressed(key, ...)
 		if key == "r" or key == "enter" or key == "return" or key == " " then
 			love.filesystem.load("main.lua")()
 			love.load()
-		elseif key == "escape" then
+		elseif key == "escape" and not testmap then
 			GAMESTATE = "MENU"
 			love.filesystem.load("main.lua")()
 			love.load()
+		elseif key == "escape" and testmap then
+			GAMESTATE = "EDITOR"
 		end
 	elseif GAMESTATE == "MENU" then
 		if key == "escape" then
@@ -96,8 +98,9 @@ end
 
 
 function Editor.keypressed(key)
-	if key == "escape" then
+	if key == "escape" then		
 		Editor.unload()
+		testmap = false
 	end
 	
 	local concentration = love.keyboard.isShiftDown() and 4 or (love.keyboard.isAltDown() and 1 or 2)
@@ -122,6 +125,16 @@ function Editor.keypressed(key)
 		elseif currentObject == "player" then
 			currentObject = "wall"
 		end
+	end
+	if key == 'p' then
+		local f = love.filesystem.newFile('maps/testmap.lua')
+		f:open('w')
+			f:write(generateCode())
+		f:close()
+		testmap = true
+		GAMESTATE = "INGAME"
+		love.filesystem.load("main.lua")()
+		love.load()
 	end
 	if key == 'return' and maps < 10 then
 		local f = love.filesystem.newFile('maps/level'..maps+1 .. '.lua')

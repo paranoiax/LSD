@@ -133,6 +133,8 @@ function Editor.unload() -- unloads all hooks and returns to menu
 	sensors = {}
 	walls = {}
 	object = {}
+	RectangleEditor = {}
+	RectangleEditor2 = {}
 	playerX, playerY = 0,0
 	player.isSet = false
 	GAMESTATE = "MENU"

@@ -192,8 +192,12 @@ function love.load()
 		currentLevel = currentLevel - 1
 		assert(currentLevel > 0, "Couldn't find a level for that map-pack")
 	end
-	map = love.filesystem.load("levels/"..currentPack.."/level"..currentLevel..".lua")()
-	
+	if not testmap then
+		map = love.filesystem.load("levels/"..currentPack.."/level"..currentLevel..".lua")()
+	else
+		map = love.filesystem.load("maps/testmap.lua")()
+	end
+		
 	for i,v in pairs{sensors=addSensor, walls=addWall} do
 		for _, data in ipairs(map[i]) do
 			v(unpack(data))

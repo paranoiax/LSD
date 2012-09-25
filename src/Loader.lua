@@ -6,7 +6,7 @@ function nextLevel(dt)
 	if win == true then
 		winTimer = winTimer - dt
 	end
-	if winTimer < 0 then
+	if winTimer < 0 and not testmap then
 		if love.filesystem.exists("levels/" .. currentPack .."/level"..currentLevel + 1 ..".lua") then
 			currentLevel = currentLevel + 1
 			if currentLevel > maxLevel then
@@ -29,7 +29,11 @@ function nextLevel(dt)
 		end
 		love.filesystem.load("main.lua")()
 		love.load()		
-	end	
+	elseif winTimer < 0 and testmap then
+		testmap = true
+		love.filesystem.load("main.lua")()
+		love.load()	
+	end
 end
 
 function game_over(dt)
