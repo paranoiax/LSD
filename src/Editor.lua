@@ -64,7 +64,9 @@ function Editor.update(dt)
 	
 	for i,v in ipairs(RectangleEditor2) do
 		v.quad = love.graphics.newQuad(0, 0, v.w, v.h, RedTilesW, RedTilesW)
-	end	
+	end
+	
+	mouseScroll(x,y)
 	
 end
 

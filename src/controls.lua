@@ -151,3 +151,19 @@ function Editor.keypressed(key)
 		maps = maps - 1
 	end
 end
+
+function mouseScroll(x,y)
+	x, y = love.mouse.getPosition()
+	if x < 30 then
+		camera.x = camera.x - 100 * dt * Editor.speed
+	end
+	if y < 30 then
+		camera.y = camera.y - 100 * dt * Editor.speed
+	end
+	if x > screenWidth - 30 then
+		camera.x = camera.x + 100 * dt * Editor.speed
+	end
+	if y > screenHeight - 30 then
+		camera.y = camera.y + 100 * dt * Editor.speed
+	end
+end
