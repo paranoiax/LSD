@@ -34,6 +34,9 @@ end
 		
 	--ALL YOUR BASE ARE BELONG TO US
 	playerImg = love.graphics.newImage("images/player.png")
+	
+	RectangleEditor = {}
+	RectangleEditor2 = {}
 
 function Editor.update(dt)
 	if love.keyboard.isDown("up") then
@@ -54,9 +57,19 @@ function Editor.update(dt)
 	else
 		Editor.speed = 4
 	end
+	
+	for i,v in ipairs(RectangleEditor) do
+		v.quad = love.graphics.newQuad(0, 0, v.w, v.h, GreyTilesW, GreyTilesW)
+	end
+	
+	for i,v in ipairs(RectangleEditor2) do
+		v.quad = love.graphics.newQuad(0, 0, v.w, v.h, RedTilesW, RedTilesW)
+	end	
+	
 end
 
 function Editor.draw()
+	
 	local width = love.graphics.getWidth()
 	local x, y = love.mouse.getPosition()
 	x, y = x + camera.x, y + camera.y
@@ -77,14 +90,16 @@ function Editor.draw()
 		end
 		love.graphics.print('level'..i..'.lua', width*(i-1)/9, 784)
 	end
-	camera:set()	
-	for i, v in ipairs(walls) do	
-		love.graphics.setColor(255,0,0)
-		love.graphics.rectangle('fill', v.x, v.y, v.w, v.h)
+	camera:set()
+	
+	for i,v in ipairs(RectangleEditor) do
+		love.graphics.setColor(255,255,255)
+		love.graphics.drawq(GreyTiles,v.quad,v.x,v.y)
 	end
-	for i, v in ipairs(sensors) do	
-		love.graphics.setColor(120,120,120)
-		love.graphics.rectangle('fill', v.x, v.y, v.w, v.h)
+	
+	for i,v in ipairs(RectangleEditor2) do
+		love.graphics.setColor(255,255,255)
+		love.graphics.drawq(RedTiles,v.quad,v.x,v.y)
 	end
 	
 	love.graphics.setColor(255,255,255)
@@ -93,10 +108,10 @@ function Editor.draw()
 	end
 	
 	if currentObject == "wall" then
-		love.graphics.setColor(255,0,0,150)
+		currentQuad = RedTiles
 	end
 	if currentObject == "sensor" then
-		love.graphics.setColor(0,0,0,150)
+		currentQuad = GreyTiles
 	end
 	if currentObject == "player" then
 		love.graphics.setColor(255,255,255,150)
@@ -104,7 +119,10 @@ function Editor.draw()
 	end
 	if y < 769 and currentObject ~= "player" then
 		x, y = (math.floor((x / 10)) * 10), (math.floor((y / 10)) * 10) --snap to grid
-		love.graphics.rectangle('fill', x, y, gui.w, gui.h)
+		--love.graphics.rectangle('fill', x, y, gui.w, gui.h)
+		love.graphics.setColor(255,255,255,150)
+		EditorQuad = love.graphics.newQuad(0, 0, gui.w, gui.h, GreyTilesW, GreyTilesW)
+		love.graphics.drawq(currentQuad,EditorQuad,x,y)
 	end
 	camera:unset()
 end

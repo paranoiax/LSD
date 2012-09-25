@@ -33,5 +33,17 @@ collision.Remove = function(x, y)
 			table.remove(object, i)
 		end
 	end
+	for i,v in ipairs(RectangleEditor) do
+		local colliding = collision.check(x,y,1,1, v.x,v.y,v.w,v.h)
+		if colliding then
+			table.remove(RectangleEditor, i)
+		end
+	end
+	for i,v in ipairs(RectangleEditor2) do
+		local colliding = collision.check(x,y,1,1, v.x,v.y,v.w,v.h)
+		if colliding then
+			table.remove(RectangleEditor2, i)
+		end
+	end
 end
 return collision

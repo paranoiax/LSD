@@ -67,8 +67,10 @@ function Editor.mousepressed(x, y, b)
 			table.insert(object, {x = x, y = y, w = gui.w, h = gui.h})
 			if currentObject == "wall" then
 				table.insert(walls, {x = x, y = y, w = gui.w, h = gui.h})
+				table.insert(RectangleEditor2, {x = x, y = y, w = gui.w, h = gui.h})
 			elseif currentObject == "sensor" then
 				table.insert(sensors, {x = x, y = y, w = gui.w, h = gui.h})
+				table.insert(RectangleEditor, {x = x, y = y, w = gui.w, h = gui.h})
 			end		
 		end
 		
