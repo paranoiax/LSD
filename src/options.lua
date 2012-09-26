@@ -18,10 +18,12 @@ frame:ShowCloseButton(false)
 options = {
 	graphics = {},
 	audio = {},
-	cheats = {}
+	cheats = {},
+	controls = {}
 }
 options.audio.music = true
 options.audio.sfx = true
+options.controls.inverted = false
 options.graphics.particleEffects = true
 options.graphics.shakeScreen = true
 options.graphics.slowmotion = true

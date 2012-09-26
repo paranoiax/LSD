@@ -9,6 +9,8 @@ require "Editor"
 require "menu"
 require "controls"
 require "options"
+require "lib.32log"
+require "lib.Vector"
 local cron = require 'lib.cron'
 local tween = require 'lib.tween'
 
@@ -121,6 +123,7 @@ function love.load()
 
 	bg = love.graphics.newImage("images/bg.jpg")
 	vignetteImg = love.graphics.newImage("images/vignette.jpg")
+	trajectoryImg = love.graphics.newImage("images/trajectory.png")
 
 	love.physics.setMeter(64)
 	world = love.physics.newWorld(0, 9.81 * 64, true)
@@ -218,7 +221,7 @@ function love.load()
 	objects.ball.shape = love.physics.newCircleShape(12)
 	objects.ball.fixture = love.physics.newFixture(objects.ball.body, objects.ball.shape, 1)
 	objects.ball.fixture:setRestitution(0)
-	objects.ball.body:setLinearDamping(0.2)
+	--objects.ball.body:setLinearDamping(0.2) -- unfortunately, this messes with the trajectory
 	objects.ball.body:setFixedRotation(true)
 	objects.ball.fixture:setFriction(1)
 	objects.ball.fixture:setUserData("ball")
@@ -228,6 +231,13 @@ function love.load()
 	objects.ball.sticky = false
 	objects.ball.canJump = false
 	objects.ball.isAlive = true
+	objects.ball.pos = Vector:new(x, y)
+	objects.ball.jumpImpulseVector=nil
+	objects.ball.maxImpulseVelocity = 600
+	objects.ball.impulseVectorLength = 0
+	objects.ball.maxImpulseVelocityLength=720
+	objects.ball.maxProjections = 24
+	objects.ball.projectionSpacing=13
 
 	for rectA,tab in pairs({[{"", "Grey"}]=Sensor, [{"2","Red"}]=Wall}) do
 		for i,v in ipairs(tab) do
@@ -332,23 +342,36 @@ end
 function ball_launch()
 	local x,y = objects.ball.body:getPosition()
 	if objects.ball.canJump == true then
-		objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
+		--objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
+		objects.ball.body:applyLinearImpulse(objects.ball.jumpImpulseVector.x,objects.ball.jumpImpulseVector.y)
 	end
 end
 
 function draw_crosshair()		
-	if objects.ball.canJump == true then
+	if objects.ball.canJump then
 		love.graphics.setColor(202,143,84,-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
-		love.graphics.line(objects.ball.body:getX(), objects.ball.body:getY(), love.mouse.getX() + camera.x, love.mouse.getY() + camera.y)
-		love.graphics.setColor(255,255,255,gameAlpha)
+	
+		local projections = objects.ball.impulseVectorLength / (objects.ball.maxImpulseVelocity/objects.ball.maxProjections)
+
+		for t=0, projections do
+			local pos=getTrajectoryPoint(Vector:new(objects.ball.body:getX(), objects.ball.body:getY()),objects.ball.jumpImpulseVector,t*objects.ball.projectionSpacing,objects.ball.body:getMass())
+
+			love.graphics.setColor(255,255,255,(-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y)-t*(200/objects.ball.maxProjections)))
+			--love.graphics.circle("fill",pos.x,pos.y,objects.ball.shape:getRadius(),24)
+			love.graphics.draw(trajectoryImg,pos.x - trajectoryImg:getWidth() / 2,pos.y - trajectoryImg:getHeight() / 2)
+
+		end
+		
 	end
 end
 
 function aim_crosshair()
-	love.mouse.setVisible(false)
-	love.graphics.setColor(202,143,84,gameAlpha)
-	love.graphics.line(love.mouse:getX() -7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() + 7 + camera.x, love.mouse.getY() + 7 + camera.y)
-	love.graphics.line(love.mouse:getX() +7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() -7 + camera.x, love.mouse.getY() + 7 + camera.y)
+	if not aiming then
+		love.mouse.setVisible(false)
+		love.graphics.setColor(202,143,84,gameAlpha)
+		love.graphics.line(love.mouse:getX() -7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() + 7 + camera.x, love.mouse.getY() + 7 + camera.y)
+		love.graphics.line(love.mouse:getX() +7 +camera.x, love.mouse:getY() -7 + camera.y, love.mouse.getX() -7 + camera.x, love.mouse.getY() + 7 + camera.y)
+	end
 end
 
 function draw_timer()
@@ -455,7 +478,7 @@ function explosionTimer(dt)
 		multiplier = 1
 	end
 	if explodeBall == true and SensorsDestroyed > 0 then
-		explosionTime =  explosionTime - dt * 1.25 * multiplier
+		explosionTime =  explosionTime - dt * multiplier
 	end
 	if (explosionTime < 0) and (not options.cheats.timeOut) then
 		objects.ball.sticky = true
@@ -485,7 +508,25 @@ end
 
 function INGAME_UPDATE(dt2)
 	dt = dt2
-	if GAMESTATE == "INGAME" then		
+	if GAMESTATE == "INGAME" then
+	
+		if aiming then
+			local bodyCoords = Vector:new((love.mouse.getX()-objects.ball.body:getX() + camera.x)*objects.ball.force,(love.mouse.getY()-objects.ball.body:getY() + camera.y)*objects.ball.force)
+			objects.ball.jumpImpulseVector = bodyCoords
+			
+			objects.ball.linearVelocity = Vector:new(objects.ball.body:getLinearVelocity())
+			objects.ball.linearVelocityLength = objects.ball.linearVelocity:getLength()
+			
+			objects.ball.jumpImpulseVector.x = objects.ball.jumpImpulseVector.x * (objects.ball.maxImpulseVelocity/objects.ball.maxImpulseVelocityLength)
+			objects.ball.jumpImpulseVector.y = objects.ball.jumpImpulseVector.y * (objects.ball.maxImpulseVelocity/objects.ball.maxImpulseVelocityLength)
+			objects.ball.impulseVectorLength = objects.ball.jumpImpulseVector:getLength()
+			
+			if options.controls.inverted then
+				objects.ball.jumpImpulseVector.x = objects.ball.jumpImpulseVector.x *-1
+				objects.ball.jumpImpulseVector.y = objects.ball.jumpImpulseVector.y *-1
+			end
+		end
+		
 		world:update(dt)
 		TEsound.cleanup()		
 		objects.ball.anim:update(dt)	
@@ -621,7 +662,10 @@ function INGAME_DRAW()
 		for i,v in ipairs(DeathParticle) do
 			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
 			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
-		end		
+		end
+		
+		drawGreyRectangle()
+		drawRedRectangle()
 		
 		if debugmode == true then
 			love.graphics.setColor(255,50,200,gameAlpha)
@@ -641,10 +685,7 @@ function INGAME_DRAW()
 			love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
 			love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
 			love.graphics.print("Explosion: "..explosionWidth .. ', ' .. explosionHeight,10 + camera.x, 215 + camera.y)
-		end
-		
-		drawGreyRectangle()
-		drawRedRectangle()
+		end		
 		
 		if options.graphics.motionblur then
 			if blur then
@@ -652,7 +693,7 @@ function INGAME_DRAW()
 				love.graphics.setColor(255,255,255,gameAlpha)			
 				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
 			end
-		end
+		end		
 		
 		love.graphics.setFont(e)
 		love.graphics.setColor(10,10,10,gameAlpha)
@@ -781,4 +822,14 @@ end
 function tweenTitleY(dt)
 	titleY = titleY + 200 * dt
 	if titleY >= 20 then titleY = 20 end
+end
+
+function getTrajectoryPoint(startingPosition, startingVelocity, n , m)
+	--velocity and gravity are given per second but we want time step values here
+	local t = 1 / 60 -- seconds per time step (at 60fps)
+	local gravityX, gravityY = world:getGravity() 
+	local stepVelocity = Vector:new(t * startingVelocity.x/m, t * startingVelocity.y/m) -- m/s
+	local stepGravity = Vector:new(t * t * gravityX, t * t * gravityY)-- m/s/s
+
+	return Vector:new(startingPosition.x + n * stepVelocity.x + 0.5 * (n*n+n) * stepGravity.x, startingPosition.y + n * stepVelocity.y + 0.5 * (n*n+n) * stepGravity.y)
 end
