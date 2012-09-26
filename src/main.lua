@@ -261,8 +261,8 @@ function love.load()
 	gameOverTimer = 3
 	
 	runNativeResolution()
-	scaleX = screenWidth / 1280
-	scaleY = screenHeight / 720
+	scaleX = screenWidth / 996
+	scaleY = screenHeight / 560
 	
 	ball_menu_image = love.graphics.newImage("images/ball_anim_menu.png")
 	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
