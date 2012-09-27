@@ -342,26 +342,24 @@ end
 function ball_launch()
 	local x,y = objects.ball.body:getPosition()
 	if objects.ball.canJump == true then
-		--objects.ball.body:applyLinearImpulse((love.mouse.getX()-x + camera.x)*objects.ball.force,(love.mouse.getY()-y + camera.y)*objects.ball.force)
 		objects.ball.body:applyLinearImpulse(objects.ball.jumpImpulseVector.x,objects.ball.jumpImpulseVector.y)
 	end
 end
 
 function draw_crosshair()		
-	if objects.ball.canJump then
-		love.graphics.setColor(202,143,84,-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y))
-	
+	if objects.ball.canJump then	
 		local projections = objects.ball.impulseVectorLength / (objects.ball.maxImpulseVelocity/objects.ball.maxProjections)
-
+		local tAlpha = 255		
 		for t=0, projections do
-			local pos=getTrajectoryPoint(Vector:new(objects.ball.body:getX(), objects.ball.body:getY()),objects.ball.jumpImpulseVector,t*objects.ball.projectionSpacing,objects.ball.body:getMass())
-
-			love.graphics.setColor(255,255,255,(-distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y)-t*(200/objects.ball.maxProjections)))
-			--love.graphics.circle("fill",pos.x,pos.y,objects.ball.shape:getRadius(),24)
+			local pos=getTrajectoryPoint(Vector:new(objects.ball.body:getX(), objects.ball.body:getY()),objects.ball.jumpImpulseVector,t*objects.ball.projectionSpacing,objects.ball.body:getMass())			
+			if tAlpha > 40 then
+				tAlpha = tAlpha - 30
+			else 
+				tAlpha = 40
+			end			
+			love.graphics.setColor(255,255,255,tAlpha)
 			love.graphics.draw(trajectoryImg,pos.x - trajectoryImg:getWidth() / 2,pos.y - trajectoryImg:getHeight() / 2)
-
-		end
-		
+		end		
 	end
 end
 
