@@ -42,6 +42,7 @@ function love.keypressed(key, ...)
 			love.filesystem.load("main.lua")()
 			love.load()
 		elseif key == "escape" and testmap then
+			slowmo.time = {t = 1}
 			GAMESTATE = "EDITOR"
 		end
 	elseif GAMESTATE == "MENU" then
@@ -89,9 +90,9 @@ function love.keyboard.isAltDown()
 	return love.keyboard.isDown"lalt" or love.keyboard.isDown"ralt"
 end
 
-
 function Editor.keypressed(key)
-	if key == "escape" then		
+
+	if key == "escape" then
 		Editor.unload()
 		testmap = false
 	end
