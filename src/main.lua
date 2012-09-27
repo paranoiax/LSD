@@ -674,27 +674,7 @@ function INGAME_DRAW()
 		end
 		
 		drawGreyRectangle()
-		drawRedRectangle()
-		
-		if debugmode == true then
-			love.graphics.setColor(255,50,200,gameAlpha)
-			love.graphics.setFont(d)
-			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),10 + camera.x,15 + camera.y)
-			love.graphics.print("Active Bodies: "..world:getBodyCount(),10 + camera.x,35 + camera.y)
-			love.graphics.print("Particles per Explosion: "..limit,10 + camera.x,55 + camera.y)
-			for q = 1, #Sensor do 
-				if Sensor[q].touching == true then
-					love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),10 + camera.x,115 + camera.y)
-				end
-			end
-			love.graphics.print("Frames per Second: "..love.timer:getFPS(),10 + camera.x, 75 + camera.y)
-			love.graphics.print(string.format("Option list: graphics; shake:%s, pfx:%s, slomo:%s, blur:%s", options.graphics.shakeScreen, options.graphics.particleEffects, options.graphics.slowmotion, options.graphics.motionblur),10 + camera.x, 95 + camera.y)
-			love.graphics.print("Time until explosion: "..explosionTime,10 + camera.x, 135 + camera.y)
-			love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),10 + camera.x, 155 + camera.y)
-			love.graphics.print("Current Level: "..currentLevel,10 + camera.x, 175 + camera.y)
-			love.graphics.print("Current Gamestate: "..GAMESTATE,10 + camera.x, 195 + camera.y)
-			love.graphics.print("Explosion: "..explosionWidth .. ', ' .. explosionHeight,10 + camera.x, 215 + camera.y)
-		end		
+		drawRedRectangle()				
 		
 		if options.graphics.motionblur then
 			if blur then
@@ -728,6 +708,26 @@ function INGAME_DRAW()
 		
 		aim_crosshair()
 		camera:unset()
+		
+		if debugmode == true then
+			love.graphics.setColor(255,50,200,gameAlpha)
+			love.graphics.setFont(d)
+			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),15,15)
+			love.graphics.print("Active Bodies: "..world:getBodyCount(),15,35)
+			love.graphics.print("Particles for next Explosion: "..limit,15,55)
+			for q = 1, #Sensor do 
+				if Sensor[q].touching == true then
+					love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),15,115)
+				end
+			end
+			love.graphics.print("Frames per Second: "..love.timer:getFPS(),15, 75)
+			love.graphics.print(string.format("Option list: graphics; shake:%s, pfx:%s, slomo:%s, blur:%s", options.graphics.shakeScreen, options.graphics.particleEffects, options.graphics.slowmotion, options.graphics.motionblur),15, 95)
+			love.graphics.print("Time until explosion: "..explosionTime,15, 135)
+			love.graphics.print("Max Level: "..love.filesystem.read("save.lua"),15, 155)
+			love.graphics.print("Current Level: "..currentLevel,15, 175)
+			love.graphics.print("Current Gamestate: "..GAMESTATE,15, 195)
+			love.graphics.print("Size of next Explosion: "..explosionWidth .. ', ' .. explosionHeight,15, 215)
+		end
 		
 		if not options.cheats.timeOut then
 			draw_timer()
