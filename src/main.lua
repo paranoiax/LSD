@@ -11,6 +11,7 @@ require "controls"
 require "options"
 require "lib.32log"
 require "lib.Vector"
+require "pixelshader"
 local cron = require 'lib.cron'
 local tween = require 'lib.tween'
 
@@ -103,6 +104,7 @@ motionFrames = 10 -- number of frames to store for motion; must be at least 1 (t
 alphaMultiplier = 100-- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
 
 function love.load()
+
 	love.mouse.setVisible(false)
 	
 	explodeBall = false
@@ -307,6 +309,7 @@ function love.load()
 end
 
 function love.update(dt)
+	time = time+dt
 	dt = dt * slowmo.time.t
 	if GAMESTATE == "OPTIONS" then
 		loveframes.update(dt)
@@ -321,15 +324,18 @@ function love.update(dt)
 end
 
 function love.draw()
+	pixeleffect:send("time",time)
 	love.graphics.setBackgroundColor(255,255,255)
 	love.graphics.setColor(255,255,255,gameAlpha)
-	love.graphics.setBlendMode("alpha")
+	love.graphics.setBlendMode("alpha")	
+	if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
+	love.graphics.setPixelEffect()
 	if GAMESTATE == "EDITOR" then
 		Editor.draw()
 	end
-	MENU_DRAW()
-	INGAME_DRAW()
+	MENU_DRAW()	
+	INGAME_DRAW()	
 	if GAMESTATE == "OPTIONS" then
 		loveframes.draw()
 	end
@@ -359,7 +365,7 @@ function draw_crosshair()
 			end			
 			love.graphics.setColor(255,255,255,tAlpha)
 			love.graphics.draw(trajectoryImg,pos.x - trajectoryImg:getWidth() / 2,pos.y - trajectoryImg:getHeight() / 2)
-		end		
+		end
 	end
 end
 
@@ -415,7 +421,9 @@ end
 function drawRedRectangle()
 	for i,v in ipairs(Rectangle2) do
 		love.graphics.setColor(255,255,255,gameAlpha)
+		if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 		love.graphics.drawq(RedTiles, v.quad, v.x, v.y)
+		love.graphics.setPixelEffect()
 	end
 end
 
@@ -423,7 +431,9 @@ function drawGreyRectangle()
 	for i,v in ipairs(Rectangle) do
 		if not Sensor[i].isDestroyed then
 			love.graphics.setColor(255,255,255,gameAlpha)
+			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 			love.graphics.drawq(GreyTiles, v.quad, v.x, v.y)
+			love.graphics.setPixelEffect()
 		end
 	end
 end
@@ -634,7 +644,9 @@ function INGAME_DRAW()
 		
 		if objects.ball.isAlive then
 			love.graphics.setColor(255,255,255,gameAlpha)
+			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+			love.graphics.setPixelEffect()
 		end
 	   
 		if debugmode then
@@ -648,7 +660,7 @@ function INGAME_DRAW()
 				love.graphics.setColor(166,38,27,gameAlpha)
 				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
 			end
-		end		
+		end
 		
 		for i,v in ipairs(Particle) do
 			if not v.isDestroyed then
@@ -664,7 +676,6 @@ function INGAME_DRAW()
 		
 		drawGreyRectangle()
 		drawRedRectangle()
-		
 		if debugmode == true then
 			love.graphics.setColor(255,50,200,gameAlpha)
 			love.graphics.setFont(d)
