@@ -6,7 +6,7 @@ function love.conf(t)
 	t.author = "Kai Hossbach (paranoiax)"	
 	t.title = 'LSD - Little Sticky Destroyer'
 	t.screen.vsync = false
-	t.screen.fullscreen= false
+	t.screen.fullscreen= true
 	t.screen.fsaa = 0
 	t.identity = "LSD"
 	t.console = false

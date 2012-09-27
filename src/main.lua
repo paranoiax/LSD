@@ -262,7 +262,6 @@ function love.load()
 	gameOver = false
 	gameOverTimer = 3
 	
-	runNativeResolution()
 	scaleX = screenWidth / 996
 	scaleY = screenHeight / 560
 	
@@ -504,13 +503,6 @@ function outOfBounds()
 		if not win then
 			gameOver = true
 		end
-	end
-end
-
-function runNativeResolution()
-	gameWidth, gameHeight, gameFullscreen, gameVsync, gameFsaa = love.graphics.getMode( )
-	if not gameFullscreen then
-		love.graphics.toggleFullscreen()
 	end
 end
 
