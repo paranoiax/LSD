@@ -494,9 +494,14 @@ function explosionTimer(dt)
 		explosionTime = 0
 	end
 	if GAMESTATE == "INGAME" then
-		local nIntensity = 0.25 / explosionTime
-		if nIntensity >= 0.65 then nIntensity = 0.65 end
-		pixeleffect:send("nIntensity", nIntensity)
+		if objects.ball.isAlive then
+			local nIntensity = 0.25 / explosionTime
+			if nIntensity >= 0.65 then nIntensity = 0.65 end
+			pixeleffect:send("nIntensity", nIntensity)
+		elseif not objects.ball.isAlive then
+			local nIntensity = 0.65
+			pixeleffect:send("nIntensity", nIntensity)
+		end
 	end
 end
 
