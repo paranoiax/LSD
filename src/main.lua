@@ -317,6 +317,8 @@ function love.update(dt)
 	MENU_UPDATE(dt)
 	INGAME_UPDATE(dt)
 	if GAMESTATE == "EDITOR" then
+		local nIntensity = 0.25
+		pixeleffect:send("nIntensity", nIntensity)
 		Editor.update(dt)
 	end
 	tween.update(dt)
@@ -748,12 +750,13 @@ end
 
 function MENU_DRAW()
 	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
+		love.graphics.setColor(255,255,255,gameAlpha)
 		ball_menu_anim:draw(screenWidth / 2 - 96, 170)
 
 		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10)
+		love.graphics.setColor(10,10,10,gameAlpha)
 		love.graphics.printf("Little Sticky Destroyer",2, titleY+2, screenWidth, "center")
-		love.graphics.setColor(217,177,102)
+		love.graphics.setColor(217,177,102,gameAlpha)
 		love.graphics.printf("Little Sticky Destroyer",0, titleY, screenWidth, "center")
 		
 		if GAMESTATE == "MENU" then
