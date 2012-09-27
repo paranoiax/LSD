@@ -304,6 +304,7 @@ function love.load()
 		canvas:clear()
 	end
 	blur = false
+	pixeleffect:send("nIntensity", 0.25)
 	
 end
 
@@ -495,6 +496,9 @@ function explosionTimer(dt)
 		explodeBall = false
 		gameOver = true
 		explosionTime = 0
+	end
+	if GAMESTATE == "INGAME" then
+		pixeleffect:send("nIntensity", 0.25 * explosionTime)
 	end
 end
 
