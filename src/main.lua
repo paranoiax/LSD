@@ -303,7 +303,7 @@ function love.load()
 		canvas = love.graphics.newCanvas()
 		canvas:clear()
 	end
-	blur = false
+	blur = false	
 	pixeleffect:send("nIntensity", 0.25)
 	
 end
@@ -330,7 +330,7 @@ function love.draw()
 	love.graphics.setBlendMode("alpha")	
 	if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-	love.graphics.setPixelEffect()
+	if pixelEffectSupported then love.graphics.setPixelEffect() end
 	if GAMESTATE == "EDITOR" then
 		Editor.draw()
 	end
@@ -420,10 +420,8 @@ end
 
 function drawRedRectangle()
 	for i,v in ipairs(Rectangle2) do
-		love.graphics.setColor(255,255,255,gameAlpha)
-		if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
+		love.graphics.setColor(255,255,255,gameAlpha)		
 		love.graphics.drawq(RedTiles, v.quad, v.x, v.y)
-		love.graphics.setPixelEffect()
 	end
 end
 
@@ -431,9 +429,7 @@ function drawGreyRectangle()
 	for i,v in ipairs(Rectangle) do
 		if not Sensor[i].isDestroyed then
 			love.graphics.setColor(255,255,255,gameAlpha)
-			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 			love.graphics.drawq(GreyTiles, v.quad, v.x, v.y)
-			love.graphics.setPixelEffect()
 		end
 	end
 end
@@ -498,7 +494,9 @@ function explosionTimer(dt)
 		explosionTime = 0
 	end
 	if GAMESTATE == "INGAME" then
-		pixeleffect:send("nIntensity", 0.25 * explosionTime)
+		local nIntensity = 0.25 / explosionTime
+		if nIntensity >= 0.65 then nIntensity = 0.65 end
+		pixeleffect:send("nIntensity", nIntensity)
 	end
 end
 
@@ -642,7 +640,7 @@ function INGAME_DRAW()
 			love.graphics.setColor(255,255,255,gameAlpha)
 			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
 			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
-			love.graphics.setPixelEffect()
+			if pixelEffectSupported then love.graphics.setPixelEffect() end
 		end
 	   
 		if debugmode then
@@ -672,6 +670,7 @@ function INGAME_DRAW()
 		
 		drawGreyRectangle()
 		drawRedRectangle()
+		
 		if debugmode == true then
 			love.graphics.setColor(255,50,200,gameAlpha)
 			love.graphics.setFont(d)
