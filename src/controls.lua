@@ -66,7 +66,7 @@ function Editor.mousepressed(x, y, b)
 		x, y = (math.floor((x / 10)) * 10), (math.floor((y / 10)) * 10) --snap to grid		
 		
 		colliding = collision.checkInsert(x, y)		
-		if not colliding then
+		if not colliding and currentObject ~= "player" then
 			table.insert(object, {x = x, y = y, w = gui.w, h = gui.h})
 			if currentObject == "wall" then
 				table.insert(walls, {x = x, y = y, w = gui.w, h = gui.h})
