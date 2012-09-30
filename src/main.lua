@@ -218,7 +218,11 @@ function love.load()
 
 	objects.ball = {}
 	objects.ball.image = love.graphics.newImage("images/ball_anim.png")
+	objects.ball.imageJump = love.graphics.newImage("images/ball_anim_jump.png")
+	objects.ball.imageFall = love.graphics.newImage("images/ball_anim_fall.png")
 	objects.ball.anim = newAnimation(objects.ball.image, 24, 24, 0.1, 0)
+	objects.ball.animJump = newAnimation(objects.ball.imageJump, 24, 24, 0.1, 0)
+	objects.ball.animFall = newAnimation(objects.ball.imageFall, 24, 24, 0.1, 0)
 	objects.ball.force = 0.95
 	objects.ball.body = love.physics.newBody(world, map.player[1], map.player[2], "dynamic")
 	objects.ball.shape = love.physics.newCircleShape(12)
@@ -369,7 +373,16 @@ function love.load()
 		if objects.ball.isAlive then
 			love.graphics.setColor(255,255,255,gameAlpha)
 			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
-			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+				if objects.ball.canJump then
+					objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+				else
+					local x,y = objects.ball.body:getLinearVelocity()
+					if y <= 0 then
+						objects.ball.animJump:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+					else
+						objects.ball.animFall:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+					end
+				end
 			if pixelEffectSupported then love.graphics.setPixelEffect() end
 		end
 	   
@@ -666,7 +679,9 @@ function INGAME_UPDATE(dt2)
 		
 		world:update(dt)
 		TEsound.cleanup()		
-		objects.ball.anim:update(dt)	
+		objects.ball.anim:update(dt)
+		objects.ball.animJump:update(dt)
+		objects.ball.animFall:update(dt)
 		explosionTimer(dt)
 		
 		for i,v in ipairs(Sensor) do
