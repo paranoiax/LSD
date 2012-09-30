@@ -311,18 +311,36 @@ function love.load()
 	blur = false
 	pixeleffect:send("nIntensity", 0.25)    
 	
-	local currentParallax
-	local Parallax = {}
+	local currentParallax1
+	local Parallax1 = {}
+	local currentParallax2
+	local Parallax2 = {}
+	local currentParallax3
+	local Parallax3 = {}
 	
-	for currentParallax = 1, 500 do
-		Parallax[currentParallax] = {}
-		Parallax[currentParallax].size = math.random(6,18)
-		Parallax[currentParallax].x = math.random(-map.boundaries,map.boundaries)
-		Parallax[currentParallax].y = math.random(-map.boundaries,map.boundaries)
+	for currentParallax1 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
+		Parallax1[currentParallax1] = {}
+		Parallax1[currentParallax1].size = math.random(6,18)
+		Parallax1[currentParallax1].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
+		Parallax1[currentParallax1].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
+	end
+	
+	for currentParallax2 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
+		Parallax2[currentParallax2] = {}
+		Parallax2[currentParallax2].size = math.random(6,18)
+		Parallax2[currentParallax2].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
+		Parallax2[currentParallax2].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
+	end
+	
+	for currentParallax3 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
+		Parallax3[currentParallax3] = {}
+		Parallax3[currentParallax3].size = math.random(6,18)
+		Parallax3[currentParallax3].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
+		Parallax3[currentParallax3].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
 	end
 	
     camera:newLayer(0.75, function()
-		for i,v in ipairs(Parallax) do
+		for i,v in ipairs(Parallax1) do
 			love.graphics.setColor(255,255,255,150)
 			love.graphics.rectangle("fill",v.x,v.y,v.size,v.size)
 			love.graphics.setColor(255,255,255)
@@ -330,7 +348,7 @@ function love.load()
     end)
 	
 	camera:newLayer(0.45, function()
-		for i,v in ipairs(Parallax) do
+		for i,v in ipairs(Parallax2) do
 			love.graphics.setColor(255,255,255,100)
 			love.graphics.rectangle("fill",v.x,v.y,v.size*2,v.size*2)
 			love.graphics.setColor(255,255,255)
@@ -338,7 +356,7 @@ function love.load()
     end)
 	
 	camera:newLayer(0.2, function()
-		for i,v in ipairs(Parallax) do
+		for i,v in ipairs(Parallax3) do
 			love.graphics.setColor(255,255,255,50)
 			love.graphics.rectangle("fill",v.x,v.y,v.size*3,v.size*3)
 			love.graphics.setColor(255,255,255)
@@ -615,7 +633,8 @@ function checkWin()
 		shake = false
 		objects.ball.sticky = true
 		objects.ball.isAlive = false
-		objects.ball.canJump = false		
+		objects.ball.canJump = false
+		gameOver = false
 	end
 end
 
@@ -649,7 +668,9 @@ function explosionTimer(dt)
 end
 
 function outOfBounds()
-	if objects.ball.body:getX() < -map.boundaries or objects.ball.body:getX() > map.boundaries or objects.ball.body:getY() < -map.boundaries or objects.ball.body:getY() > map.boundaries then
+	if objects.ball.body:getX() < map.minX -500 or objects.ball.body:getX() > map.maxX + 500 or objects.ball.body:getY() > map.maxY + 500 then
+	local nIntensity = 0.65
+	pixeleffect:send("nIntensity", nIntensity)
 		if not win then
 			gameOver = true
 		end

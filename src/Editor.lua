@@ -143,24 +143,61 @@ end
 
 function generateCode() --If this code works, it was written by Kai. If not, I don't know who wrote it.
   local ret = '' -- I am not sure if we need this, but too scared to delete. 
+  
   ret = "return {\n\n"
   
   if player.isSet then
 	ret = ret .. '\t' .. 'player = {' .. math.floor(playerX + .5) .. ', ' .. math.floor(playerY + .5) .. '},\n'
   end
-  ret = ret .. '\t' .. 'boundaries = 5000,\n\n'
+  
+	for i,v in ipairs(object) do
+		local value = v.x + v.w / 2
+		if maxX == nil then maxX = value end
+		if value > maxX then
+			maxX = value
+		end
+	end
+	
+	for i,v in ipairs(object) do
+		local value = v.x - v.w / 2
+		if minX == nil then minX = value end
+		if value < minX then
+			minX = value
+		end
+	end
+	
+	for i,v in ipairs(object) do
+		local value = v.y + v.h / 2
+		if maxY == nil then maxY = value end
+		if value > maxY then
+			maxY = value
+		end
+	end
+	
+	for i,v in ipairs(object) do
+		local value = v.y - v.h / 2
+		if minY == nil then minY = value end
+		if value < minY then
+			minY = value
+		end
+	end
+	
+  ret = ret .. '\t' .. 'minX = ' .. minX .. ',\n'
+  ret = ret .. '\t' .. 'maxX = ' .. maxX .. ',\n'
+  ret = ret .. '\t' .. 'minY = ' .. minY .. ',\n'
+  ret = ret .. '\t' .. 'maxY = ' .. maxY .. ',\n\n'
   
   ret = ret .. '\t' .. 'walls = {\n'
   
   for i, v in ipairs(walls) do
-    ret = ret .. '\t' .. '{' .. v.x .. ', ' .. v.y+v.h .. ', ' .. v.w .. ', ' .. v.h .. '},\n' --Magic. Do not touch.
+    ret = ret .. '\t\t' .. '{' .. v.x .. ', ' .. v.y+v.h .. ', ' .. v.w .. ', ' .. v.h .. '},\n' --Magic. Do not touch.
   end
   
   ret = ret .. '\t' .. '},\n\n' -- drunk, fix later
   
   ret = ret .. '\t' .. 'sensors = {\n'
   for i, v in ipairs(sensors) do
-    ret = ret .. "        {" .. v.x .. ', ' .. v.y+v.h .. ', ' .. v.w .. ', ' .. v.h .. '},\n'
+    ret = ret .. "\t\t{" .. v.x .. ', ' .. v.y+v.h .. ', ' .. v.w .. ', ' .. v.h .. '},\n'
   end
   
   ret = ret .. '\t' .. '}\n\n}'
