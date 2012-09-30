@@ -171,6 +171,7 @@ function love.load()
 	death = false
 	shake = false
 	camera.time = 3
+	camera.layers = {}
 
 	-- LEVEL --
 	
@@ -303,8 +304,135 @@ function love.load()
 		canvas = love.graphics.newCanvas()
 		canvas:clear()
 	end
-	blur = false	
-	pixeleffect:send("nIntensity", 0.25)
+	blur = false
+	pixeleffect:send("nIntensity", 0.25)    
+	
+	local currentParallax
+	local Parallax = {}
+	
+	for currentParallax = 1, 500 do
+		Parallax[currentParallax] = {}
+		Parallax[currentParallax].size = math.random(6,18)
+		Parallax[currentParallax].x = math.random(-map.boundaries,map.boundaries)
+		Parallax[currentParallax].y = math.random(-map.boundaries,map.boundaries)
+	end
+	
+    camera:newLayer(0.75, function()
+		for i,v in ipairs(Parallax) do
+			love.graphics.setColor(255,255,255,150)
+			love.graphics.rectangle("fill",v.x,v.y,v.size,v.size)
+			love.graphics.setColor(255,255,255)
+		end
+    end)
+	
+	camera:newLayer(0.45, function()
+		for i,v in ipairs(Parallax) do
+			love.graphics.setColor(255,255,255,100)
+			love.graphics.rectangle("fill",v.x,v.y,v.size*2,v.size*2)
+			love.graphics.setColor(255,255,255)
+		end
+    end)
+	
+	camera:newLayer(0.2, function()
+		for i,v in ipairs(Parallax) do
+			love.graphics.setColor(255,255,255,50)
+			love.graphics.rectangle("fill",v.x,v.y,v.size*3,v.size*3)
+			love.graphics.setColor(255,255,255)
+		end
+    end)
+	
+	camera:newLayer(1, function()
+		if options.graphics.shakeScreen then
+			camera:shake()
+		end
+		
+		love.graphics.setLine(3, "smooth")
+		
+		if options.graphics.motionblur then
+			if blur then
+				love.graphics.setBlendMode("subtractive")			
+				love.graphics.setCanvas(canvas)
+				blurAlpha = math.clamp(dt*alphaMultiplier*255, motionFrames, 255)
+				blurAlpha = ((blurAlpha / 255) * gameAlpha)
+				love.graphics.setColor(0, 0, 0, blurAlpha)
+				--Makes the transparency low as it adds to the canvas.
+				love.graphics.rectangle('fill', 0+camera.x, 0+camera.y, screenWidth,screenHeight)
+				--Adds a background so the trails don't stick.
+				love.graphics.setBlendMode("alpha")
+			end
+		end
+		
+		if aiming == true then
+			draw_crosshair()
+		end	
+		
+		if objects.ball.isAlive then
+			love.graphics.setColor(255,255,255,gameAlpha)
+			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
+			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
+			if pixelEffectSupported then love.graphics.setPixelEffect() end
+		end
+	   
+		if debugmode then
+			for i,v in ipairs(Sensor) do
+				if v.touching == true then
+					love.graphics.setColor(200, 0, 0, 60,gameAlpha)
+					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
+				end
+			end
+			for i,v in ipairs(Wall) do
+				love.graphics.setColor(166,38,27,gameAlpha)
+				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
+			end
+		end
+		
+		for i,v in ipairs(Particle) do
+			if not v.isDestroyed then
+				love.graphics.setColor(v.r,v.g,v.b,ParticleAlpha[1]) --(v.r, v.g, v.b)
+				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
+			end
+		end
+		
+		for i,v in ipairs(DeathParticle) do
+			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
+			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
+		end
+		
+		drawGreyRectangle()
+		drawRedRectangle()				
+		
+		if options.graphics.motionblur then
+			if blur then
+				love.graphics.setCanvas()
+				love.graphics.setColor(255,255,255,gameAlpha)			
+				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
+			end
+		end		
+		
+		love.graphics.setFont(e)
+		love.graphics.setColor(10,10,10,gameAlpha)
+		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 22 + camera.y, screenWidth, "center")
+		love.graphics.setColor(217,177,102,gameAlpha)
+		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 20 + camera.y, screenWidth, "center")
+		
+		if win then
+			love.graphics.setFont(e)
+			love.graphics.setColor(10,10,10,gameAlpha)
+			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
+			love.graphics.setColor(217,177,102,gameAlpha)
+			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
+		end
+		
+		if gameOver and not win then
+			love.graphics.setFont(e)
+			love.graphics.setColor(10,10,10,gameAlpha)
+			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
+			love.graphics.setColor(217,177,102,gameAlpha)
+			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
+		end
+		
+		aim_crosshair()
+    end)
 	
 end
 
@@ -618,98 +746,7 @@ function INGAME_DRAW()
 	if GAMESTATE == "INGAME" then	
 		--math.randomseed(love.timer.getMicroTime()) -- causes SERIOUS LAG!		
 		
-		camera:set()
-		if options.graphics.shakeScreen then
-			camera:shake()
-		end
-		
-		love.graphics.setLine(3, "smooth")
-		
-		if options.graphics.motionblur then
-			if blur then
-				love.graphics.setBlendMode("subtractive")			
-				love.graphics.setCanvas(canvas)
-				blurAlpha = math.clamp(dt*alphaMultiplier*255, motionFrames, 255)
-				blurAlpha = ((blurAlpha / 255) * gameAlpha)
-				love.graphics.setColor(0, 0, 0, blurAlpha)
-				--Makes the transparency low as it adds to the canvas.
-				love.graphics.rectangle('fill', 0+camera.x, 0+camera.y, screenWidth,screenHeight)
-				--Adds a background so the trails don't stick.
-				love.graphics.setBlendMode("alpha")
-			end
-		end
-		
-		if aiming == true then
-			draw_crosshair()
-		end	
-		
-		if objects.ball.isAlive then
-			love.graphics.setColor(255,255,255,gameAlpha)
-			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
-			objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
-			if pixelEffectSupported then love.graphics.setPixelEffect() end
-		end
-	   
-		if debugmode then
-			for i,v in ipairs(Sensor) do
-				if v.touching == true then
-					love.graphics.setColor(200, 0, 0, 60,gameAlpha)
-					love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-				end
-			end
-			for i,v in ipairs(Wall) do
-				love.graphics.setColor(166,38,27,gameAlpha)
-				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-			end
-		end
-		
-		for i,v in ipairs(Particle) do
-			if not v.isDestroyed then
-				love.graphics.setColor(v.r,v.g,v.b,ParticleAlpha[1]) --(v.r, v.g, v.b)
-				love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))
-			end
-		end
-		
-		for i,v in ipairs(DeathParticle) do
-			love.graphics.setColor(202,143,84,DeathParticleAlpha[1])
-			love.graphics.polygon("fill", v.body:getWorldPoints(v.shape:getPoints()))	
-		end
-		
-		drawGreyRectangle()
-		drawRedRectangle()				
-		
-		if options.graphics.motionblur then
-			if blur then
-				love.graphics.setCanvas()
-				love.graphics.setColor(255,255,255,gameAlpha)			
-				love.graphics.draw(canvas, 0+camera.x, 0+camera.y)
-			end
-		end		
-		
-		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10,gameAlpha)
-		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,2 + camera.x, 22 + camera.y, screenWidth, "center")
-		love.graphics.setColor(217,177,102,gameAlpha)
-		love.graphics.printf(SensorsDestroyed .."/"..SensorsCount,0 + camera.x, 20 + camera.y, screenWidth, "center")
-		
-		if win then
-			love.graphics.setFont(e)
-			love.graphics.setColor(10,10,10,gameAlpha)
-			love.graphics.printf("Level Completed!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-			love.graphics.setColor(217,177,102,gameAlpha)
-			love.graphics.printf("Level Completed!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
-		end
-		
-		if gameOver and not win then
-			love.graphics.setFont(e)
-			love.graphics.setColor(10,10,10,gameAlpha)
-			love.graphics.printf("Try Again!",2 + camera.x, screenHeight / 2 - 50 + camera.y, screenWidth, "center")
-			love.graphics.setColor(217,177,102,gameAlpha)
-			love.graphics.printf("Try Again!",0 + camera.x, screenHeight / 2 - 52 + camera.y, screenWidth, "center")
-		end
-		
-		aim_crosshair()
-		camera:unset()
+		camera:draw()
 		
 		if debugmode == true then
 			love.graphics.setColor(255,50,200,gameAlpha)
