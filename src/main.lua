@@ -668,7 +668,7 @@ function explosionTimer(dt)
 end
 
 function outOfBounds()
-	if objects.ball.body:getX() < map.minX -500 or objects.ball.body:getX() > map.maxX + 500 or objects.ball.body:getY() > map.maxY + 500 then
+	if objects.ball.body:getX() < map.minX -250 or objects.ball.body:getX() > map.maxX + 250 or objects.ball.body:getY() > map.maxY + 250 then
 	local nIntensity = 0.65
 	pixeleffect:send("nIntensity", nIntensity)
 		if not win then
@@ -710,9 +710,11 @@ function INGAME_UPDATE(dt2)
 				v.body:setActive(false)
 			end
 		end
-		
-		camera.x = camera.x - (camera.x - (objects.ball.body:getX() - screenWidth / 2)) * dt * camera.speed
-		camera.y = camera.y - (camera.y - (objects.ball.body:getY() - screenHeight / 2)) * dt * camera.speed
+
+		if objects.ball.body:getX() > map.minX - 250 and objects.ball.body:getX() < map.maxX +250 and objects.ball.body:getY() < map.maxY + 250 then
+			camera.x = camera.x - (camera.x - (objects.ball.body:getX() - screenWidth / 2)) * dt * camera.speed
+			camera.y = camera.y - (camera.y - (objects.ball.body:getY() - screenHeight / 2)) * dt * camera.speed
+		end
 		
 		if not objects.ball.isAlive then
 			objects.ball.canJump = false
