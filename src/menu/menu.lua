@@ -4,6 +4,8 @@ menu.font_title = love.graphics.newFont("menu/assets/Orbitron Black.ttf",64)
 menu.font_desc = love.graphics.newFont("menu/assets/League_Gothic-webfont.ttf",22)
 menu.font_menu = love.graphics.newFont("menu/assets/League_Gothic-webfont.ttf",26)
 menu.icon = love.graphics.newImage("images/icon.png")
+menu.iconBig = love.graphics.newImage("images/ball_anim_menu.png")
+menu.iconBig_anim = newAnimation(menu.iconBig, 192, 192, 0.1, 0)
 menu.padding = 64
 menu.option = 0
 menu.state = 1
@@ -31,13 +33,15 @@ function menu:draw()
     orig_r, orig_g, orig_b, orig_a = love.graphics.getColor( )
     love.graphics.setColor(0,0,0,127)
     love.graphics.rectangle("fill",love.graphics.getWidth()*6/10,0,love.graphics.getWidth()*3/10,love.graphics.getHeight())
-    love.graphics.setColor(0,0,0,96+96*math.abs(math.sin(menu.title_fade)))
+    love.graphics.setColor(0,0,0,96+96*math.abs(math.sin(menu.title_fade)))	
     love.graphics.setFont(menu.font_title)
     love.graphics.print(
       menu.view[menu.state].title,
       (love.graphics.getWidth()*6/10)/2-(menu.font_title:getWidth(menu.view[menu.state].title)/2),
       love.graphics.getHeight()*0.9-(menu.font_title:getHeight())
     )
+	love.graphics.setColor(255,255,255,96+96*math.abs(math.sin(menu.title_fade)))	
+	menu.iconBig_anim:draw(love.graphics:getWidth() / 6, 50)
     love.graphics.setColor(0,0,0,192)
     love.graphics.setFont(menu.font_desc)
     love.graphics.printf(
@@ -75,6 +79,7 @@ end
 
 function menu:update(dt)
   if menu.run then
+	menu.iconBig_anim:update(dt)
     menu.title_fade = menu.title_fade + dt
     menu.iconpos = menu.option*menu.font_menu:getHeight()+menu.offset+menu.font_menu:getHeight()/2
     if menu.iconpos > menu.iconcurpos then

@@ -335,7 +335,7 @@ function love.load()
 	}
 	menu:load(menu_view)
 	videomodes = love.graphics.getModes()
-	currentmode = 1
+	if currentmode == nil then currentmode = 1 end
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
@@ -951,7 +951,8 @@ function menu:callback(cb)
   elseif cb == "res" then
     love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
     menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
-    currentmode = ((currentmode + 1)% #videomodes)
+    currentmode = ((currentmode)% #videomodes) +1
+	love.load()
   elseif cb == "sound" then
     sound = not sound
     local temp_x = ""
