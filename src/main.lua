@@ -1,12 +1,11 @@
 debugmode = true
 demo = false
-require "lib.loveframes.init"
 require "camera"
 require "lib.TEsound"
 require "lib.AnAL"
 require "Loader"
 require "Editor"
-require "menu"
+menu = require("menu/menu")
 require "controls"
 require "options"
 require "lib.32log"
@@ -269,32 +268,74 @@ function love.load()
 	
 	scaleX = screenWidth / 996
 	scaleY = screenHeight / 560
-	
-	ball_menu_image = love.graphics.newImage("images/ball_anim_menu.png")
-	ball_menu_anim = newAnimation(ball_menu_image, 192, 192, 0.1, 0)
-	
-	if currentLevel > 1 then
-		button_spawn(screenWidth / 2 - f:getWidth("Continue") / 2,screenHeight -275,"Continue", "continue")
-	end
-	
-	if not demo then
-		menu = {
-			{"New Game", "new_game"},
-			{"Map Editor", "mapedit"},
-			{"Options", "options"},
-			{"Quit", "quit"},
-		}
+	if GAMESTATE == "MENU" then
+		menu.run = true
 	else
-		menu = {
-			{"New Game", "new_game"},
-			{"Quit", "quit"},
-		}
+		menu.run = false
 	end
-	local menuY = screenHeight -220
-	for i,v in ipairs(menu) do
-		button_spawn(screenWidth/2 - f:getWidth(v[1])/2, menuY, v[1], v[2])
-		menuY = menuY + 55
+	menu_view = {}
+	if currentLevel > 1 then
+	menu_view[1] = {
+		title="Little Sticky\nDestroyer",
+		desc="",
+		{t="Continue",cb="cont"},
+		{t="New Game",cb="ng"},
+		{t="Map Editor",cb="lvledit"},
+		{t="Options",cb="op"},
+		{t="Cheats",cb="cheats"},
+		{t="Credits",cb="cr"},	
+		{t="Exit",cb="exit"}
+	}
+	else
+	menu_view[1] = {
+		title="Little Sticky\nDestroyer",
+		desc="",
+		{t="New Game",cb="ng"},
+		{t="Map Editor",cb="lvledit"},
+		{t="Options",cb="op"},
+		{t="Cheats",cb="cheats"},
+		{t="Credits",cb="cr"},	
+		{t="Exit",cb="exit"}
+	}
 	end
+	menu_view[2] = {
+		title="Options",
+		desc="Set your options here.",
+		{t="Fullscreen",cb="fs"},
+		{t="Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")",cb="res"},
+		{t="Sound (on)",cb="sound"},
+		{t="Return",cb="mm"}
+	}
+	menu_view[3] = {
+		title="Quit",
+		desc="Are you sure you want to quit?",
+		{t="Confirm",cb="cexit"},
+		{t="Return",cb="mm"}
+	}
+	menu_view[4] = {
+		title="Credits",
+		desc=[[
+			Project Manager / Lead Artist / Lead Programmer:
+			-Kai Hossbach
+
+			Executive Programmer:
+			-Qais Patankar
+
+			Resources / Libraries:
+			-Love2d (love2d.org)
+			-Box2D (box2d.org)
+			-TEsound (by Taehl)
+			-AnAL (by bartbes)
+			-32Log (by ishkabible)
+			-cron (by kikito)
+			-tween (by kikito)
+			-lovemenu (by josefnpat)
+		]],
+		{t="Return",cb="mm"}
+	}
+	menu:load(menu_view)
+	videomodes = love.graphics.getModes()
+	currentmode = 1
 	
 	if GAMESTATE == "MENU" then
 		TEsound.stop("music")
@@ -470,10 +511,9 @@ end
 function love.update(dt)
 	time = time+dt
 	dt = dt * slowmo.time.t
-	if GAMESTATE == "OPTIONS" then
-		loveframes.update(dt)
+	if GAMESTATE == "MENU" then
+		menu:update(dt)
 	end
-	MENU_UPDATE(dt)
 	INGAME_UPDATE(dt)
 	if GAMESTATE == "EDITOR" then
 		local nIntensity = 0.25
@@ -495,14 +535,10 @@ function love.draw()
 	if GAMESTATE == "EDITOR" then
 		Editor.draw()
 	end
-	MENU_DRAW()	
-	INGAME_DRAW()	
-	if GAMESTATE == "OPTIONS" then
-		loveframes.draw()
+	if GAMESTATE == "MENU" then
+		menu:draw()
 	end
-	if GAMESTATE=="MENU" or GAMESTATE=="OPTIONS" then
-		menuCursor()
-	end
+	INGAME_DRAW()
 	drawVignette()
 end
 
@@ -813,33 +849,6 @@ function INGAME_DRAW()
 	end
 end
 
-function MENU_UPDATE(dt)
-	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
-		tweenTitleY(dt)
-		ball_menu_anim:update(dt)
-		if GAMESTATE == "MENU" then
-			button_check()
-		end
-	end
-end
-
-function MENU_DRAW()
-	if GAMESTATE == "MENU" or GAMESTATE == "OPTIONS" then
-		love.graphics.setColor(255,255,255,gameAlpha)
-		ball_menu_anim:draw(screenWidth / 2 - 96, 170)
-
-		love.graphics.setFont(e)
-		love.graphics.setColor(10,10,10,gameAlpha)
-		love.graphics.printf("Little Sticky Destroyer",2, titleY+2, screenWidth, "center")
-		love.graphics.setColor(217,177,102,gameAlpha)
-		love.graphics.printf("Little Sticky Destroyer",0, titleY, screenWidth, "center")
-		
-		if GAMESTATE == "MENU" then
-			button_draw()
-		end
-	end	
-end
-
 -- loading main.lua again is: unresourceful (many resources, unless lua garbage collects it..)
 function continue()
 	con_level = love.filesystem.read("save.lua")
@@ -919,4 +928,42 @@ function getTrajectoryPoint(startingPosition, startingVelocity, n , m)
 	local stepGravity = Vector:new(t * t * gravityX, t * t * gravityY)-- m/s/s
 
 	return Vector:new(startingPosition.x + n * stepVelocity.x + 0.5 * (n*n+n) * stepGravity.x, startingPosition.y + n * stepVelocity.y + 0.5 * (n*n+n) * stepGravity.y)
+end
+
+sound = true
+function menu:callback(cb)
+  if cb == "ng" then
+   newGame()
+  elseif cb == "cont" then  
+  continue()
+  elseif cb == "op" then
+    menu:setstate(2)
+	elseif cb == "lvledit" then
+	Editor.load()
+  elseif cb == "cr" then
+    menu:setstate(4)
+  elseif cb == "exit" then
+    menu:setstate(3)
+  elseif cb == "cexit" then
+    love.event.push("quit")
+  elseif cb == "fs" then
+    love.graphics.toggleFullscreen()
+  elseif cb == "res" then
+    love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
+    menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
+    currentmode = ((currentmode + 1)% #videomodes)
+  elseif cb == "sound" then
+    sound = not sound
+    local temp_x = ""
+    if sound then
+      temp_s = "on"
+    else
+      temp_s = "off"
+    end
+    menu_view[2][3].t = "Sound ("..temp_s..")"
+  elseif cb == "mm" then
+    menu:setstate(1)
+  else
+    print("unknown command:"..cb)
+  end
 end

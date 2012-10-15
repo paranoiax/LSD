@@ -14,6 +14,10 @@ end
 	maps = love.filesystem.enumerate('maps')
 	maps = #maps
 	object = {}
+	minX = 0
+	minY = 0
+	maxX = 0
+	maxY = 0
 	currentObject = "wall"	
 	walls = {}
 	player = {}
@@ -128,7 +132,7 @@ end
 
 function Editor.unload() -- unloads all hooks and returns to menu
 	camera.x = 0
-	camera.y = 0
+	camera.y = 0	
 	sensors = {}
 	walls = {}
 	object = {}
@@ -136,9 +140,22 @@ function Editor.unload() -- unloads all hooks and returns to menu
 	RectangleEditor2 = {}
 	playerX, playerY = 0,0
 	player.isSet = false
+	Editor.speed = 4
+	maps = love.filesystem.enumerate('maps')
+	maps = #maps
+	minX = 0
+	minY = 0
+	maxX = 0
+	maxY = 0
+	currentObject = "wall"
+	player = {}
+	gui = {
+		w  = 50,
+		h  = 50
+	}
 	GAMESTATE = "MENU"
 	love.filesystem.load("main.lua")()
-	love.load()
+	love.load()	
 end
 
 function generateCode() --If this code works, it was written by Kai. If not, I don't know who wrote it.
