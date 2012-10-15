@@ -1,12 +1,12 @@
 -- also serves as a utility file
 function love.conf(t)
 
-	t.screen.width = 0
-	t.screen.height = 0
+	t.screen.width = 800
+	t.screen.height = 600
 	t.author = "Kai Hossbach (paranoiax)"	
 	t.title = 'LSD - Little Sticky Destroyer'
 	t.screen.vsync = false
-	t.screen.fullscreen= true
+	t.screen.fullscreen= false
 	t.screen.fsaa = 0
 	t.identity = "LSD"
 	t.console = false

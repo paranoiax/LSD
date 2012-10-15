@@ -1,5 +1,7 @@
 function love.mousepressed(x,y,b)
-	loveframes.mousepressed(x, y, b)
+	if GAMESTATE == "MENU" then
+		menu:mousepressed(x,y,button)
+	end
 	if GAMESTATE == "EDITOR" then
 		Editor.mousepressed(x, y, b)
 	end
@@ -12,7 +14,6 @@ function love.mousepressed(x,y,b)
 end
 
 function love.mousereleased(x,y,b)
-	loveframes.mousereleased(x, y, b)
 	if b == "l" and GAMESTATE == "INGAME" then
 		ball_launch(x,y)
 		aiming = false
@@ -20,17 +21,15 @@ function love.mousereleased(x,y,b)
 			objects.ball.sticky = false
 		end				
 	end
-	if b == "l" and GAMESTATE == "MENU" then
-		button_click(x,y)
-	end
 end
 
 function love.keyreleased(key)
-	loveframes.keyreleased(key)
 end
 
 function love.keypressed(key, ...)
-	loveframes.keypressed(key, ...)
+	if GAMESTATE == "MENU" then
+		menu:keypressed(key)
+	end
 	if GAMESTATE == "EDITOR" then
 		Editor.keypressed(key, ...)
 	elseif GAMESTATE == "INGAME" then
@@ -44,10 +43,6 @@ function love.keypressed(key, ...)
 		elseif key == "escape" and testmap then
 			slowmo.time = {t = 1}
 			GAMESTATE = "EDITOR"
-		end
-	elseif GAMESTATE == "MENU" then
-		if key == "escape" then
-			love.event.push("quit")
 		end
 	elseif GAMESTATE == "OPTIONS" and key=="escape" then
 		GAMESTATE = "MENU"
