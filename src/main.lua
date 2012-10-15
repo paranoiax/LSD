@@ -948,6 +948,7 @@ function menu:callback(cb)
     love.event.push("quit")
   elseif cb == "fs" then
     love.graphics.toggleFullscreen()
+	love.load()
   elseif cb == "res" then
     love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
     menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
