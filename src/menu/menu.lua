@@ -38,10 +38,10 @@ function menu:draw()
     love.graphics.print(
       menu.view[menu.state].title,
       (love.graphics.getWidth()*6/10)/2-(menu.font_title:getWidth(menu.view[menu.state].title)/2),
-      love.graphics.getHeight()*0.9-(menu.font_title:getHeight())
+      love.graphics.getHeight()*0.85-(menu.font_title:getHeight())
     )
 	love.graphics.setColor(255,255,255,96+96*math.abs(math.sin(menu.title_fade)))	
-	menu.iconBig_anim:draw(love.graphics:getWidth() / 6, 50)
+	menu.iconBig_anim:draw(love.graphics:getWidth() / 6, 75-50*math.abs(math.sin(menu.title_fade)))
     love.graphics.setColor(0,0,0,192)
     love.graphics.setFont(menu.font_desc)
     love.graphics.printf(
