@@ -46,14 +46,14 @@ function camera:timer(dt)
 	if shake == true then
 		camera.time = camera.time - dt * 4
 	end
-	if camera.time < 1 then
-		camera.time = 3
+	if camera.time < 0 then
+		camera.time = 2
 		shake = false
 	end
 end
 
 function camera.shake()
-	if camera.time > 1 and shake == true then
+	if camera.time > 0 and shake == true then
 		love.graphics.translate(math.random(15*2)-15, math.random(15*2)-15)
 	end
 end
