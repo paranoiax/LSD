@@ -70,7 +70,7 @@ function endCallback(fixture1, fixture2, contact)
 			explodeBall = false
 			explosionTime = 1
 			tween.resetAll()
-			cron.reset()			
+			cron.reset()
 		end
 	end
 
@@ -160,6 +160,7 @@ function love.load()
 	RedTiles:setWrap("repeat","repeat")	
 	RedTilesW, RedTilesH = RedTiles:getWidth(), GreyTiles:getHeight()
 
+	timeOut = false
 	collX = 0
 	collY = 0
 	explosionWidth = 0
@@ -169,7 +170,7 @@ function love.load()
 	explode = false
 	death = false
 	shake = false
-	camera.time = 3
+	camera.time = 2
 	camera.layers = {}
 
 	-- LEVEL --
@@ -686,9 +687,10 @@ function explosionTimer(dt)
 		objects.ball.sticky = true
 		objects.ball.isAlive = false
 		objects.ball.canJump = false
-		death = true
+		death = true		
 		explodeBall = false
 		gameOver = true
+		timeOut = true
 		explosionTime = 0
 	end
 	if GAMESTATE == "INGAME" then
@@ -798,12 +800,18 @@ function INGAME_UPDATE(dt2)
 				end
 			end
 			if options.graphics.particleEffects == true then
-				addDeathParticle()
-				for i,v in ipairs(DeathParticle) do
-					v.body:applyLinearImpulse(VelX / 500, VelY / 500)
+				addDeathParticle()				
+				if timeOut then
+					for i,v in ipairs(DeathParticle) do						
+						v.body:applyLinearImpulse(math.random(-15,15),math.random(-20,10))
+					end
+				else
+					for i,v in ipairs(DeathParticle) do
+						v.body:applyLinearImpulse(VelX / 500, VelY / 500)
+					end
 				end
 			end
-			cron.after(1.25, tweenDeath)			
+			cron.after(1.25, tweenDeath)
 			death = false
 		end
 		
@@ -828,7 +836,7 @@ function INGAME_DRAW()
 			love.graphics.print("Mouse-Ball Distance: "..distanceFrom(objects.ball.body:getX(),objects.ball.body:getY(),love.mouse:getX() + camera.x,love.mouse.getY() + camera.y),15,15)
 			love.graphics.print("Active Bodies: "..world:getBodyCount(),15,35)
 			love.graphics.print("Particles for next Explosion: "..limit,15,55)
-			for q = 1, #Sensor do 
+			for q = 1, #Sensor do
 				if Sensor[q].touching == true then
 					love.graphics.print("Position of next Explosion: "..math.floor(collX + .5)..", "..math.floor(collY + .5),15,115)
 				end
@@ -840,6 +848,7 @@ function INGAME_DRAW()
 			love.graphics.print("Current Level: "..currentLevel,15, 175)
 			love.graphics.print("Current Gamestate: "..GAMESTATE,15, 195)
 			love.graphics.print("Size of next Explosion: "..explosionWidth .. ', ' .. explosionHeight,15, 215)
+			love.graphics.print("Camera Shake: "..tostring(shake) .. ', ' .. camera.time,15, 235)
 		end
 		
 		if not options.cheats.timeOut then
@@ -948,6 +957,7 @@ function menu:callback(cb)
     love.event.push("quit")
   elseif cb == "fs" then
     love.graphics.toggleFullscreen()
+	love.load()
   elseif cb == "res" then
     love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
     menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
