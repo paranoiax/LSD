@@ -285,6 +285,8 @@ function love.load()
 	if temp_s == "true" then temp_s = "on" else temp_s = "off" end
 	temp_m = tostring(options.audio.music)
 	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
+	temp_inv = tostring(options.controls.inverted)
+	if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
 	
 	menu_view = {}
 	if currentLevel > 1 then
@@ -318,6 +320,7 @@ function love.load()
 		{t="Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")",cb="res"},
 		{t="Sound ("..temp_s..")",cb="sound"},
 		{t="Music ("..temp_m..")",cb="music"},
+		{t="Invert controls ("..temp_inv..")",cb="inverted"},
 		{t="Return",cb="mm"}
 	}
 	menu_view[3] = {
@@ -982,11 +985,17 @@ function menu:callback(cb)
     menu_view[2][3].t = "Sound ("..temp_s..")"
   elseif cb == "music" then
     options.audio.music = not options.audio.music
-	if options.audio.music then TEsound.resume("music") else TEsound.pause("music") end
+	if options.audio.music then TEsound.playLooping("sounds/music.mp3", "music", nil, 0.65) else TEsound.stop("music") end
 	temp_m = tostring(options.audio.music)
 	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
     menu_view[2][4].t = "Music ("..temp_m..")"
+  elseif cb == "inverted" then
+  options.controls.inverted = not options.controls.inverted
+  temp_inv = tostring(options.controls.inverted)
+  if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
+  menu_view[2][5].t = "Invert controls ("..temp_inv..")"
   elseif cb == "mm" then
+	saveOptions()
     menu:setstate(1)
   else
     print("unknown command:"..cb)
