@@ -46,16 +46,22 @@ function beginCallback(fixture1, fixture2, contact)
 	for i,v in ipairs(Sensor) do
 		if checkValues(fixture1, fixture2, v.fixture) then
 			if checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
-			v.touching = true
-			collX = v.body:getX()
-			collY = v.body:getY()
-			explosionWidth = v.width
-			explosionHeight = v.height
-			limit = ((v.width + v.height) / 2)
-			if limit < 20 then
-				limit = 20
-			elseif limit > 85 then
-				limit = 85 end
+				v.touching = true
+				collX = v.body:getX()
+				collY = v.body:getY()
+				explosionWidth = v.width
+				explosionHeight = v.height
+				limit = ((v.width + v.height) / 2)
+				if limit < 20 then
+					limit = 20
+				elseif limit > 85 then
+					limit = 85 
+				end
+				if SensorsDestroyed == SensorsCount -1 then
+					v.isDestroyed = true
+					explode = true
+					shake = true
+				end
 			end
 		end
 	end
@@ -79,7 +85,7 @@ function endCallback(fixture1, fixture2, contact)
 			if checkValues(fixture1:getUserData(), fixture2:getUserData(), "ball") then
 				v.touching = false
 				--v.fixture:destroy()
-				v.isDestroyed = true				
+				v.isDestroyed = true
 				explode = true
 				shake = true
 				if options.audio.sfx then
