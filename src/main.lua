@@ -280,6 +280,12 @@ function love.load()
 	else
 		menu.run = false
 	end
+	
+	temp_s = tostring(options.audio.sfx)
+	if temp_s == "true" then temp_s = "on" else temp_s = "off" end
+	temp_m = tostring(options.audio.music)
+	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
+	
 	menu_view = {}
 	if currentLevel > 1 then
 	menu_view[1] = {
@@ -310,7 +316,8 @@ function love.load()
 		desc="Set your options here.",
 		{t="Fullscreen",cb="fs"},
 		{t="Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")",cb="res"},
-		{t="Sound (on)",cb="sound"},
+		{t="Sound ("..temp_s..")",cb="sound"},
+		{t="Music ("..temp_m..")",cb="music"},
 		{t="Return",cb="mm"}
 	}
 	menu_view[3] = {
@@ -945,7 +952,6 @@ function getTrajectoryPoint(startingPosition, startingVelocity, n , m)
 	return Vector:new(startingPosition.x + n * stepVelocity.x + 0.5 * (n*n+n) * stepGravity.x, startingPosition.y + n * stepVelocity.y + 0.5 * (n*n+n) * stepGravity.y)
 end
 
-sound = true
 function menu:callback(cb)
   if cb == "ng" then
    newGame()
@@ -970,14 +976,16 @@ function menu:callback(cb)
     currentmode = ((currentmode)% #videomodes) +1
 	love.load()
   elseif cb == "sound" then
-    sound = not sound
-    local temp_x = ""
-    if sound then
-      temp_s = "on"
-    else
-      temp_s = "off"
-    end
+    options.audio.sfx = not options.audio.sfx	    
+	temp_s = tostring(options.audio.sfx)
+	if temp_s == "true" then temp_s = "on" else temp_s = "off" end
     menu_view[2][3].t = "Sound ("..temp_s..")"
+  elseif cb == "music" then
+    options.audio.music = not options.audio.music
+	if options.audio.music then TEsound.resume("music") else TEsound.pause("music") end
+	temp_m = tostring(options.audio.music)
+	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
+    menu_view[2][4].t = "Music ("..temp_m..")"
   elseif cb == "mm" then
     menu:setstate(1)
   else

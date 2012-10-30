@@ -1,11 +1,3 @@
-function generateWhitespace(n)
-	local w = ' '
-	for i=2, n do
-		w = w .. " "
-	end
-	return w
-end
-
 options = {
 	graphics = {},
 	audio = {},
