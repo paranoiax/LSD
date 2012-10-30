@@ -297,6 +297,10 @@ function love.load()
 	if temp_blur == "true" then temp_blur = "enabled" else temp_blur = "disabled" end
 	temp_vignette = tostring(options.graphics.vignette)
 	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
+	temp_god = tostring(options.cheats.SensorsAreFtw)
+	if temp_god == "true" then temp_god = "enabled" else temp_god = "disabled" end
+	temp_color = tostring(options.cheats.colorfulExplosion)
+	if temp_color == "true" then temp_color = "enabled" else temp_color = "disabled" end
 	
 	menu_view = {}
 	if currentLevel > 1 then
@@ -363,6 +367,13 @@ function love.load()
 			-tween (by kikito)
 			-lovemenu (by josefnpat)
 		]],
+		{t="Return",cb="mm"}
+	}
+	menu_view[5] = {
+		title="Cheats",
+		desc="Set your cheats here.",
+		{t="Godmode ("..temp_god..")",cb="god"},
+		{t="Colorful explosions ("..temp_color..")",cb="color"},
 		{t="Return",cb="mm"}
 	}
 	menu:load(menu_view)
@@ -712,7 +723,12 @@ function explosionTimer(dt)
 		multiplier = 1
 	end
 	if explodeBall == true and SensorsDestroyed > 0 then
-		explosionTime =  explosionTime - dt * multiplier
+		if (not options.cheats.timeout) or (not options.cheats.SensorsAreFtw) then
+			explosionTime =  explosionTime - dt * multiplier
+		end
+		if options.cheats.timeOut then
+			explosionTime = 1
+		end
 	end
 	if (explosionTime < 0) and (not options.cheats.timeOut) then
 		objects.ball.sticky = true
@@ -724,7 +740,7 @@ function explosionTimer(dt)
 		timeOut = true
 		explosionTime = 0
 	end
-	if GAMESTATE == "INGAME" then
+	if GAMESTATE == "INGAME" then		
 		if objects.ball.isAlive then
 			local nIntensity = 0.25 / explosionTime
 			if nIntensity >= 0.65 then nIntensity = 0.65 end
@@ -977,8 +993,10 @@ function menu:callback(cb)
   continue()
   elseif cb == "op" then
     menu:setstate(2)
-	elseif cb == "lvledit" then
+  elseif cb == "lvledit" then
 	Editor.load()
+  elseif cb == "cheats" then
+	menu:setstate(5)
   elseif cb == "cr" then
     menu:setstate(4)
   elseif cb == "exit" then
@@ -1034,6 +1052,16 @@ function menu:callback(cb)
 	temp_vignette = tostring(options.graphics.vignette)
 	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
 	menu_view[2][10].t = "Vignette ("..temp_vignette..")"
+  elseif cb == "god" then
+	options.cheats.SensorsAreFtw = not options.cheats.SensorsAreFtw
+	temp_god = tostring(options.cheats.SensorsAreFtw)
+	if temp_god == "true" then temp_god = "enabled" else temp_god = "disabled" end
+	menu_view[5][1].t = "Godmode ("..temp_god..")"  
+  elseif cb == "color" then
+	options.cheats.colorfulExplosion = not options.cheats.colorfulExplosion
+	temp_color = tostring(options.cheats.colorfulExplosion)
+	if temp_color == "true" then temp_color = "enabled" else temp_color = "disabled" end
+	menu_view[5][2].t = "Colorful explosions ("..temp_color..")"
   elseif cb == "mm" then
 	saveOptions()
     menu:setstate(1)
