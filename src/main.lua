@@ -287,6 +287,16 @@ function love.load()
 	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
 	temp_inv = tostring(options.controls.inverted)
 	if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
+	temp_part = tostring(options.graphics.particleEffects)
+	if temp_part == "true" then temp_part = "enabled" else temp_part = "disabled" end
+	temp_shake = tostring(options.graphics.shakeScreen)
+	if temp_shake == "true" then temp_shake = "enabled" else temp_shake = "disabled" end
+	temp_slow = tostring(options.graphics.slowmotion)
+	if temp_slow == "true" then temp_slow = "enabled" else temp_slow = "disabled" end
+	temp_blur = tostring(options.graphics.motionblur)
+	if temp_blur == "true" then temp_blur = "enabled" else temp_blur = "disabled" end
+	temp_vignette = tostring(options.graphics.vignette)
+	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
 	
 	menu_view = {}
 	if currentLevel > 1 then
@@ -309,7 +319,7 @@ function love.load()
 		{t="Map Editor",cb="lvledit"},
 		{t="Options",cb="op"},
 		{t="Cheats",cb="cheats"},
-		{t="Credits",cb="cr"},	
+		{t="Credits",cb="cr"},
 		{t="Exit",cb="exit"}
 	}
 	end
@@ -321,6 +331,11 @@ function love.load()
 		{t="Sound ("..temp_s..")",cb="sound"},
 		{t="Music ("..temp_m..")",cb="music"},
 		{t="Invert controls ("..temp_inv..")",cb="inverted"},
+		{t="Particle effects ("..temp_part..")",cb="particles"},
+		{t="Screen shaking ("..temp_shake..")",cb="shake"},
+		{t="Slow motion ("..temp_slow..")",cb="slow"},
+		{t="Motion blur ("..temp_blur..")",cb="blur"},
+		{t="Vignette ("..temp_vignette..")",cb="vignette"},
 		{t="Return",cb="mm"}
 	}
 	menu_view[3] = {
@@ -990,10 +1005,35 @@ function menu:callback(cb)
 	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
     menu_view[2][4].t = "Music ("..temp_m..")"
   elseif cb == "inverted" then
-  options.controls.inverted = not options.controls.inverted
-  temp_inv = tostring(options.controls.inverted)
-  if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
-  menu_view[2][5].t = "Invert controls ("..temp_inv..")"
+    options.controls.inverted = not options.controls.inverted
+    temp_inv = tostring(options.controls.inverted)
+    if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
+    menu_view[2][5].t = "Invert controls ("..temp_inv..")"
+  elseif cb == "particles" then
+	options.graphics.particleEffects = not options.graphics.particleEffects
+    temp_part = tostring(options.graphics.particleEffects)
+	if temp_part == "true" then temp_part = "enabled" else temp_part = "disabled" end
+	menu_view[2][6].t = "Particle effects ("..temp_part..")"
+  elseif cb == "shake" then
+	options.graphics.shakeScreen = not options.graphics.shakeScreen
+	temp_shake = tostring(options.graphics.shakeScreen)
+	if temp_shake == "true" then temp_shake = "enabled" else temp_shake = "disabled" end
+	menu_view[2][7].t = "Screen shaking ("..temp_shake..")"
+  elseif cb == "slow" then
+	options.graphics.slowmotion = not options.graphics.slowmotion
+	temp_slow = tostring(options.graphics.slowmotion)
+	if temp_slow == "true" then temp_slow = "enabled" else temp_slow = "disabled" end  
+	menu_view[2][8].t = "Slow motion ("..temp_slow..")"
+  elseif cb == "blur" then
+	options.graphics.motionblur = not options.graphics.motionblur
+	temp_blur = tostring(options.graphics.motionblur)
+	if temp_blur == "true" then temp_blur = "enabled" else temp_blur = "disabled" end
+	menu_view[2][9].t = "Motion blur ("..temp_blur..")"
+  elseif cb == "vignette" then
+	options.graphics.vignette = not options.graphics.vignette
+	temp_vignette = tostring(options.graphics.vignette)
+	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
+	menu_view[2][10].t = "Vignette ("..temp_vignette..")"
   elseif cb == "mm" then
 	saveOptions()
     menu:setstate(1)
