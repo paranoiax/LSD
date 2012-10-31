@@ -38,5 +38,5 @@ vec4 effect(vec4 color, Image tex, vec2 tc, vec2 pc)
 	
 }]]
 
-pixeleffect:send("sIntensity", 0.025)
+pixeleffect:send("nIntensity", 0.025)
 pixeleffect:send("sCount", 512)
