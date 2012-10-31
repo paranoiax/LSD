@@ -297,6 +297,8 @@ function love.load()
 	if temp_blur == "true" then temp_blur = "enabled" else temp_blur = "disabled" end
 	temp_vignette = tostring(options.graphics.vignette)
 	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
+	temp_grain = tostring(options.graphics.shader)
+	if temp_grain == "true" then temp_grain = "enabled" else temp_grain = "disabled" end
 	temp_god = tostring(options.cheats.SensorsAreFtw)
 	if temp_god == "true" then temp_god = "enabled" else temp_god = "disabled" end
 	temp_color = tostring(options.cheats.colorfulExplosion)
@@ -340,6 +342,7 @@ function love.load()
 		{t="Slow motion ("..temp_slow..")",cb="slow"},
 		{t="Motion blur ("..temp_blur..")",cb="blur"},
 		{t="Vignette ("..temp_vignette..")",cb="vignette"},
+		{t="Film grain ("..temp_grain..")",cb="grain"},
 		{t="Return",cb="mm"}
 	}
 	menu_view[3] = {
@@ -393,7 +396,9 @@ function love.load()
 		canvas:clear()
 	end
 	blur = false
-	pixeleffect:send("nIntensity", 0.25)    
+	if options.graphics.shader then
+		pixeleffect:send("nIntensity", 0.25)
+	end
 	
 	local currentParallax1
 	local Parallax1 = {}
@@ -474,7 +479,7 @@ function love.load()
 		
 		if objects.ball.isAlive then
 			love.graphics.setColor(255,255,255,gameAlpha)
-			if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
+			if pixelEffectSupported and options.graphics.shader then love.graphics.setPixelEffect(pixeleffect) end
 				if objects.ball.canJump then
 					objects.ball.anim:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
 				else
@@ -485,7 +490,7 @@ function love.load()
 						objects.ball.animFall:draw(objects.ball.body:getX() - objects.ball.shape:getRadius(), objects.ball.body:getY() - objects.ball.shape:getRadius())
 					end
 				end
-			if pixelEffectSupported then love.graphics.setPixelEffect() end
+			if pixelEffectSupported and options.graphics.shader then love.graphics.setPixelEffect() end
 		end
 	   
 		if debugmode then
@@ -559,8 +564,10 @@ function love.update(dt)
 	end
 	INGAME_UPDATE(dt)
 	if GAMESTATE == "EDITOR" then
-		local nIntensity = 0.25
-		pixeleffect:send("nIntensity", nIntensity)
+		if options.graphics.shader then
+			local nIntensity = 0.25
+			pixeleffect:send("nIntensity", nIntensity)
+		end
 		Editor.update(dt)
 	end
 	tween.update(dt)
@@ -568,13 +575,15 @@ function love.update(dt)
 end
 
 function love.draw()
-	pixeleffect:send("time",time)
+	if options.graphics.shader then
+		pixeleffect:send("time",time)
+	end
 	love.graphics.setBackgroundColor(255,255,255)
 	love.graphics.setColor(255,255,255,gameAlpha)
 	love.graphics.setBlendMode("alpha")	
-	if pixelEffectSupported then love.graphics.setPixelEffect(pixeleffect) end
+	if pixelEffectSupported and options.graphics.shader then love.graphics.setPixelEffect(pixeleffect) end
 	love.graphics.draw(bg,0,0,0,scaleX,scaleY)
-	if pixelEffectSupported then love.graphics.setPixelEffect() end
+	if pixelEffectSupported and options.graphics.shader then love.graphics.setPixelEffect() end
 	if GAMESTATE == "EDITOR" then
 		Editor.draw()
 	end
@@ -740,7 +749,7 @@ function explosionTimer(dt)
 		timeOut = true
 		explosionTime = 0
 	end
-	if GAMESTATE == "INGAME" then		
+	if GAMESTATE == "INGAME"  and options.graphics.shader then
 		if objects.ball.isAlive then
 			local nIntensity = 0.25 / explosionTime
 			if nIntensity >= 0.65 then nIntensity = 0.65 end
@@ -754,8 +763,10 @@ end
 
 function outOfBounds()
 	if objects.ball.body:getX() < map.minX -250 or objects.ball.body:getX() > map.maxX + 250 or objects.ball.body:getY() > map.maxY + 250 then
-	local nIntensity = 0.65
-	pixeleffect:send("nIntensity", nIntensity)
+		if options.graphics.shader then
+			local nIntensity = 0.65
+			pixeleffect:send("nIntensity", nIntensity)
+		end
 		if not win then
 			gameOver = true
 		end
@@ -1003,13 +1014,15 @@ function menu:callback(cb)
     menu:setstate(3)
   elseif cb == "cexit" then
     love.event.push("quit")
-  elseif cb == "fs" then
+  elseif cb == "fs" then	
     love.graphics.toggleFullscreen()
+	saveOptions()
 	love.load()
   elseif cb == "res" then
     love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
     menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
     currentmode = ((currentmode)% #videomodes) +1
+	saveOptions()
 	love.load()
   elseif cb == "sound" then
     options.audio.sfx = not options.audio.sfx	    
@@ -1052,6 +1065,11 @@ function menu:callback(cb)
 	temp_vignette = tostring(options.graphics.vignette)
 	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
 	menu_view[2][10].t = "Vignette ("..temp_vignette..")"
+  elseif cb == "grain" then
+	options.graphics.shader = not options.graphics.shader
+	temp_grain = tostring(options.graphics.shader)
+	if temp_grain == "true" then temp_grain = "enabled" else temp_grain = "disabled" end
+	menu_view[2][11].t = "Film grain ("..temp_grain..")"
   elseif cb == "god" then
 	options.cheats.SensorsAreFtw = not options.cheats.SensorsAreFtw
 	temp_god = tostring(options.cheats.SensorsAreFtw)
