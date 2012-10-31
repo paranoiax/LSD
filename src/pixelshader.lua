@@ -2,6 +2,9 @@ time = 0
 
 pixelEffectSupported = love.graphics.isSupported("pixeleffect")
 
+if not pixelEffectSupported then
+	options.graphics.shader = false
+end
 pixeleffect = love.graphics.newPixelEffect[[
 extern number time;
 

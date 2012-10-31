@@ -54,7 +54,7 @@ end
 
 function camera.shake()
 	if camera.time > 0 and shake == true then
-		love.graphics.translate(math.random(15*2)-15, math.random(15*2)-15)
+		love.graphics.translate(math.random(20*2)-20, math.random(20*2)-20)
 	end
 end
 
