@@ -311,6 +311,7 @@ function love.load()
 		desc="",
 		{t="Continue",cb="cont"},
 		{t="New Game",cb="ng"},
+		{t="Intructions",cb="inst"},
 		{t="Map Editor",cb="lvledit"},
 		{t="Options",cb="op"},
 		{t="Cheats",cb="cheats"},
@@ -322,6 +323,7 @@ function love.load()
 		title="Little Sticky\nDestroyer",
 		desc="",
 		{t="New Game",cb="ng"},
+		{t="Intructions",cb="inst"},
 		{t="Map Editor",cb="lvledit"},
 		{t="Options",cb="op"},
 		{t="Cheats",cb="cheats"},
@@ -377,6 +379,25 @@ function love.load()
 		desc="Set your cheats here.",
 		{t="Godmode ("..temp_god..")",cb="god"},
 		{t="Colorful explosions ("..temp_color..")",cb="color"},
+		{t="Return",cb="mm"}
+	}
+	menu_view[6] = {
+		title="Instructions",
+		desc=[[
+			The goal of the game is to destroy all grey platforms.
+			Avoid these evil, nasty, red Walls at all costs! - they're deadly!
+			
+			You can make your little hero jump from one platform to another.
+			Once you leave a platform, it explodes.
+			
+			The more platforms you already destroyed, the faster
+			the timer on the bottom will run out.
+			If it reaches zero, your little hero explodes!
+			
+			You aim by holding the left mouse button.
+			Once you leave it, your little hero will jump
+			to	it's desired location.
+		]],
 		{t="Return",cb="mm"}
 	}
 	menu:load(menu_view)
@@ -1008,6 +1029,8 @@ function menu:callback(cb)
 	Editor.load()
   elseif cb == "cheats" then
 	menu:setstate(5)
+  elseif cb == "inst" then
+	menu:setstate(6)
   elseif cb == "cr" then
     menu:setstate(4)
   elseif cb == "exit" then
