@@ -1,6 +1,5 @@
 menu = {}
 
-menu.font_title = love.graphics.newFont("menu/assets/Orbitron Black.ttf",64)
 menu.font_desc = love.graphics.newFont("menu/assets/League_Gothic-webfont.ttf",22)
 menu.font_menu = love.graphics.newFont("menu/assets/League_Gothic-webfont.ttf",26)
 menu.icon = love.graphics.newImage("images/icon.png")
@@ -33,14 +32,20 @@ function menu:draw()
     orig_r, orig_g, orig_b, orig_a = love.graphics.getColor( )
     love.graphics.setColor(0,0,0,127)
     love.graphics.rectangle("fill",love.graphics.getWidth()*6/10,0,love.graphics.getWidth()*3/10,love.graphics.getHeight())
-    love.graphics.setColor(0,0,0,96+96*math.abs(math.sin(menu.title_fade)))	
-    love.graphics.setFont(menu.font_title)
+    love.graphics.setColor(0,0,0,126+126*math.abs(math.sin(menu.title_fade)))	
+    love.graphics.setFont(e)
     love.graphics.print(
       menu.view[menu.state].title,
-      (love.graphics.getWidth()*6/10)/2-(menu.font_title:getWidth(menu.view[menu.state].title)/2),
-      love.graphics.getHeight()*0.85-(menu.font_title:getHeight())
+      (love.graphics.getWidth()*6/10)/2-(e:getWidth(menu.view[menu.state].title)/2)+2,
+      love.graphics.getHeight()*0.85-(e:getHeight())+2
     )
-	love.graphics.setColor(255,255,255,96+96*math.abs(math.sin(menu.title_fade)))	
+	love.graphics.setColor(217,177,102,126+126*math.abs(math.sin(menu.title_fade)))	
+	love.graphics.print(
+      menu.view[menu.state].title,
+      (love.graphics.getWidth()*6/10)/2-(e:getWidth(menu.view[menu.state].title)/2),
+      love.graphics.getHeight()*0.85-(e:getHeight())
+    )
+	love.graphics.setColor(255,255,255,255)	
 	menu.iconBig_anim:draw(love.graphics:getWidth() / 6, 75-50*math.abs(math.sin(menu.title_fade)))
     love.graphics.setColor(0,0,0,192)
     love.graphics.setFont(menu.font_desc)
