@@ -365,6 +365,7 @@ function love.load()
 			Resources / Libraries:
 			-Love2d (love2d.org)
 			-Box2D (box2d.org)
+			-Bfxr (bfxr.net)
 			-TEsound (by Taehl)
 			-AnAL (by bartbes)
 			-32Log (by ishkabible)
