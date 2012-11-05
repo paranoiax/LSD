@@ -1027,9 +1027,17 @@ function menu:callback(cb)
 	elseif cb == "op" then
 		menu:setstate(2)
 	elseif cb == "lvledit" then
-		Editor.load()
+		if not demo then
+			Editor.load()
+		else
+			menu.view[1].desc = "Map Editor not available in Demo!"
+		end
 	elseif cb == "cheats" then
-		menu:setstate(5)
+		if not demo then
+			menu:setstate(5)
+		else
+			menu.view[1].desc = "Cheats not available in Demo!"
+		end
 	elseif cb == "inst" then
 		menu:setstate(6)
 	elseif cb == "cr" then
