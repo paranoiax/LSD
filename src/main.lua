@@ -108,7 +108,7 @@ end
 motionFrames = 10 -- number of frames to store for motion; must be at least 1 (the current frame)
 alphaMultiplier = 100-- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
 
-function love.load()
+function love.load()	
 
 	love.mouse.setVisible(false)
 	
@@ -1020,94 +1020,94 @@ function getTrajectoryPoint(startingPosition, startingVelocity, n , m)
 end
 
 function menu:callback(cb)
-  if cb == "ng" then
-   newGame()
-  elseif cb == "cont" then  
-  continue()
-  elseif cb == "op" then
-    menu:setstate(2)
-  elseif cb == "lvledit" then
-	Editor.load()
-  elseif cb == "cheats" then
-	menu:setstate(5)
-  elseif cb == "inst" then
-	menu:setstate(6)
-  elseif cb == "cr" then
-    menu:setstate(4)
-  elseif cb == "exit" then
-    menu:setstate(3)
-  elseif cb == "cexit" then
-    love.event.push("quit")
-  elseif cb == "fs" then	
-    love.graphics.toggleFullscreen()
-	saveOptions()
-	love.load()
-  elseif cb == "res" then
-    love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
-    menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
-    currentmode = ((currentmode)% #videomodes) +1
-	saveOptions()
-	love.load()
-  elseif cb == "sound" then
-    options.audio.sfx = not options.audio.sfx	    
-	temp_s = tostring(options.audio.sfx)
-	if temp_s == "true" then temp_s = "on" else temp_s = "off" end
-    menu_view[2][3].t = "Sound ("..temp_s..")"
-  elseif cb == "music" then
-    options.audio.music = not options.audio.music
-	if options.audio.music then TEsound.playLooping("sounds/music.mp3", "music", nil, 0.65) else TEsound.stop("music") end
-	temp_m = tostring(options.audio.music)
-	if temp_m == "true" then temp_m = "on" else temp_m = "off" end
-    menu_view[2][4].t = "Music ("..temp_m..")"
-  elseif cb == "inverted" then
-    options.controls.inverted = not options.controls.inverted
-    temp_inv = tostring(options.controls.inverted)
-    if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
-    menu_view[2][5].t = "Invert controls ("..temp_inv..")"
-  elseif cb == "particles" then
-	options.graphics.particleEffects = not options.graphics.particleEffects
-    temp_part = tostring(options.graphics.particleEffects)
-	if temp_part == "true" then temp_part = "enabled" else temp_part = "disabled" end
-	menu_view[2][6].t = "Particle effects ("..temp_part..")"
-  elseif cb == "shake" then
-	options.graphics.shakeScreen = not options.graphics.shakeScreen
-	temp_shake = tostring(options.graphics.shakeScreen)
-	if temp_shake == "true" then temp_shake = "enabled" else temp_shake = "disabled" end
-	menu_view[2][7].t = "Screen shaking ("..temp_shake..")"
-  elseif cb == "slow" then
-	options.graphics.slowmotion = not options.graphics.slowmotion
-	temp_slow = tostring(options.graphics.slowmotion)
-	if temp_slow == "true" then temp_slow = "enabled" else temp_slow = "disabled" end  
-	menu_view[2][8].t = "Slow motion ("..temp_slow..")"
-  elseif cb == "blur" then
-	options.graphics.motionblur = not options.graphics.motionblur
-	temp_blur = tostring(options.graphics.motionblur)
-	if temp_blur == "true" then temp_blur = "enabled" else temp_blur = "disabled" end
-	menu_view[2][9].t = "Motion blur ("..temp_blur..")"
-  elseif cb == "vignette" then
-	options.graphics.vignette = not options.graphics.vignette
-	temp_vignette = tostring(options.graphics.vignette)
-	if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
-	menu_view[2][10].t = "Vignette ("..temp_vignette..")"
-  elseif cb == "grain" then
-	options.graphics.shader = not options.graphics.shader
-	temp_grain = tostring(options.graphics.shader)
-	if temp_grain == "true" then temp_grain = "enabled" else temp_grain = "disabled" end
-	menu_view[2][11].t = "Film grain ("..temp_grain..")"
-  elseif cb == "god" then
-	options.cheats.SensorsAreFtw = not options.cheats.SensorsAreFtw
-	temp_god = tostring(options.cheats.SensorsAreFtw)
-	if temp_god == "true" then temp_god = "enabled" else temp_god = "disabled" end
-	menu_view[5][1].t = "Godmode ("..temp_god..")"  
-  elseif cb == "color" then
-	options.cheats.colorfulExplosion = not options.cheats.colorfulExplosion
-	temp_color = tostring(options.cheats.colorfulExplosion)
-	if temp_color == "true" then temp_color = "enabled" else temp_color = "disabled" end
-	menu_view[5][2].t = "Colorful explosions ("..temp_color..")"
-  elseif cb == "mm" then
-	saveOptions()
-    menu:setstate(1)
-  else
-    print("unknown command:"..cb)
-  end
+	if cb == "ng" then
+		newGame()
+	elseif cb == "cont" then  
+		continue()
+	elseif cb == "op" then
+		menu:setstate(2)
+	elseif cb == "lvledit" then
+		Editor.load()
+	elseif cb == "cheats" then
+		menu:setstate(5)
+	elseif cb == "inst" then
+		menu:setstate(6)
+	elseif cb == "cr" then
+		menu:setstate(4)
+	elseif cb == "exit" then
+		menu:setstate(3)
+	elseif cb == "cexit" then
+		love.event.push("quit")
+	elseif cb == "fs" then	
+		love.graphics.toggleFullscreen()
+		saveOptions()
+		love.load()
+	elseif cb == "res" then
+		love.graphics.setMode( videomodes[currentmode].width, videomodes[currentmode].height )
+		menu_view[2][2].t = "Resolution ("..love.graphics.getWidth().."x"..love.graphics.getHeight()..")"
+		currentmode = ((currentmode)% #videomodes) +1
+		saveOptions()
+		love.load()
+	elseif cb == "sound" then
+		options.audio.sfx = not options.audio.sfx	    
+		temp_s = tostring(options.audio.sfx)
+		if temp_s == "true" then temp_s = "on" else temp_s = "off" end
+		menu_view[2][3].t = "Sound ("..temp_s..")"
+	elseif cb == "music" then
+		options.audio.music = not options.audio.music
+		if options.audio.music then TEsound.playLooping("sounds/music.mp3", "music", nil, 0.65) else TEsound.stop("music") end
+		temp_m = tostring(options.audio.music)
+		if temp_m == "true" then temp_m = "on" else temp_m = "off" end
+		menu_view[2][4].t = "Music ("..temp_m..")"
+	elseif cb == "inverted" then
+		options.controls.inverted = not options.controls.inverted
+		temp_inv = tostring(options.controls.inverted)
+		if temp_inv == "true" then temp_inv = "yes" else temp_inv = "no" end
+		menu_view[2][5].t = "Invert controls ("..temp_inv..")"
+	elseif cb == "particles" then
+		options.graphics.particleEffects = not options.graphics.particleEffects
+		temp_part = tostring(options.graphics.particleEffects)
+		if temp_part == "true" then temp_part = "enabled" else temp_part = "disabled" end
+		menu_view[2][6].t = "Particle effects ("..temp_part..")"
+	elseif cb == "shake" then
+		options.graphics.shakeScreen = not options.graphics.shakeScreen
+		temp_shake = tostring(options.graphics.shakeScreen)
+		if temp_shake == "true" then temp_shake = "enabled" else temp_shake = "disabled" end
+		menu_view[2][7].t = "Screen shaking ("..temp_shake..")"
+	elseif cb == "slow" then
+		options.graphics.slowmotion = not options.graphics.slowmotion
+		temp_slow = tostring(options.graphics.slowmotion)
+		if temp_slow == "true" then temp_slow = "enabled" else temp_slow = "disabled" end  
+		menu_view[2][8].t = "Slow motion ("..temp_slow..")"
+	elseif cb == "blur" then
+		options.graphics.motionblur = not options.graphics.motionblur
+		temp_blur = tostring(options.graphics.motionblur)
+		if temp_blur == "true" then temp_blur = "enabled" else temp_blur = "disabled" end
+		menu_view[2][9].t = "Motion blur ("..temp_blur..")"
+	elseif cb == "vignette" then
+		options.graphics.vignette = not options.graphics.vignette
+		temp_vignette = tostring(options.graphics.vignette)
+		if temp_vignette == "true" then temp_vignette = "enabled" else temp_vignette = "disabled" end
+		menu_view[2][10].t = "Vignette ("..temp_vignette..")"
+	elseif cb == "grain" then
+		options.graphics.shader = not options.graphics.shader
+		temp_grain = tostring(options.graphics.shader)
+		if temp_grain == "true" then temp_grain = "enabled" else temp_grain = "disabled" end
+		menu_view[2][11].t = "Film grain ("..temp_grain..")"
+	elseif cb == "god" then
+		options.cheats.SensorsAreFtw = not options.cheats.SensorsAreFtw
+		temp_god = tostring(options.cheats.SensorsAreFtw)
+		if temp_god == "true" then temp_god = "enabled" else temp_god = "disabled" end
+		menu_view[5][1].t = "Godmode ("..temp_god..")"  
+	elseif cb == "color" then
+		options.cheats.colorfulExplosion = not options.cheats.colorfulExplosion
+		temp_color = tostring(options.cheats.colorfulExplosion)
+		if temp_color == "true" then temp_color = "enabled" else temp_color = "disabled" end
+		menu_view[5][2].t = "Colorful explosions ("..temp_color..")"
+	elseif cb == "mm" then
+		saveOptions()
+		menu:setstate(1)
+	else
+		print("unknown command:"..cb)
+	end
 end

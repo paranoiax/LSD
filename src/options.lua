@@ -64,6 +64,11 @@ function saveOptions()
 	love.filesystem.write("settings.lua", set)
 end
 
+local savedMode = {ResX,ResY,ResFull,false,0}
+if love.graphics.getMode ~= savedMode then
+	love.graphics.setMode(ResX,ResY,ResFull,false,0)
+end
+
 local strfrm = string.format
 function string.format(...)
 	local args = {...}
