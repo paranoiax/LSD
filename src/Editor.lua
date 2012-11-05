@@ -3,7 +3,8 @@ collision = require 'collision'
 
 function Editor.load()	
 	GAMESTATE = "EDITOR"
-	love.filesystem.load("main.lua")()
+	collectgarbage()
+	love.load("main.lua")
 	love.load()
 	if not love.filesystem.exists('maps') then
 		love.filesystem.mkdir('maps')
