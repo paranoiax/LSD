@@ -108,8 +108,9 @@ end
 motionFrames = 10 -- number of frames to store for motion; must be at least 1 (the current frame)
 alphaMultiplier = 100-- alpha of each motion is determined by: frameNumber * (1 / motionFrames * alphaMultiplier)
 
-function love.load()	
-
+function love.load()
+	
+	collectgarbage()
 	love.mouse.setVisible(false)
 	
 	explodeBall = false
@@ -303,6 +304,8 @@ function love.load()
 	if temp_god == "true" then temp_god = "enabled" else temp_god = "disabled" end
 	temp_color = tostring(options.cheats.colorfulExplosion)
 	if temp_color == "true" then temp_color = "enabled" else temp_color = "disabled" end
+	temp_parallax = tostring(options.graphics.parallax)
+	if temp_parallax == "true" then temp_parallax = "enabled" else temp_parallax = "disabled" end
 	
 	menu_view = {}
 	if currentLevel > 1 then
@@ -345,6 +348,7 @@ function love.load()
 		{t="Motion blur ("..temp_blur..")",cb="blur"},
 		{t="Vignette ("..temp_vignette..")",cb="vignette"},
 		{t="Film grain ("..temp_grain..")",cb="grain"},
+		{t="Parallax scrolling ("..temp_parallax..")",cb="parallax"},
 		{t="Return",cb="mm"}
 	}
 	menu_view[3] = {
@@ -422,57 +426,59 @@ function love.load()
 		pixeleffect:send("nIntensity", 0.25)
 	end
 	
-	local currentParallax1
-	local Parallax1 = {}
-	local currentParallax2
-	local Parallax2 = {}
-	local currentParallax3
-	local Parallax3 = {}
-	
-	for currentParallax1 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
-		Parallax1[currentParallax1] = {}
-		Parallax1[currentParallax1].size = math.random(6,18)
-		Parallax1[currentParallax1].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
-		Parallax1[currentParallax1].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
-	end
-	
-	for currentParallax2 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
-		Parallax2[currentParallax2] = {}
-		Parallax2[currentParallax2].size = math.random(6,18)
-		Parallax2[currentParallax2].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
-		Parallax2[currentParallax2].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
-	end
-	
-	for currentParallax3 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
-		Parallax3[currentParallax3] = {}
-		Parallax3[currentParallax3].size = math.random(6,18)
-		Parallax3[currentParallax3].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
-		Parallax3[currentParallax3].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
-	end
-	
-    camera:newLayer(0.75, function()
-		for i,v in ipairs(Parallax1) do
-			love.graphics.setColor(255,255,255,150)
-			love.graphics.rectangle("fill",v.x,v.y,v.size,v.size)
-			love.graphics.setColor(255,255,255)
+	if options.graphics.parallax then
+		local currentParallax1
+		local Parallax1 = {}
+		local currentParallax2
+		local Parallax2 = {}
+		local currentParallax3
+		local Parallax3 = {}
+		
+		for currentParallax1 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
+			Parallax1[currentParallax1] = {}
+			Parallax1[currentParallax1].size = math.random(6,18)
+			Parallax1[currentParallax1].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
+			Parallax1[currentParallax1].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
 		end
-    end)
-	
-	camera:newLayer(0.45, function()
-		for i,v in ipairs(Parallax2) do
-			love.graphics.setColor(255,255,255,100)
-			love.graphics.rectangle("fill",v.x,v.y,v.size*2,v.size*2)
-			love.graphics.setColor(255,255,255)
+		
+		for currentParallax2 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
+			Parallax2[currentParallax2] = {}
+			Parallax2[currentParallax2].size = math.random(6,18)
+			Parallax2[currentParallax2].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
+			Parallax2[currentParallax2].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
 		end
-    end)
-	
-	camera:newLayer(0.2, function()
-		for i,v in ipairs(Parallax3) do
-			love.graphics.setColor(255,255,255,50)
-			love.graphics.rectangle("fill",v.x,v.y,v.size*3,v.size*3)
-			love.graphics.setColor(255,255,255)
+		
+		for currentParallax3 = 1, ((map.minX+map.maxX+map.maxY+map.minY) / 40) do
+			Parallax3[currentParallax3] = {}
+			Parallax3[currentParallax3].size = math.random(6,18)
+			Parallax3[currentParallax3].x = math.random(map.minX-map.minX,map.maxX+map.maxX)
+			Parallax3[currentParallax3].y = math.random(map.minY-map.minY,map.maxY+map.maxY)
 		end
-    end)
+		
+		camera:newLayer(0.75, function()
+			for i,v in ipairs(Parallax1) do
+				love.graphics.setColor(255,255,255,150)
+				love.graphics.rectangle("fill",v.x,v.y,v.size,v.size)
+				love.graphics.setColor(255,255,255)
+			end
+		end)
+		
+		camera:newLayer(0.45, function()
+			for i,v in ipairs(Parallax2) do
+				love.graphics.setColor(255,255,255,100)
+				love.graphics.rectangle("fill",v.x,v.y,v.size*2,v.size*2)
+				love.graphics.setColor(255,255,255)
+			end
+		end)
+		
+		camera:newLayer(0.2, function()
+			for i,v in ipairs(Parallax3) do
+				love.graphics.setColor(255,255,255,50)
+				love.graphics.rectangle("fill",v.x,v.y,v.size*3,v.size*3)
+				love.graphics.setColor(255,255,255)
+			end
+		end)
+	end
 	
 	camera:newLayer(1, function()
 		if options.graphics.shakeScreen then
@@ -1102,6 +1108,11 @@ function menu:callback(cb)
 		temp_grain = tostring(options.graphics.shader)
 		if temp_grain == "true" then temp_grain = "enabled" else temp_grain = "disabled" end
 		menu_view[2][11].t = "Film grain ("..temp_grain..")"
+	elseif cb == "parallax" then
+		options.graphics.parallax = not options.graphics.parallax
+		temp_parallax = tostring(options.graphics.parallax)
+		if temp_parallax == "true" then temp_parallax = "enabled" else temp_parallax = "disabled" end
+		menu_view[2][12].t = "Parallax scrolling ("..temp_parallax..")"
 	elseif cb == "god" then
 		options.cheats.SensorsAreFtw = not options.cheats.SensorsAreFtw
 		temp_god = tostring(options.cheats.SensorsAreFtw)
