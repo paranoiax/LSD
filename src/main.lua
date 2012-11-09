@@ -415,9 +415,10 @@ function love.load()
 			TEsound.playLooping("sounds/music.mp3", "music", nil, 0.65) --to lower volume as intended without need for additonal line
 		end
 	end
-	
+	po2Supported = love.graphics.isSupported("npot")
+	subtractiveSupported = love.graphics.isSupported("subtractive")
 	canvasSupported = love.graphics.isSupported("canvas")
-	if canvasSupported then
+	if canvasSupported and subtractiveSupported then
 		canvas = love.graphics.newCanvas()
 		canvas:clear()
 	end
@@ -995,7 +996,7 @@ function slowmoStop()
 end
 
 function drawVignette()
-	if options.graphics.vignette then
+	if options.graphics.vignette and po2Supported then
 		love.graphics.setColor(255,255,255,gameAlpha)
 		love.graphics.setBlendMode("multiplicative")
 		love.graphics.draw(vignetteImg,0,0,0,scaleX,scaleY)
