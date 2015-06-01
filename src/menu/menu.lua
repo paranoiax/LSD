@@ -75,7 +75,7 @@ function menu:draw()
       0,
       menu.icon:getHeight()/2
     )
-    love.graphics.setFont(orig_font)
+    if orig_font then love.graphics.setFont(orig_font) end
     love.graphics.setColor(orig_r,orig_g,orig_b,orig_a)
 	menu:cursor()
   end
